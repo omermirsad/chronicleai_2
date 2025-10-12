@@ -1,371 +1,383 @@
-# Chronicle AI - Deployment Scripts
+# Chronicle AI - Intelligent Journaling Companion
 
-This directory contains scripts to help you deploy and maintain Chronicle AI in production.
+<div align="center">
 
-## Available Scripts
+![Chronicle AI Logo](docs/logo.png)
 
-### 1. `pre-deploy.sh` - Pre-Deployment Check
+**Your intelligent companion for self-reflection and personal growth**
 
-Comprehensive validation before deploying to production.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.2-blue)](https://reactjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)](https://supabase.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Usage:**
-```bash
-chmod +x scripts/pre-deploy.sh
-./scripts/pre-deploy.sh
-```
+[Live Demo](https://chronicle-ai.app) • [Documentation](docs/) • [Report Bug](https://github.com/yourusername/chronicle-ai/issues) • [Request Feature](https://github.com/yourusername/chronicle-ai/issues)
 
-**What it checks:**
-- ✅ Node.js and npm versions
-- ✅ TypeScript type checking
-- ✅ ESLint validation
-- ✅ Code formatting
-- ✅ Environment variables
-- ✅ Security vulnerabilities
-- ✅ Production build
-- ✅ Bundle size
-- ✅ Git status
-- ✅ Sensitive data in code
-- ✅ TODO/FIXME comments
-
-**When to run:** Before every production deployment
+</div>
 
 ---
 
-### 2. `validate-env.ts` - Environment Variable Validation
+## 📖 About Chronicle AI
 
-Validates that all required environment variables are set correctly.
+Chronicle AI is an intelligent journaling application that combines the simplicity of traditional journaling with the power of artificial intelligence. It helps users:
 
-**Usage:**
-```bash
-# For production environment
-NODE_ENV=production npx ts-node scripts/validate-env.ts
-
-# Or use npm script
-npm run validate:env
-```
-
-**What it validates:**
-- `VITE_SUPABASE_URL` - format and accessibility
-- `VITE_SUPABASE_ANON_KEY` - length and format
-- `VITE_APP_URL` - HTTPS protocol
-- Optional variables (Sentry, Analytics, PWA)
-
-**When to run:** 
-- Before first deployment
-- After changing environment variables
-- When debugging configuration issues
+- 📝 **Capture thoughts effortlessly** - Freestyle writing or guided prompts
+- 🤖 **Gain AI-powered insights** - Automated analysis of emotions and patterns
+- 📊 **Track emotional trends** - Visualize mood and energy over time
+- 🔍 **Discover perspectives** - View entries through different lenses
+- 🔒 **Maintain privacy** - End-to-end encrypted and secure
 
 ---
 
-### 3. `verify-database.ts` - Database Schema Verification
+## ✨ Key Features
 
-Verifies your Supabase database schema is correctly set up.
+### 🎯 Core Features
+- **Freestyle Journaling** - Blank canvas for free expression
+- **Guided Sessions** - Structured prompts for gratitude, challenges, weekly reviews, and more
+- **Voice Input** - Speak your thoughts using Web Speech API
+- **Photo Attachments** - Add visual memories to entries
+- **Mood & Energy Tracking** - Monitor emotional well-being
 
-**Usage:**
+### 🤖 AI-Powered Features
+- **Instant Analysis** - Automated summaries, tags, and sentiment detection
+- **Socratic Questions** - Thought-provoking prompts for deeper reflection
+- **Multiple Perspectives** - View entries from objective, compassionate, and future-self viewpoints
+- **Long-term Insights** - Pattern recognition across multiple entries
+- **Emotional Intelligence** - Understanding emotional trends and triggers
+
+### 📅 Organization & Discovery
+- **Calendar View** - Visual timeline of your journaling journey
+- **On This Day** - Rediscover past entries from the same date
+- **Search & Filter** - Find entries by tags, mood, or date
+- **Data Export** - Download all data in JSON, Markdown, or CSV
+
+### 🔐 Privacy & Security
+- **Row-Level Security** - Database-level isolation
+- **Encryption** - Data encrypted in transit and at rest
+- **Private AI Processing** - Your data never trains AI models
+- **GDPR Compliant** - Full data export and deletion rights
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm 9+
+- Supabase account
+- Google Gemini API key
+
+### Installation
+
 ```bash
-# Set environment variables first
-export VITE_SUPABASE_URL="https://xxxxx.supabase.co"
-export SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
+# Clone the repository
+git clone https://github.com/yourusername/chronicle-ai.git
+cd chronicle-ai
 
-# Run verification
-npx ts-node scripts/verify-database.ts
+# Install dependencies
+npm install
 
-# Or use npm script
+# Copy environment template
+cp .env.example .env.local
+
+# Edit .env.local with your credentials
+nano .env.local
+```
+
+### Environment Setup
+
+Required variables in `.env.local`:
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_GEMINI_API_KEY=your-gemini-api-key  # For local dev only
+VITE_APP_URL=http://localhost:5173
+```
+
+### Database Setup
+
+```bash
+# Install Supabase CLI
+npm install -g supabase
+
+# Link to your project
+npx supabase link --project-ref YOUR_PROJECT_REF
+
+# Run migrations
+npx supabase db push
+
+# Verify setup
 npm run verify:db
 ```
 
-**What it checks:**
-- ✅ All required tables exist
-- ✅ Row Level Security (RLS) enabled
-- ✅ Storage buckets configured
-- ✅ Database functions deployed
-- ✅ Edge functions accessible
+### Run Development Server
 
-**When to run:**
-- After running database migrations
-- Before first deployment
-- When debugging database issues
-
----
-
-### 4. `health-check.ts` - Post-Deployment Health Check
-
-Runs comprehensive health checks on your deployed application.
-
-**Usage:**
 ```bash
-# Check production site
-npx ts-node scripts/health-check.ts --url https://yourdomain.com
-
-# Check staging
-npx ts-node scripts/health-check.ts --url https://staging.yourdomain.com
+npm run dev
 ```
 
-**What it checks:**
-- ✅ Main page accessibility
-- ✅ Important routes (terms, privacy, help)
-- ✅ SSL/TLS configuration
-- ✅ Security headers
-- ✅ 404 handling
-- ✅ Performance metrics
-- ✅ Compression enabled
-
-**When to run:**
-- Immediately after deployment
-- After DNS changes
-- During incident response
-- Regular monitoring (daily/weekly)
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## Quick Start Guide
+## 📚 Documentation
 
-### First Time Deployment
-
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-2. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your values
-   ```
-
-3. **Run database migrations**
-   ```bash
-   npm run supabase:db:push
-   ```
-
-4. **Verify database setup**
-   ```bash
-   npm run verify:db
-   ```
-
-5. **Deploy edge functions**
-   ```bash
-   # Set Gemini API key
-   npx supabase secrets set GEMINI_API_KEY=your_key
-   
-   # Deploy functions
-   npm run supabase:functions:deploy
-   ```
-
-6. **Run pre-deployment checks**
-   ```bash
-   ./scripts/pre-deploy.sh
-   ```
-
-7. **Deploy to hosting platform**
-   ```bash
-   npm run deploy:vercel
-   # OR
-   npm run deploy:netlify
-   ```
-
-8. **Run health check**
-   ```bash
-   npx ts-node scripts/health-check.ts --url https://yourdomain.com
-   ```
+- [Deployment Guide](DEPLOYMENT.md) - Complete production deployment instructions
+- [Development Rules](AI_RULES.md) - Tech stack and coding guidelines
+- [Scripts Documentation](scripts/README.md) - Available deployment scripts
+- [API Documentation](docs/api.md) - API endpoints and usage
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
 
 ---
 
-### Regular Deployment
+## 🏗️ Tech Stack
 
-For subsequent deployments after your first successful deploy:
+### Frontend
+- **React 18** - UI framework with hooks and context
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Vite** - Fast build tool and dev server
+- **Recharts** - Data visualization
+
+### Backend & Infrastructure
+- **Supabase** - PostgreSQL database, authentication, and storage
+- **Google Gemini API** - AI-powered analysis and insights
+- **Supabase Edge Functions** - Serverless API layer
+
+### Developer Tools
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+- **Vitest** - Unit testing
+- **TypeScript** - Static type checking
+
+---
+
+## 🗂️ Project Structure
+
+```
+chronicle-ai/
+├── src/
+│   ├── components/          # React components
+│   │   ├── Auth.tsx
+│   │   ├── Header.tsx
+│   │   ├── JournalEditor.tsx
+│   │   ├── JournalFeed.tsx
+│   │   ├── Onboarding.tsx
+│   │   └── ...
+│   ├── pages/              # Page components
+│   │   ├── LandingPage.tsx
+│   │   ├── TermsOfService.tsx
+│   │   ├── PrivacyPolicy.tsx
+│   │   └── HelpCenter.tsx
+│   ├── hooks/              # Custom React hooks
+│   │   ├── useAuth.ts
+│   │   ├── useJournal.ts
+│   │   └── useSpeechRecognition.ts
+│   ├── services/           # API and business logic
+│   │   ├── geminiService.ts
+│   │   └── dataExportService.ts
+│   ├── lib/                # Third-party integrations
+│   │   ├── supabase.ts
+│   │   └── errorMonitoring.ts
+│   ├── utils/              # Utility functions
+│   │   ├── security.ts
+│   │   ├── validation.ts
+│   │   ├── encryption.ts
+│   │   └── performance.ts
+│   ├── config/             # Configuration
+│   │   └── index.ts
+│   ├── types.ts            # TypeScript types
+│   └── App.tsx             # Main app component
+├── supabase/
+│   ├── migrations/         # Database migrations
+│   │   ├── 001_initial_schema.sql
+│   │   └── 002_security_updates.sql
+│   └── functions/          # Edge functions
+│       ├── gemini-proxy/
+│       └── health/
+├── scripts/                # Deployment scripts
+│   ├── pre-deploy.sh
+│   ├── validate-env.ts
+│   ├── verify-database.ts
+│   └── health-check.ts
+├── public/                 # Static assets
+├── docs/                   # Documentation
+├── .env.example           # Environment template
+├── package.json           # Dependencies
+├── tsconfig.json          # TypeScript config
+├── vite.config.ts         # Vite config
+└── README.md              # This file
+```
+
+---
+
+## 🧪 Testing
 
 ```bash
-# 1. Pull latest changes
-git pull origin main
+# Run all tests
+npm test
 
-# 2. Install any new dependencies
-npm install
+# Run tests with UI
+npm run test:ui
 
-# 3. Run pre-deployment checks
+# Run tests with coverage
+npm run test:coverage
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+```
+
+---
+
+## 🚢 Deployment
+
+### Quick Deploy
+
+```bash
+# Run pre-deployment checks
 npm run pre-deploy
 
-# 4. Deploy
-npm run deploy:vercel  # or deploy:netlify
+# Deploy to Vercel
+npm run deploy:vercel
+
+# OR deploy to Netlify
+npm run deploy:netlify
 ```
+
+### Detailed Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for complete production deployment guide.
 
 ---
 
-## Troubleshooting
+## 🔧 Available Scripts
 
-### Pre-Deploy Script Fails
-
-**Issue:** TypeScript errors
-```bash
-# Fix: Run type checking to see details
-npm run type-check
-```
-
-**Issue:** Linting errors
-```bash
-# Fix: Auto-fix linting issues
-npm run lint:fix
-```
-
-**Issue:** Build fails
-```bash
-# Fix: Clear cache and rebuild
-rm -rf node_modules dist
-npm install
-npm run build:prod
-```
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm test` | Run tests |
+| `npm run lint` | Lint code |
+| `npm run lint:fix` | Fix linting issues |
+| `npm run type-check` | Check TypeScript types |
+| `npm run format` | Format code with Prettier |
+| `npm run pre-deploy` | Run all pre-deployment checks |
+| `npm run validate:env` | Validate environment variables |
+| `npm run verify:db` | Verify database setup |
 
 ---
 
-### Database Verification Fails
+## 🛡️ Security
 
-**Issue:** Tables not found
-```bash
-# Fix: Run migrations
-npm run supabase:db:push
-```
+Chronicle AI takes security seriously:
 
-**Issue:** RLS not enabled
-```sql
--- Run in Supabase SQL Editor
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
-```
+- **Data Encryption** - TLS in transit, encryption at rest
+- **Row-Level Security** - Database-level access control
+- **Input Sanitization** - XSS and injection prevention
+- **Rate Limiting** - API abuse prevention
+- **Security Headers** - CSP, HSTS, X-Frame-Options
+- **Audit Logging** - Track all data access
+- **Regular Updates** - Dependencies kept current
 
-**Issue:** Storage bucket missing
-```bash
-# Fix: Create bucket in Supabase Dashboard
-# Storage > Create Bucket > "journal-photos" (public)
-```
+Report security issues to: security@chronicle-ai.app
 
 ---
 
-### Health Check Fails
+## 🤝 Contributing
 
-**Issue:** 404 errors
-```bash
-# Fix: Check SPA routing configuration
-# Vercel: verify vercel.json redirects
-# Netlify: verify netlify.toml redirects
-```
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-**Issue:** Security headers missing
-```bash
-# Fix: Update hosting platform config
-# See vercel.json or netlify.toml examples
-```
+### Development Workflow
 
-**Issue:** SSL errors
-```bash
-# Fix: Wait for SSL provisioning (5-10 minutes)
-# Check hosting platform DNS settings
-```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
----
+### Code Style
 
-## CI/CD Integration
-
-### GitHub Actions Example
-
-```yaml
-name: Deploy to Production
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run pre-deployment checks
-        run: npm run pre-deploy
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
-      
-      - name: Deploy to Vercel
-        run: npm run deploy:vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-```
+- Follow TypeScript strict mode
+- Use Prettier for formatting
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation
 
 ---
 
-## Monitoring Scripts
+## 📊 Roadmap
 
-### Create a monitoring cron job
+### Version 2.0 (Current) ✅
+- [x] AI-powered insights
+- [x] Guided journaling sessions
+- [x] Multiple perspectives
+- [x] Mood and energy tracking
+- [x] Mobile-responsive design
+- [x] Data export (GDPR compliance)
 
-```bash
-# Add to crontab (run health check every hour)
-0 * * * * /usr/local/bin/ts-node /path/to/scripts/health-check.ts --url https://yourdomain.com >> /var/log/chronicle-health.log 2>&1
-```
+### Version 2.1 (Next)
+- [ ] Voice journaling (full audio entries)
+- [ ] Habit tracking integration
+- [ ] Custom AI prompts
+- [ ] Social features (shared journals)
+- [ ] Mobile apps (iOS/Android)
+- [ ] Advanced analytics dashboard
 
-### Send alerts on failure
+### Version 3.0 (Future)
+- [ ] Multi-language support
+- [ ] Therapist collaboration features
+- [ ] Integration with health devices
+- [ ] Community templates
+- [ ] API for third-party integrations
 
-```bash
-#!/bin/bash
-# health-check-with-alerts.sh
-
-if ! npx ts-node scripts/health-check.ts --url https://yourdomain.com; then
-    # Send email alert
-    echo "Health check failed!" | mail -s "Chronicle AI Health Alert" admin@yourdomain.com
-    
-    # Or send Slack notification
-    curl -X POST -H 'Content-type: application/json' \
-      --data '{"text":"Health check failed for Chronicle AI"}' \
-      YOUR_SLACK_WEBHOOK_URL
-fi
-```
-
----
-
-## Best Practices
-
-1. **Always run pre-deploy checks** before pushing to production
-2. **Test in staging first** if you have a staging environment
-3. **Monitor health checks** for the first hour after deployment
-4. **Keep scripts updated** as you add new features
-5. **Document any custom scripts** you add to this directory
-6. **Version control everything** including script changes
-7. **Set up automated health checks** for early problem detection
+See [ROADMAP.md](docs/ROADMAP.md) for detailed plans.
 
 ---
 
-## Getting Help
+## 📝 License
 
-If you encounter issues with these scripts:
-
-1. Check the troubleshooting section above
-2. Review error messages carefully
-3. Check Supabase logs for backend issues
-4. Review hosting platform logs
-5. Contact support: support@chronicle-ai.app
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Contributing
+## 🙏 Acknowledgments
 
-When adding new deployment scripts:
-
-1. Add clear documentation to this README
-2. Include usage examples
-3. Add error handling
-4. Test thoroughly
-5. Update package.json scripts if needed
+- [Google Gemini](https://ai.google.dev/) - AI-powered insights
+- [Supabase](https://supabase.com/) - Backend infrastructure
+- [Vercel](https://vercel.com/) - Hosting platform
+- [Heroicons](https://heroicons.com/) - Icon system
+- [Tailwind CSS](https://tailwindcss.com/) - Styling framework
+- All our amazing contributors!
 
 ---
 
-Last Updated: {{ DATE }}
+## 💬 Support
+
+- **Documentation:** [docs.chronicle-ai.app](https://docs.chronicle-ai.app)
+- **Email:** support@chronicle-ai.app
+- **Discord:** [Join our community](https://discord.gg/chronicle-ai)
+- **Twitter:** [@chronicle_ai](https://twitter.com/chronicle_ai)
+
+---
+
+## 📈 Stats
+
+![GitHub stars](https://img.shields.io/github/stars/yourusername/chronicle-ai?style=social)
+![GitHub forks](https://img.shields.io/github/forks/yourusername/chronicle-ai?style=social)
+![GitHub issues](https://img.shields.io/github/issues/yourusername/chronicle-ai)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/chronicle-ai)
+
+---
+
+<div align="center">
+
+**[Website](https://chronicle-ai.app)** • **[Documentation](docs/)** • **[Blog](https://blog.chronicle-ai.app)**
+
+Made with ❤️ by the Chronicle AI team
+
+</div>

@@ -1,15 +1,12 @@
-// src/Router.tsx
-import React, { FC, lazy, Suspense } from 'react';
+import { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { useAuth } from './hooks/useAuth';
 
-// Lazy load all pages
 const App = lazy(() => import('./App'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 
-// Simple loading component
 const PageLoader: FC = () => (
   <div className="min-h-screen bg-rose-50 flex items-center justify-center">
     <div className="text-center">
@@ -19,68 +16,11 @@ const PageLoader: FC = () => (
   </div>
 );
 
-// Simple router component
 const Router: FC = () => {
   const { user, loading } = useAuth();
-  const path = window.location.pathname;
+  const [path, setPath] = useState(window.location.pathname);
 
-  // Handle navigation
-  const navigate = (path: string) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
-  // Store navigate function globally for use in components
-  React.useEffect(() => {
-    (window as any).navigate = navigate;
-  }, []);
-
-  // Public routes that don't require authentication
-  const publicRoutes: { [key: string]: React.ReactNode } = {
-    '/': <LandingPage />,
-    '/terms': <TermsOfService />,
-    '/privacy': <PrivacyPolicy />,
-    '/help': <HelpCenter />,
-  };
-
-  // Auth route
-  if (path === '/auth' || path.startsWith('/auth/')) {
-    return (
-      <Suspense fallback={<PageLoader />}>
-        <App />
-      </Suspense>
-    );
-  }
-
-  // Check if current path is a public route
-  if (publicRoutes[path]) {
-    return (
-      <Suspense fallback={<PageLoader />}>
-        {publicRoutes[path]}
-      </Suspense>
-    );
-  }
-
-  // For protected routes (app), show landing page if not authenticated
-  if (!loading && !user && path !== '/') {
-    // Redirect to landing page if trying to access app while not logged in
-    window.location.href = '/';
-    return <PageLoader />;
-  }
-
-  // Show app for authenticated users or loading state
-  return (
-    <Suspense fallback={<PageLoader />}>
-      <App />
-    </Suspense>
-  );
-};
-
-// Simple history listener to trigger re-renders on navigation
-export const useRouter = () => {
-  const [, setPath] = React.useState(window.location.pathname);
-
-  React.useEffect(() => {
+  useEffect(() => {
     const handlePopState = () => {
       setPath(window.location.pathname);
     };
@@ -89,13 +29,50 @@ export const useRouter = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  return {
-    navigate: (path: string) => {
-      window.history.pushState({}, '', path);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    },
-    path: window.location.pathname,
+  // Public routes configuration
+  const publicRoutes: Record<string, JSX.Element> = {
+    '/': <LandingPage />,
+    '/terms': <TermsOfService />,
+    '/privacy': <PrivacyPolicy />,
+    '/help': <HelpCenter />,
   };
+
+  // Handle public routes
+  if (publicRoutes[path]) {
+    return <Suspense fallback={<PageLoader />}>{publicRoutes[path]}</Suspense>;
+  }
+
+  // Handle auth route
+  if (path === '/auth' || path.startsWith('/auth/')) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <App />
+      </Suspense>
+    );
+  }
+
+  // Protected route logic
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  if (!user && path !== '/') {
+    // Redirect to landing if not authenticated
+    window.location.href = '/';
+    return <PageLoader />;
+  }
+
+  // Show app for authenticated users
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <App />
+    </Suspense>
+  );
+};
+
+export const navigate = (path: string): void => {
+  window.history.pushState({}, '', path);
+  window.dispatchEvent(new PopStateEvent('popstate'));
 };
 
 export default Router;

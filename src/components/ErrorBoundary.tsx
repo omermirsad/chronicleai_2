@@ -1,21 +1,18 @@
-
-// src/components/ErrorBoundary.tsx
-// Fix: Import React types Component, ErrorInfo, ReactNode
-import * as React from 'react';
+import { Component, ReactNode, ErrorInfo } from 'react';
 import * as Sentry from '@sentry/react';
 
 interface Props {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
+  children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
-  errorInfo: React.ErrorInfo | null;
+  errorInfo: ErrorInfo | null;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
+class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
     error: null,
@@ -26,11 +23,11 @@ class ErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
-    
-    // Log to Sentry in production
-    if (process.env.NODE_ENV === 'production') {
+
+    // Log to Sentry in production only
+    if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
       Sentry.captureException(error, {
         contexts: {
           react: {
@@ -39,7 +36,7 @@ class ErrorBoundary extends React.Component<Props, State> {
         },
       });
     }
-    
+
     this.setState({ errorInfo });
   }
 
@@ -49,6 +46,10 @@ class ErrorBoundary extends React.Component<Props, State> {
       error: null,
       errorInfo: null,
     });
+  };
+
+  private handleReload = () => {
+    window.location.href = '/';
   };
 
   public render() {
@@ -74,27 +75,28 @@ class ErrorBoundary extends React.Component<Props, State> {
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              
+
               <h2 className="text-2xl font-bold text-stone-800 mb-2">
-                Oops! Something went wrong
+                Something went wrong
               </h2>
-              
+
               <p className="text-stone-600 mb-6">
-                We apologize for the inconvenience. The error has been logged and we'll look into it.
+                We apologize for the inconvenience. The error has been logged and our team will
+                investigate.
               </p>
-              
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+
+              {import.meta.env.DEV && this.state.error && (
                 <details className="text-left mb-4 p-4 bg-red-50 rounded-md">
                   <summary className="cursor-pointer text-sm font-medium text-red-800">
                     Error Details (Development Only)
                   </summary>
-                  <pre className="mt-2 text-xs text-red-700 overflow-auto">
+                  <pre className="mt-2 text-xs text-red-700 overflow-auto max-h-40">
                     {this.state.error.toString()}
                     {this.state.errorInfo?.componentStack}
                   </pre>
                 </details>
               )}
-              
+
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={this.handleReset}
@@ -102,9 +104,9 @@ class ErrorBoundary extends React.Component<Props, State> {
                 >
                   Try Again
                 </button>
-                
+
                 <button
-                  onClick={() => window.location.href = '/'}
+                  onClick={this.handleReload}
                   className="px-4 py-2 bg-stone-200 text-stone-700 rounded-md hover:bg-stone-300 transition"
                 >
                   Go Home

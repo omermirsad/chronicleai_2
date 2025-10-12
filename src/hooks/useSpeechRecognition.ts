@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import * as React from 'react';
 
 // Custom type definitions for the Web Speech API for cross-browser compatibility
 // and to resolve TypeScript errors, as these types are not always standard.
@@ -51,10 +51,10 @@ declare global {
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 export const useSpeechRecognition = (onTranscriptChange: (transcript: string) => void) => {
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<ISpeechRecognition | null>(null);
+  const [isListening, setIsListening] = React.useState(false);
+  const recognitionRef = React.useRef<ISpeechRecognition | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!SpeechRecognitionAPI) {
       console.error("Speech Recognition API not supported in this browser.");
       return;
@@ -83,14 +83,14 @@ export const useSpeechRecognition = (onTranscriptChange: (transcript: string) =>
     recognitionRef.current = recognition;
   }, [onTranscriptChange, isListening]);
 
-  const startListening = useCallback(() => {
+  const startListening = React.useCallback(() => {
     if (recognitionRef.current && !isListening) {
       setIsListening(true);
       recognitionRef.current.start();
     }
   }, [isListening]);
 
-  const stopListening = useCallback(() => {
+  const stopListening = React.useCallback(() => {
     if (recognitionRef.current && isListening) {
       setIsListening(false);
       recognitionRef.current.stop();

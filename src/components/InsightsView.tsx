@@ -1,5 +1,6 @@
+
 // Fix: Import React types FC, useState, useMemo
-import React, { useState, useMemo, FC } from 'react';
+import * as React from 'react';
 import { JournalEntry } from '../types';
 import { generateInsights } from '../services/geminiService';
 import { SparklesIcon, SeedingIcon, ChartBarIcon } from './Icons';
@@ -33,12 +34,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 // Fix: Use FC type for functional component
-const InsightsView: FC<InsightsViewProps> = ({ entries, userId }) => {
+const InsightsView: React.FC<InsightsViewProps> = ({ entries, userId }) => {
   // Fix: Add generic type to useState
-  const [insights, setInsights] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [insights, setInsights] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
   // Fix: Add generic type to useState
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   const handleGenerateInsights = async () => {
     setIsLoading(true);
@@ -56,7 +57,7 @@ const InsightsView: FC<InsightsViewProps> = ({ entries, userId }) => {
   
   const hasEnoughEntries = entries.length >= 3;
 
-  const moodData = useMemo(() => {
+  const moodData = React.useMemo(() => {
     return entries
       .filter(entry => typeof entry.mood === 'number')
       .map(entry => ({

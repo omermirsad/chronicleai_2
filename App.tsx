@@ -1,44 +1,37 @@
-// src/App.tsx - Updated with Onboarding
-import React, { useState, useMemo, lazy, Suspense, useEffect, FC } from 'react';
-import ErrorBoundary from './components/ErrorBoundary';
-import Header from './components/Header';
-import Auth from './components/Auth';
-import Onboarding from './components/Onboarding';
-import { useJournal } from './hooks/useJournal';
-import { useAuth } from './hooks/useAuth';
-import { JournalEntry, View } from './types';
-import { FeedSkeleton } from './components/SkeletonLoader';
-import ToastProvider from './components/ToastProvider';
+
+// src/App.tsx
+// Fix: Import React types like FC, useState, useMemo, lazy, Suspense, useEffect
+import * as React from 'react';
 import toast from 'react-hot-toast';
+import ErrorBoundary from './src/components/ErrorBoundary';
+import Header from './src/components/Header';
+import Auth from './src/components/Auth';
+import { useJournal } from './src/hooks/useJournal';
+import { useAuth } from './src/hooks/useAuth';
+import { JournalEntry, View } from './src/types';
+import { FeedSkeleton } from './src/components/SkeletonLoader';
+import ToastProvider from './src/components/ToastProvider';
 
 // Lazy load heavy components for better performance
-const JournalEditor = lazy(() => import('./components/JournalEditor'));
-const JournalFeed = lazy(() => import('./components/JournalFeed'));
-const InsightsView = lazy(() => import('./components/InsightsView'));
-const CalendarView = lazy(() => import('./components/CalendarView'));
-const PerspectiveLensModal = lazy(() => import('./components/PerspectiveLensModal'));
+const JournalEditor = React.lazy(() => import('./src/components/JournalEditor'));
+const JournalFeed = React.lazy(() => import('./src/components/JournalFeed'));
+const InsightsView = React.lazy(() => import('./src/components/InsightsView'));
+const CalendarView = React.lazy(() => import('./src/components/CalendarView'));
+const PerspectiveLensModal = React.lazy(() => import('./src/components/PerspectiveLensModal'));
 
-const App: FC = () => {
+// Fix: Use FC type for functional component
+const App: React.FC = () => {
   const { user, signOut, loading: authLoading } = useAuth();
+  // Fix: useJournal now returns deleteEntry, loading, and syncStatus
   const { entries, addEntry, updateEntry, deleteEntry, loading: entriesLoading, syncStatus } = useJournal();
-  const [currentView, setCurrentView] = useState<View>('feed');
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  // Check if user has completed onboarding
-  useEffect(() => {
-    if (user && !authLoading) {
-      const onboardingCompleted = localStorage.getItem('onboarding_completed');
-      if (!onboardingCompleted) {
-        // Small delay to let the main app render first
-        setTimeout(() => setShowOnboarding(true), 500);
-      }
-    }
-  }, [user, authLoading]);
+  // Fix: Add generic type to useState
+  const [currentView, setCurrentView] = React.useState<View>('feed');
+  // Fix: Add generic type to useState
+  const [selectedEntry, setSelectedEntry] = React.useState<JournalEntry | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   // Check for offline/online status
-  useEffect(() => {
+  React.useEffect(() => {
     const handleOnline = () => toast.success('Back online! Syncing your entries...');
     const handleOffline = () => toast.error('You are offline. Changes will sync when connection returns.');
     
@@ -65,11 +58,7 @@ const App: FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-  };
-
-  const hasOnThisDayEntries = useMemo(() => {
+  const hasOnThisDayEntries = React.useMemo(() => {
     const today = new Date();
     return entries.some(entry => {
       const entryDate = new Date(entry.date);
@@ -94,21 +83,23 @@ const App: FC = () => {
       case 'insights':
         return <InsightsView entries={entries} userId={user!.id} />;
       case 'calendar':
+        // Fix: Pass onDeleteEntry to CalendarView
         return (
-            <CalendarView 
-                entries={entries}
-                onOpenPerspectiveLens={handleOpenPerspectiveLens}
-                onDeleteEntry={deleteEntry}
-            />
+          <CalendarView
+            entries={entries}
+            onOpenPerspectiveLens={handleOpenPerspectiveLens}
+            onDeleteEntry={deleteEntry}
+          />
         );
       case 'feed':
       default:
+        // Fix: Pass onDeleteEntry to JournalFeed
         return (
-            <JournalFeed 
-                entries={entries}
-                onOpenPerspectiveLens={handleOpenPerspectiveLens}
-                onDeleteEntry={deleteEntry}
-            />
+          <JournalFeed
+            entries={entries}
+            onOpenPerspectiveLens={handleOpenPerspectiveLens}
+            onDeleteEntry={deleteEntry}
+          />
         );
     }
   };
@@ -140,14 +131,6 @@ const App: FC = () => {
       <div className="min-h-screen bg-rose-50 text-stone-900">
         <ToastProvider />
         
-        {/* Show onboarding overlay if needed */}
-        {showOnboarding && (
-          <Onboarding 
-            onComplete={handleOnboardingComplete}
-            userName={user.name}
-          />
-        )}
-        
         <Header 
           currentView={currentView} 
           setCurrentView={setCurrentView}
@@ -158,23 +141,23 @@ const App: FC = () => {
         />
         
         <main className="max-w-3xl mx-auto p-4 sm:p-6">
-          <Suspense fallback={<FeedSkeleton />}>
+          <React.Suspense fallback={<FeedSkeleton />}>
             {entriesLoading && entries.length === 0 ? (
               <FeedSkeleton />
             ) : (
               renderView()
             )}
-          </Suspense>
+          </React.Suspense>
         </main>
         
         {selectedEntry && (
-          <Suspense fallback={<div />}>
+          <React.Suspense fallback={<div />}>
             <PerspectiveLensModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               entry={selectedEntry}
             />
-          </Suspense>
+          </React.Suspense>
         )}
       </div>
     </ErrorBoundary>

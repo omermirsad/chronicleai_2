@@ -12,9 +12,12 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext ts,tsx --fix",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,md}\"",
     "analyze": "vite-bundle-visualizer",
+    
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:functions:deploy": "supabase functions deploy --no-verify-jwt",
@@ -22,10 +25,19 @@
     "supabase:migration:new": "supabase migration new",
     "supabase:migration:up": "supabase migration up",
     "supabase:db:reset": "supabase db reset",
+    "supabase:db:push": "supabase db push",
+    
     "deploy:vercel": "npm run build:prod && vercel --prod",
     "deploy:netlify": "npm run build:prod && netlify deploy --prod",
+    
+    "validate:env": "ts-node scripts/validate-env.ts",
+    "verify:db": "ts-node scripts/verify-database.ts",
+    "pre-deploy": "npm run lint && npm run type-check && npm run validate:env && npm run build:prod",
+    
     "security:check": "npm audit --audit-level=moderate",
-    "security:fix": "npm audit fix"
+    "security:fix": "npm audit fix",
+    
+    "postinstall": "npm run security:check"
   },
   "dependencies": {
     "@sentry/react": "^7.91.0",
@@ -73,7 +85,8 @@
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
     "terser": "^5.26.0",
-    "supabase": "^1.142.2"
+    "supabase": "^1.142.2",
+    "ts-node": "^10.9.2"
   },
   "engines": {
     "node": ">=18.0.0",

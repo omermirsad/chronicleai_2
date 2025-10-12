@@ -1,5 +1,6 @@
+
 // Fix: Import React types
-import React, { useState, useCallback, useEffect, FC, ChangeEvent, FormEvent } from 'react';
+import * as React from 'react';
 import { JournalEntry, View, GuidedSessionType } from '../types';
 import { analyzeEntry, getGuidedPrompt } from '../services/geminiService';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
@@ -28,37 +29,37 @@ const guidedSessions = [
 const GUIDED_DRAFT_KEY = 'chronicle-ai-guided-draft';
 
 // Fix: Use FC type for functional component
-const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
-  const [text, setText] = useState('');
+const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
+  const [text, setText] = React.useState('');
   // Fix: Add generic type to useState
-  const [photo, setPhoto] = useState<{ base64: string; mimeType: string } | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [photo, setPhoto] = React.useState<{ base64: string; mimeType: string } | null>(null);
+  const [isProcessing, setIsProcessing] = React.useState(false);
   // Fix: Add generic type to useState
-  const [mode, setMode] = useState<EditorMode>('selection');
-  const [textBeforeRecording, setTextBeforeRecording] = useState('');
+  const [mode, setMode] = React.useState<EditorMode>('selection');
+  const [textBeforeRecording, setTextBeforeRecording] = React.useState('');
   // Fix: Add generic type to useState
-  const [mood, setMood] = useState<number | null>(null);
-  const [energy, setEnergy] = useState<number>(50);
+  const [mood, setMood] = React.useState<number | null>(null);
+  const [energy, setEnergy] = React.useState<number>(50);
   
   // Guided session state
   // Fix: Add generic type to useState
-  const [session, setSession] = useState<{type: GuidedSessionType, title: string} | null>(null);
+  const [session, setSession] = React.useState<{type: GuidedSessionType, title: string} | null>(null);
   // Fix: Add generic type to useState
-  const [history, setHistory] = useState<{ prompt: string; response: string }[]>([]);
-  const [currentPrompt, setCurrentPrompt] = useState('');
+  const [history, setHistory] = React.useState<{ prompt: string; response: string }[]>([]);
+  const [currentPrompt, setCurrentPrompt] = React.useState('');
   // Fix: Add generic type to useState
-  const [promptChoices, setPromptChoices] = useState<string[]>([]);
-  const [currentResponse, setCurrentResponse] = useState('');
-  const [isThinking, setIsThinking] = useState(false);
+  const [promptChoices, setPromptChoices] = React.useState<string[]>([]);
+  const [currentResponse, setCurrentResponse] = React.useState('');
+  const [isThinking, setIsThinking] = React.useState(false);
 
   // Draft state
   // Fix: Add generic type to useState
-  const [draftToResume, setDraftToResume] = useState<any | null>(null);
+  const [draftToResume, setDraftToResume] = React.useState<any | null>(null);
   // Fix: Add generic type to useState
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [saveStatus, setSaveStatus] = React.useState<'idle' | 'saving' | 'saved'>('idle');
 
 
-  const handleTranscriptChange = useCallback((transcript: string) => {
+  const handleTranscriptChange = React.useCallback((transcript: string) => {
     const prefix = textBeforeRecording ? textBeforeRecording + ' ' : '';
     if (mode === 'freestyle') {
       setText(prefix + transcript);
@@ -78,7 +79,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
     }
   }
 
-  const fetchNextPrompt = useCallback(async (sessionType: GuidedSessionType, currentHistory: { prompt: string; response: string }[]) => {
+  const fetchNextPrompt = React.useCallback(async (sessionType: GuidedSessionType, currentHistory: { prompt: string; response: string }[]) => {
     setIsThinking(true);
     setCurrentPrompt('');
     setPromptChoices([]);
@@ -91,13 +92,13 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
     setIsThinking(false);
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (mode === 'guided' && session && history.length === 0 && !currentPrompt && promptChoices.length === 0) {
       fetchNextPrompt(session.type, []);
     }
   }, [mode, session, history, fetchNextPrompt, currentPrompt, promptChoices]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     try {
         const savedDraft = localStorage.getItem(GUIDED_DRAFT_KEY);
         if (savedDraft) {
@@ -203,7 +204,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
   };
 
   // Fix: Use ChangeEvent type for event parameter
-  const handlePhotoUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -216,7 +217,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
   };
 
   // Fix: Use FormEvent type for event parameter
-  const handleSubmitFreestyle = async (e: FormEvent) => {
+  const handleSubmitFreestyle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim() && !photo) {
       alert("Please write something or upload a photo.");

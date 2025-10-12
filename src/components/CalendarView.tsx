@@ -1,5 +1,6 @@
+
 // Fix: Import React types FC, useState, useMemo
-import React, { useState, useMemo, FC } from 'react';
+import * as React from 'react';
 import { JournalEntry } from '../types';
 import JournalEntryCard from './JournalEntryCard';
 import { XMarkIcon } from './Icons';
@@ -11,14 +12,14 @@ interface CalendarViewProps {
 }
 
 // Fix: Use FC type for functional component
-const CalendarView: FC<CalendarViewProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const CalendarView: React.FC<CalendarViewProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
+  const [currentDate, setCurrentDate] = React.useState(new Date());
   // Fix: Add generic type to useState
-  const [selectedDayEntries, setSelectedDayEntries] = useState<JournalEntry[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedDayEntries, setSelectedDayEntries] = React.useState<JournalEntry[]>([]);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
 
-  const entriesByDate = useMemo(() => {
+  const entriesByDate = React.useMemo(() => {
     const map = new Map<string, JournalEntry[]>();
     entries.forEach(entry => {
       const dateKey = new Date(entry.date).toISOString().split('T')[0];

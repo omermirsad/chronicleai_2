@@ -1,12 +1,13 @@
+
 // Fix: Import React and FC type
-import React, { FC } from 'react';
+import * as React from 'react';
 import { Auth as SupabaseAuth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '../lib/supabase';
 import { BookOpenIcon } from './Icons';
 
 // Fix: Use FC type for functional component
-const Auth: FC = () => {
+const Auth: React.FC = () => {
   return (
     <div className="min-h-screen bg-rose-50 flex flex-col justify-center items-center p-4">
       <div className="max-w-md w-full mx-auto">

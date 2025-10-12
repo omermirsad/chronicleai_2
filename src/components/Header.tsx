@@ -1,5 +1,6 @@
+
 // Fix: Import React types FC, useState, useRef, useEffect
-import React, { useState, useRef, useEffect, FC } from 'react';
+import * as React from 'react';
 import { View, User } from '../types';
 import { BookOpenIcon, PencilSquareIcon, SparklesIcon, CalendarDaysIcon, UserCircleIcon } from './Icons';
 
@@ -13,7 +14,7 @@ interface HeaderProps {
 }
 
 // Fix: Use FC type for functional component
-const SyncIndicator: FC<{ status: HeaderProps['syncStatus'] }> = ({ status }) => {
+const SyncIndicator: React.FC<{ status: HeaderProps['syncStatus'] }> = ({ status }) => {
     const statusMap = {
         idle: { text: 'Synced', color: 'text-green-600' },
         syncing: { text: 'Syncing...', color: 'text-blue-600' },
@@ -25,10 +26,10 @@ const SyncIndicator: FC<{ status: HeaderProps['syncStatus'] }> = ({ status }) =>
 }
 
 // Fix: Use FC type for functional component
-const Header: FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayNotification, user, onSignOut, syncStatus }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayNotification, user, onSignOut, syncStatus }) => {
   // Fix: Add generic type to useState
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
   
   const navItems = [
     { id: 'feed', label: 'Journal', icon: <BookOpenIcon />, notification: onThisDayNotification },
@@ -37,7 +38,7 @@ const Header: FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayNotific
     { id: 'insights', label: 'Insights', icon: <SparklesIcon /> },
   ];
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);

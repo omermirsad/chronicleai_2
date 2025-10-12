@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+
+import * as React from 'react';
 import { JournalEntry } from '../types';
 import JournalEntryCard from './JournalEntryCard';
 import OnThisDay from './OnThisDay';
@@ -10,7 +11,7 @@ interface JournalFeedProps {
   onDeleteEntry: (id: string) => void;
 }
 
-const JournalFeed: FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
+const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
   // "On This Day" logic
   const today = new Date();
   const onThisDayEntries = entries

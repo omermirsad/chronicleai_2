@@ -1,4 +1,3 @@
-// src/Router.tsx
 import { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { useAuth } from './hooks/useAuth';
 
@@ -40,6 +39,7 @@ const Router: FC = () => {
     };
   }, []);
 
+  // Public routes configuration
   const publicRoutes: Record<string, JSX.Element> = {
     '/': <LandingPage />,
     '/terms': <TermsOfService />,
@@ -47,10 +47,12 @@ const Router: FC = () => {
     '/help': <HelpCenter />,
   };
 
+  // Handle public routes
   if (publicRoutes[path]) {
     return <Suspense fallback={<PageLoader />}>{publicRoutes[path]}</Suspense>;
   }
 
+  // Handle auth route
   if (path === '/auth' || path.startsWith('/auth/')) {
     return (
       <Suspense fallback={<PageLoader />}>
@@ -59,16 +61,19 @@ const Router: FC = () => {
     );
   }
 
+  // Protected route logic
   if (loading) {
     return <PageLoader />;
   }
 
   if (!user && path !== '/') {
+    // Redirect to landing if not authenticated
     window.history.replaceState({}, '', '/');
     setPath('/');
     return <PageLoader />;
   }
 
+  // Show app for authenticated users
   return (
     <Suspense fallback={<PageLoader />}>
       <App />

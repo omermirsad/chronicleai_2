@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { JournalEntry } from '../types';
 import JournalEntryCard from './JournalEntryCard';
@@ -26,8 +25,9 @@ const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLen
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const onThisDayEntryIds = new Set(onThisDayEntries.map(e => e.id));
-  // Fix: Corrected typo from onThisDayIds to onThisDayEntryIds
-  const regularEntries = entries.filter(entry => !onThisDayEntryIds.has(entry.id));
+  const regularEntries = entries
+    .filter(entry => !onThisDayEntryIds.has(entry.id))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   if (entries.length === 0) {
     return (

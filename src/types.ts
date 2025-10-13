@@ -7,6 +7,8 @@ export interface Profile {
   email: string;
   full_name?: string;
   avatar_url?: string;
+  preferences?: Record<string, any>;
+  created_at?: string;
 }
 
 // public.journal_entries
@@ -20,9 +22,7 @@ export interface DatabaseEntry {
   photo_url?: string;
   mood?: number; // 1-5
   energy?: number; // 0-100
-  // Fix: Changed type from `any` to a specific interface to fix Supabase type inference.
   ai_analysis?: AIAnalysis;
-  // Fix: Changed type from `any` to a specific interface to fix Supabase type inference.
   guided_session?: {
     type: GuidedSessionType;
     title: string;
@@ -34,15 +34,33 @@ export interface Database {
   public: {
     Tables: {
       profiles: {
-        Row: Profile;
-        // Fix: Removed 'created_at' from Omit as it's not in the Profile interface.
-        Insert: Omit<Profile, 'id' | 'updated_at'>;
-        Update: Partial<Profile>;
+        Row: {
+          id: string;
+          email: string;
+          full_name?: string;
+          avatar_url?: string;
+          preferences?: Record<string, any>;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Insert: {
+          id: string;
+          email: string;
+          full_name?: string;
+          avatar_url?: string;
+          preferences?: Record<string, any>;
+        };
+        Update: {
+          email?: string;
+          full_name?: string;
+          avatar_url?: string;
+          preferences?: Record<string, any>;
+        };
       };
       journal_entries: {
         Row: DatabaseEntry;
-        Insert: Omit<DatabaseEntry, 'id' | 'updated_at' | 'created_at'>;
-        Update: Partial<DatabaseEntry>;
+        Insert: Omit<DatabaseEntry, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<DatabaseEntry, 'id' | 'user_id' | 'created_at'>>;
       };
     };
     Views: {

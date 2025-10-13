@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
 // A generic proxy invoker that passes parts and config to the backend function
-const callGeminiProxy = async (parts: Part[], config?: object) => {
+const callGeminiProxy = async (parts: Part[], config?: object): Promise<any> => {
   try {
     const { data, error } = await supabase.functions.invoke('gemini-proxy', {
       body: { parts, config },
@@ -108,8 +108,11 @@ export const getPerspectives = async (entryText: string): Promise<Perspective[]>
     const results = await Promise.all(prompts.map(async (p) => {
         try {
             const content = await callGeminiProxy([{ text: p.prompt }]);
-            return { title: p.title, content };
+            // Ensure content is a string
+            const textContent = typeof content === 'string' ? content : JSON.stringify(content);
+            return { title: p.title, content: textContent };
         } catch (error) {
+            console.error(`Error generating perspective "${p.title}":`, error);
             return { title: p.title, content: "Could not generate this perspective at the moment." };
         }
     }));
@@ -121,6 +124,7 @@ export const generateInsights = async (entries: JournalEntry[], userId: string):
     if (entries.length < 3) {
         return "Not enough entries to generate insights. Keep journaling to discover patterns over time!";
     }
+    
     const entriesText = entries.slice(0, 20).map(e => {
         let entryString = `Date: ${e.date}\n`;
         if (e.mood) entryString += `Mood: ${e.mood}/5\n`;
@@ -131,7 +135,9 @@ export const generateInsights = async (entries: JournalEntry[], userId: string):
 
     const prompt = `You are a personal analyst AI. Your task is to identify subtle, long-term correlations and patterns from a user's journal entries. The user also tracks mood (1=very negative, 5=very positive) and energy level (0-100). Present your findings as gentle, encouraging observations in Markdown format. Use headings, bold text, and lists to structure the information for easy readability. Do not give advice. Focus on connections between actions, environments, feelings, and the user's recorded mood and energy levels.\n\nHere are the user's entries:\n\n${entriesText}\n\nBased on these entries, what are some potential patterns or insights? Specifically look for correlations between entry content and the recorded mood/energy.`;
     
-    return await callGeminiProxy([{ text: prompt }]);
+    const result = await callGeminiProxy([{ text: prompt }]);
+    // Ensure result is a string
+    return typeof result === 'string' ? result : JSON.stringify(result);
 };
 
 const guidedPromptSchema = {
@@ -162,7 +168,8 @@ export const getGuidedPrompt = async (sessionType: GuidedSessionType, history: {
         prompt = `You are a gentle and insightful journaling guide. Give me a single, welcoming, open-ended starting prompt for a journaling session about "${sessionType}". Provide ONLY the text of the prompt.`;
          try {
             const result = await callGeminiProxy([{ text: prompt }]);
-            return [result.trim()];
+            const textResult = typeof result === 'string' ? result : JSON.stringify(result);
+            return [textResult.trim()];
         } catch (error) {
             return ["Let's begin. What's on your mind right now?"];
         }

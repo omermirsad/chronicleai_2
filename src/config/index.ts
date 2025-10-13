@@ -70,6 +70,21 @@ export const validateConfig = (): { valid: boolean; missing: string[] } => {
   };
 };
 
+// Validate required environment variables at startup
+const validateRequiredEnvVars = () => {
+  const validation = validateConfig();
+
+  if (!validation.valid && import.meta.env.PROD) {
+    throw new Error(
+      `Missing required environment variables: ${validation.missing.join(', ')}\n` +
+      'Please check your .env file and ensure all required variables are set.'
+    );
+  }
+};
+
+// Run validation
+validateRequiredEnvVars();
+
 // Log configuration on app start (dev only)
 if (import.meta.env.DEV) {
   const validation = validateConfig();

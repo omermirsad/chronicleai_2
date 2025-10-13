@@ -8,3 +8,13 @@ declare namespace JSX {
     [elemName: string]: any;
   }
 }
+
+interface WindowEventMap {
+  'navigate': CustomEvent<string>;
+}
+
+interface Window {
+  marked: {
+    parse: (markdown: string) => string;
+  };
+}

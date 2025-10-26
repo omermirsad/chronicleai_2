@@ -1,9 +1,9 @@
-// index.tsx
+// main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Router from './src/Router';
-import { initErrorMonitoring } from './src/lib/errorMonitoring';
-import './src/index.css';
+import Router from './Router';
+import { initErrorMonitoring } from './lib/errorMonitoring';
+import './index.css';
 
 // Initialize error monitoring in production
 if (import.meta.env.PROD) {

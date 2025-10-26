@@ -56,17 +56,25 @@ export interface Database {
           avatar_url?: string;
           preferences?: Record<string, any>;
         };
+        Relationships: [];
       };
       journal_entries: {
         Row: DatabaseEntry;
         Insert: Omit<DatabaseEntry, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<DatabaseEntry, 'id' | 'user_id' | 'created_at'>>;
+        Relationships: [];
       };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
       [_ in never]: never;
     };
   };

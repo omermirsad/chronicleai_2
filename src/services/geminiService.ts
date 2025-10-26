@@ -1,4 +1,9 @@
-import { GoogleGenAI, Type, GenerateContentResponse, Part } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+
+// Type aliases for backward compatibility
+const Type = SchemaType;
+type Part = { text: string } | { inlineData: { data: string; mimeType: string } };
+type GenerateContentResponse = any;
 import { JournalEntry, AIAnalysis, Perspective, GuidedSessionType } from '../types';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';

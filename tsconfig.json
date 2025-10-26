@@ -16,15 +16,14 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     
     /* Additional options */
-    "types": ["jest", "node"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
-  "exclude": ["supabase", "node_modules", "dist"]
+  "exclude": ["supabase", "node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
 }

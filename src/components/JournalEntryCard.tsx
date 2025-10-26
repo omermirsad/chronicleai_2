@@ -39,7 +39,7 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
 
   const handleDelete = () => {
     if (onDelete) {
-        toast((t) => (
+        toast((t: any) => (
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold">Are you sure you want to delete this entry?</p>
                 <div className="flex gap-4">

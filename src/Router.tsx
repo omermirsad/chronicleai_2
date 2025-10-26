@@ -6,6 +6,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
+const AuthCallback = lazy(() => import('./components/AuthCallback'));
 
 const PageLoader: FC = () => (
   <div className="min-h-screen bg-rose-50 flex items-center justify-center">
@@ -50,6 +51,15 @@ const Router: FC = () => {
   // Handle public routes
   if (publicRoutes[path]) {
     return <Suspense fallback={<PageLoader />}>{publicRoutes[path]}</Suspense>;
+  }
+
+  // Handle auth callback route (email confirmation, password reset)
+  if (path === '/auth/callback') {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <AuthCallback />
+      </Suspense>
+    );
   }
 
   // Handle auth route

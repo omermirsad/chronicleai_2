@@ -50,9 +50,9 @@ export const useJournal = () => {
     for (const action of queue) {
       try {
         if (action.type === 'add') {
-          await supabase.from('journal_entries').insert([action.payload]);
+          await supabase.from('journal_entries').insert([action.payload] as any);
         } else if (action.type === 'update' && action.id) {
-          await supabase.from('journal_entries').update(action.payload).eq('id', action.id);
+          await (supabase.from('journal_entries') as any).update(action.payload).eq('id', action.id);
         } else if (action.type === 'delete' && action.id) {
           await supabase.from('journal_entries').delete().eq('id', action.id);
         }
@@ -190,7 +190,7 @@ export const useJournal = () => {
     try {
       if (!navigator.onLine) throw new Error('Offline');
 
-      const { error } = await supabase.from('journal_entries').insert([payload]);
+      const { error } = await supabase.from('journal_entries').insert([payload] as any);
       if (error) throw error;
 
       toast.success('Entry saved');
@@ -220,7 +220,7 @@ export const useJournal = () => {
     try {
       if (!navigator.onLine) throw new Error('Offline');
 
-      const { error } = await supabase.from('journal_entries').update(payload).eq('id', id);
+      const { error } = await (supabase.from('journal_entries') as any).update(payload).eq('id', id);
       if (error) throw error;
     } catch (error) {
       console.warn('Updating entry offline:', error);

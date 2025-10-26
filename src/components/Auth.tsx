@@ -20,7 +20,7 @@ const Auth: React.FC = () => {
             <p className="text-center text-stone-600 mb-6">Sign in to continue your journey of self-reflection.</p>
             <SupabaseAuth
               supabaseClient={supabase}
-              appearance={{ 
+              appearance={{
                 theme: ThemeSupa,
                 style: {
                     button: {
@@ -36,6 +36,7 @@ const Auth: React.FC = () => {
               providers={['google', 'github']}
               theme="light"
               socialLayout="horizontal"
+              redirectTo={`${window.location.origin}/auth/callback`}
             />
         </div>
       </div>

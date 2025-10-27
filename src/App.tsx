@@ -115,11 +115,19 @@ const App: FC = () => {
 
   // Show loading state while checking auth
   if (authLoading) {
+    const isOffline = !navigator.onLine;
     return (
       <div className="min-h-screen bg-rose-50 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center max-w-md mx-auto p-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
           <p className="mt-4 text-stone-600">Loading Chronicle AI...</p>
+          {isOffline && (
+            <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-md">
+              <p className="text-sm text-yellow-800">
+                You appear to be offline. Please check your internet connection.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );

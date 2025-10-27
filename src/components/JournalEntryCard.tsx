@@ -3,9 +3,7 @@ import * as React from 'react';
 import { JournalEntry } from '../types';
 import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, LightningBoltIcon, TrashIcon } from './Icons';
 import toast from 'react-hot-toast';
-
-// @ts-ignore
-const marked = window.marked;
+import { marked } from 'marked';
 
 interface JournalEntryCardProps {
   entry: JournalEntry;

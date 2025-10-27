@@ -5,9 +5,7 @@ import { JournalEntry, View, GuidedSessionType } from '../types';
 import { analyzeEntry, getGuidedPrompt } from '../services/geminiService';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { MicrophoneIcon, PhotoIcon, PaperAirplaneIcon, HeartIcon, MountainIcon, CompassIcon, PencilSquareIcon, ArrowUturnLeftIcon, SparklesIcon, SeedingIcon } from './Icons';
-
-// @ts-ignore
-const marked = window.marked;
+import { marked } from 'marked';
 
 interface JournalEditorProps {
   addEntry: (entry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;

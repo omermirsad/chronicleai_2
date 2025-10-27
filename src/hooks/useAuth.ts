@@ -9,18 +9,32 @@ interface Profile {
   avatar_url?: string;
 }
 
+// Timeout utility to prevent hanging on slow/failed requests
+const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+    ),
+  ]);
+};
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const processSession = async (session: Session | null) => {
     if (session?.user) {
       try {
-        const { data: profile } = await supabase
+        // Add timeout to profile fetch (10 seconds)
+        const profilePromise = supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
+
+        const { data: profile } = await withTimeout(profilePromise, 10000);
 
         const profileData = profile as Profile | null;
 
@@ -33,6 +47,7 @@ export const useAuth = () => {
             session.user.email?.split('@')[0],
           avatarUrl: profileData?.avatar_url || session.user.user_metadata?.avatar_url,
         });
+        setError(null);
       } catch (error) {
         console.error('Error fetching profile:', error);
         // Fallback to basic user info if profile fetch fails
@@ -41,6 +56,7 @@ export const useAuth = () => {
           email: session.user.email!,
           name: session.user.email?.split('@')[0],
         });
+        setError(null); // Not a critical error, we have fallback
       }
     } else {
       setUser(null);
@@ -48,16 +64,28 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const getSession = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        await processSession(session);
+        // Add timeout to session fetch (15 seconds)
+        const sessionPromise = supabase.auth.getSession();
+        const result = await withTimeout(sessionPromise, 15000);
+        const session = result.data.session;
+
+        if (mounted) {
+          await processSession(session);
+        }
       } catch (error) {
         console.error('Error getting session:', error);
+        if (mounted) {
+          setError(error instanceof Error ? error.message : 'Failed to initialize authentication');
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -66,11 +94,16 @@ export const useAuth = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      await processSession(session);
-      setLoading(false);
+      if (mounted) {
+        await processSession(session);
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
@@ -85,6 +118,7 @@ export const useAuth = () => {
   return {
     user,
     loading,
+    error,
     signOut,
   };
 };

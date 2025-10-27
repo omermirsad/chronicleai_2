@@ -17,9 +17,42 @@ const PageLoader: FC = () => (
   </div>
 );
 
+interface ErrorScreenProps {
+  error: string;
+  onRetry: () => void;
+}
+
+const ErrorScreen: FC<ErrorScreenProps> = ({ error, onRetry }) => (
+  <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4">
+    <div className="max-w-md w-full bg-white rounded-lg shadow-md border border-stone-200 p-8 text-center">
+      <div className="text-red-600 text-5xl mb-4">⚠️</div>
+      <h2 className="text-2xl font-bold text-stone-800 mb-2">Connection Error</h2>
+      <p className="text-stone-600 mb-4">{error}</p>
+      <div className="space-y-2">
+        <button
+          onClick={onRetry}
+          className="w-full px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 transition-colors"
+        >
+          Retry Connection
+        </button>
+        <button
+          onClick={() => window.location.href = '/'}
+          className="w-full px-4 py-2 bg-stone-200 text-stone-800 rounded-md hover:bg-stone-300 transition-colors"
+        >
+          Go to Home Page
+        </button>
+      </div>
+      <p className="text-sm text-stone-500 mt-4">
+        If this problem persists, please check your internet connection and try again later.
+      </p>
+    </div>
+  </div>
+);
+
 const Router: FC = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, error } = useAuth();
   const [path, setPath] = useState(window.location.pathname);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -33,12 +66,36 @@ const Router: FC = () => {
 
     window.addEventListener('popstate', handlePopState);
     window.addEventListener('navigate', handleNavigate);
-    
+
     return () => {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('navigate', handleNavigate);
     };
   }, []);
+
+  // Add timeout for loading state (20 seconds)
+  useEffect(() => {
+    if (loading) {
+      const timeoutId = setTimeout(() => {
+        setLoadingTimeout(true);
+      }, 20000);
+
+      return () => clearTimeout(timeoutId);
+    } else {
+      setLoadingTimeout(false);
+    }
+  }, [loading]);
+
+  // Handle retry
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
+  // Show error screen if there's an auth error or loading timeout
+  if (error || loadingTimeout) {
+    const errorMessage = error || 'Loading is taking longer than expected. Please check your connection and try again.';
+    return <ErrorScreen error={errorMessage} onRetry={handleRetry} />;
+  }
 
   // Public routes configuration
   const publicRoutes: Record<string, JSX.Element> = {

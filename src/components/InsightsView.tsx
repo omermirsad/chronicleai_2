@@ -5,10 +5,7 @@ import { JournalEntry } from '../types';
 import { generateInsights } from '../services/geminiService';
 import { SparklesIcon, SeedingIcon, ChartBarIcon } from './Icons';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-
-// @ts-ignore
-const marked = window.marked;
+import { marked } from 'marked';
 
 interface InsightsViewProps {
   entries: JournalEntry[];

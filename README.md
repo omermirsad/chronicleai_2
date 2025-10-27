@@ -95,6 +95,26 @@ VITE_GEMINI_API_KEY=your-gemini-api-key  # For local dev only
 VITE_APP_URL=http://localhost:5173
 ```
 
+### Supabase Edge Function Configuration
+
+Configure AI model settings via Supabase secrets (required for production):
+
+```bash
+# Set Gemini API key (required)
+npx supabase secrets set GEMINI_API_KEY=your-gemini-api-key
+
+# Set AI model (optional, defaults to gemini-2.0-flash)
+npx supabase secrets set GEMINI_MODEL=gemini-2.0-flash
+
+# Deploy edge functions
+npx supabase functions deploy gemini-proxy --no-verify-jwt
+```
+
+**Available Models:**
+- `gemini-2.0-flash` (default) - Fast, cost-effective
+- `gemini-2.5-flash` - Latest version with enhanced capabilities
+- `gemini-pro` - Most capable model for complex tasks
+
 ### Database Setup
 
 ```bash

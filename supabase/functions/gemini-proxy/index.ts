@@ -10,6 +10,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { GoogleGenAI, GenerateContentResponse } from "npm:@google/genai";
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.0-flash';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,7 +27,7 @@ async function handleRequest(req: Request) {
 
   // Fix: Initialize SDK within the request handler to ensure env var is loaded.
   const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-  const model = "gemini-2.5-flash";
+  const model = GEMINI_MODEL;
   
   const { parts, config } = await req.json();
 

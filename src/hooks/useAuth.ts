@@ -27,16 +27,17 @@ export const useAuth = () => {
   const processSession = async (session: Session | null) => {
     if (session?.user) {
       try {
-        // Add timeout to profile fetch (10 seconds)
-        const profilePromise = supabase
+        // Create the profile query and execute it immediately to get a promise
+        const profileQuery = supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
 
-        const { data: profile } = await withTimeout(profilePromise, 10000);
+        // Add timeout to profile fetch (10 seconds)
+        const profileResponse = await withTimeout(profileQuery, 10000);
 
-        const profileData = profile as Profile | null;
+        const profileData = profileResponse.data as Profile | null;
 
         setUser({
           id: session.user.id,

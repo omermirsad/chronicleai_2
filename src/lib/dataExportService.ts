@@ -43,19 +43,19 @@ export const exportDataAsJSON = async (userId: string) => {
     const exportData = {
       exportDate: new Date().toISOString(),
       user: {
-        id: profile.id,
-        email: profile.email,
-        fullName: profile.full_name,
-        avatarUrl: profile.avatar_url,
-        preferences: profile.preferences,
-        createdAt: profile.created_at,
+        id: profile?.id || '',
+        email: profile?.email || '',
+        fullName: profile?.full_name || '',
+        avatarUrl: profile?.avatar_url || '',
+        preferences: profile?.preferences || {},
+        createdAt: profile?.created_at || '',
       },
       journalEntries: entries || [],
       statistics: {
         totalEntries: entries?.length || 0,
         dateRange: {
-          first: entries?.[0]?.date,
-          last: entries?.[entries.length - 1]?.date,
+          first: entries?.[0]?.date || '',
+          last: entries?.[entries.length - 1]?.date || '',
         },
       },
     };
@@ -125,17 +125,17 @@ export const downloadEntriesAsCSV = async (userId: string) => {
     ];
 
     // CSV rows
-    const rows = entries.map((entry) => {
-      const aiSummary = entry.ai_analysis?.summary?.join('; ') || '';
-      const tags = entry.tags?.join(', ') || '';
-      const sentiment = entry.ai_analysis?.sentiment || '';
-      const sessionType = entry.guided_session?.type || '';
+    const rows = entries.map((entry: any) => {
+      const aiSummary = entry?.ai_analysis?.summary?.join('; ') || '';
+      const tags = entry?.tags?.join(', ') || '';
+      const sentiment = entry?.ai_analysis?.sentiment || '';
+      const sessionType = entry?.guided_session?.type || '';
 
       return [
-        entry.date,
-        `"${entry.text.replace(/"/g, '""')}"`, // Escape quotes
-        entry.mood || '',
-        entry.energy || '',
+        entry?.date || '',
+        `"${(entry?.text || '').replace(/"/g, '""')}"`, // Escape quotes
+        entry?.mood || '',
+        entry?.energy || '',
         `"${tags}"`,
         sessionType,
         `"${aiSummary.replace(/"/g, '""')}"`,
@@ -146,7 +146,7 @@ export const downloadEntriesAsCSV = async (userId: string) => {
     // Combine headers and rows
     const csvContent = [
       headers.join(','),
-      ...rows.map((row) => row.join(',')),
+      ...rows.map((row: any) => row.join(',')),
     ].join('\n');
 
     // Create blob and download
@@ -189,8 +189,8 @@ export const downloadEntriesAsText = async (userId: string) => {
 
     // Generate text content
     const textContent = entries
-      .map((entry, index) => {
-        const date = new Date(entry.date).toLocaleDateString('en-US', {
+      .map((entry: any, index: number) => {
+        const date = new Date(entry?.date || '').toLocaleDateString('en-US', {
           weekday: 'long',
           year: 'numeric',
           month: 'long',
@@ -201,26 +201,26 @@ export const downloadEntriesAsText = async (userId: string) => {
         content += `Entry ${index + 1} - ${date}\n`;
         content += `${'='.repeat(80)}\n\n`;
 
-        if (entry.guided_session) {
+        if (entry?.guided_session) {
           content += `Session: ${entry.guided_session.title}\n\n`;
         }
 
-        content += `${entry.text}\n\n`;
+        content += `${entry?.text || ''}\n\n`;
 
-        if (entry.mood) {
+        if (entry?.mood) {
           const moods = ['😠', '😟', '😐', '🙂', '😄'];
           content += `Mood: ${moods[entry.mood - 1]} (${entry.mood}/5)\n`;
         }
 
-        if (entry.energy !== null && entry.energy !== undefined) {
+        if (entry?.energy !== null && entry?.energy !== undefined) {
           content += `Energy: ${entry.energy}/100\n`;
         }
 
-        if (entry.tags && entry.tags.length > 0) {
+        if (entry?.tags && entry.tags.length > 0) {
           content += `Tags: ${entry.tags.join(', ')}\n`;
         }
 
-        if (entry.ai_analysis) {
+        if (entry?.ai_analysis) {
           content += `\nAI Insights:\n`;
           if (entry.ai_analysis.summary) {
             content += `  • ${entry.ai_analysis.summary.join('\n  • ')}\n`;
@@ -378,8 +378,8 @@ export const getUserDataStats = async (userId: string) => {
     return {
       totalEntries: entriesCount || 0,
       dateRange: {
-        first: entries?.[0]?.date,
-        last: entries?.[entries.length - 1]?.date,
+        first: entries?.[0]?.date || '',
+        last: entries?.[entries.length - 1]?.date || '',
       },
       estimatedSizeKB: Math.round(estimatedSize),
     };

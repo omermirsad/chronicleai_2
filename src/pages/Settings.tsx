@@ -76,17 +76,17 @@ const Settings: React.FC = () => {
       if (error) throw error;
 
       if (data) {
-        setFullName(data.full_name || '');
-        setAvatarUrl(data.avatar_url || '');
-        if (data.preferences) {
+        setFullName(data?.full_name || '');
+        setAvatarUrl(data?.avatar_url || '');
+        if (data?.preferences) {
           setPreferences({
-            theme: data.preferences.theme || 'light',
-            emailNotifications: data.preferences.emailNotifications !== false,
-            insightsFrequency: data.preferences.insightsFrequency || 'weekly',
-            weeklyDigest: data.preferences.weeklyDigest !== false,
-            onThisDay: data.preferences.onThisDay !== false,
-            streakReminders: data.preferences.streakReminders !== false,
-            achievementNotifications: data.preferences.achievementNotifications !== false,
+            theme: data.preferences?.theme || 'light',
+            emailNotifications: data.preferences?.emailNotifications !== false,
+            insightsFrequency: data.preferences?.insightsFrequency || 'weekly',
+            weeklyDigest: data.preferences?.weeklyDigest !== false,
+            onThisDay: data.preferences?.onThisDay !== false,
+            streakReminders: data.preferences?.streakReminders !== false,
+            achievementNotifications: data.preferences?.achievementNotifications !== false,
           });
         }
       }
@@ -116,7 +116,7 @@ const Settings: React.FC = () => {
         .update({
           full_name: fullName,
           avatar_url: avatarUrl,
-        })
+        } as any)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -174,7 +174,7 @@ const Settings: React.FC = () => {
         .from('profiles')
         .update({
           preferences,
-        })
+        } as any)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -327,7 +327,7 @@ const Settings: React.FC = () => {
                 <input
                   type="text"
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
                   placeholder="Your full name"
                   className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 />
@@ -340,7 +340,7 @@ const Settings: React.FC = () => {
                 <input
                   type="url"
                   value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAvatarUrl(e.target.value)}
                   placeholder="https://example.com/avatar.jpg"
                   className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 />
@@ -370,7 +370,7 @@ const Settings: React.FC = () => {
                 <input
                   type="password"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
                   className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 />
@@ -383,7 +383,7 @@ const Settings: React.FC = () => {
                 <input
                   type="password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
                   className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 />
@@ -517,7 +517,7 @@ const Settings: React.FC = () => {
                 </label>
                 <select
                   value={preferences.theme}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setPreferences({ ...preferences, theme: e.target.value })
                   }
                   className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
@@ -547,7 +547,7 @@ const Settings: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={preferences.emailNotifications}
-                      onChange={(e) =>
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setPreferences({
                           ...preferences,
                           emailNotifications: e.target.checked,
@@ -571,7 +571,7 @@ const Settings: React.FC = () => {
                         <input
                           type="checkbox"
                           checked={preferences.weeklyDigest}
-                          onChange={(e) =>
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setPreferences({
                               ...preferences,
                               weeklyDigest: e.target.checked,
@@ -593,7 +593,7 @@ const Settings: React.FC = () => {
                         <input
                           type="checkbox"
                           checked={preferences.onThisDay}
-                          onChange={(e) =>
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setPreferences({
                               ...preferences,
                               onThisDay: e.target.checked,
@@ -615,7 +615,7 @@ const Settings: React.FC = () => {
                         <input
                           type="checkbox"
                           checked={preferences.streakReminders}
-                          onChange={(e) =>
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setPreferences({
                               ...preferences,
                               streakReminders: e.target.checked,
@@ -637,7 +637,7 @@ const Settings: React.FC = () => {
                         <input
                           type="checkbox"
                           checked={preferences.achievementNotifications}
-                          onChange={(e) =>
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setPreferences({
                               ...preferences,
                               achievementNotifications: e.target.checked,
@@ -660,7 +660,7 @@ const Settings: React.FC = () => {
                 </p>
                 <select
                   value={preferences.insightsFrequency}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setPreferences({
                       ...preferences,
                       insightsFrequency: e.target.value,
@@ -784,7 +784,7 @@ const Settings: React.FC = () => {
             <input
               type="text"
               value={deleteConfirmation}
-              onChange={(e) => setDeleteConfirmation(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDeleteConfirmation(e.target.value)}
               placeholder="DELETE MY ACCOUNT"
               className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
             />

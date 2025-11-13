@@ -7,6 +7,7 @@ const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const Settings = lazy(() => import('./pages/Settings'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AuthCallback = lazy(() => import('./components/AuthCallback'));
 
 const PageLoader: FC = () => (
@@ -104,6 +105,7 @@ const Router: FC = () => {
     '/terms': <TermsOfService />,
     '/privacy': <PrivacyPolicy />,
     '/help': <HelpCenter />,
+    '/pricing': <PricingPage />,
   };
 
   // Handle public routes

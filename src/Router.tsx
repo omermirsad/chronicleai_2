@@ -6,6 +6,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
+const Settings = lazy(() => import('./pages/Settings'));
 const AuthCallback = lazy(() => import('./components/AuthCallback'));
 
 const PageLoader: FC = () => (
@@ -138,6 +139,15 @@ const Router: FC = () => {
     window.history.replaceState({}, '', '/');
     setPath('/');
     return <PageLoader />;
+  }
+
+  // Handle Settings route for authenticated users
+  if (user && path === '/settings') {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <Settings />
+      </Suspense>
+    );
   }
 
   // Show app for authenticated users

@@ -74,7 +74,15 @@ export const useJournal = () => {
     setSyncStatus(remainingActions.length > 0 ? 'error' : 'idle');
   }, [user]);
 
-  const fetchEntries = useCallback(async () => {
+  const fetchEntries = useCallback(async (filters?: {
+    searchText?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    selectedTags?: string[];
+    mood?: number | null;
+    energyMin?: number | null;
+    energyMax?: number | null;
+  }) => {
     if (!user) {
       setEntries([]);
       setLoading(false);
@@ -85,11 +93,49 @@ export const useJournal = () => {
       setLoading(true);
       setSyncStatus('syncing');
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false });
+        .eq('user_id', user.id);
+
+      // Apply filters
+      if (filters?.searchText) {
+        // Search in text content (case-insensitive)
+        query = query.ilike('text', `%${filters.searchText}%`);
+      }
+
+      if (filters?.dateFrom) {
+        query = query.gte('date', filters.dateFrom);
+      }
+
+      if (filters?.dateTo) {
+        // Add one day to include the entire end date
+        const endDate = new Date(filters.dateTo);
+        endDate.setDate(endDate.getDate() + 1);
+        query = query.lt('date', endDate.toISOString().split('T')[0]);
+      }
+
+      if (filters?.selectedTags && filters.selectedTags.length > 0) {
+        // Filter by tags (using overlaps operator for array contains)
+        query = query.overlaps('tags', filters.selectedTags);
+      }
+
+      if (filters?.mood !== null && filters?.mood !== undefined) {
+        query = query.eq('mood', filters.mood);
+      }
+
+      if (filters?.energyMin !== null && filters?.energyMin !== undefined) {
+        query = query.gte('energy', filters.energyMin);
+      }
+
+      if (filters?.energyMax !== null && filters?.energyMax !== undefined) {
+        query = query.lte('energy', filters.energyMax);
+      }
+
+      // Always order by date descending
+      query = query.order('date', { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -251,5 +297,5 @@ export const useJournal = () => {
     }
   };
 
-  return { entries, loading, addEntry, updateEntry, deleteEntry, syncStatus };
+  return { entries, loading, addEntry, updateEntry, deleteEntry, syncStatus, fetchEntries };
 };

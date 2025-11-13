@@ -38,6 +38,29 @@ const Auth: React.FC = () => {
               socialLayout="horizontal"
               redirectTo={`${window.location.origin}/auth/callback`}
             />
+
+            {/* Terms and Privacy Notice */}
+            <div className="mt-6 text-center text-xs text-stone-600">
+              By signing up, you agree to our{' '}
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-rose-600 hover:text-rose-700 underline"
+              >
+                Terms of Service
+              </a>
+              {' '}and{' '}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-rose-600 hover:text-rose-700 underline"
+              >
+                Privacy Policy
+              </a>
+              .
+            </div>
         </div>
       </div>
     </div>

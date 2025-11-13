@@ -100,7 +100,42 @@ export interface Database {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_user_achievements: {
+        Args: { user_id_param: string };
+        Returns: Array<{
+          achievement_id: string;
+          earned_at: string;
+          name: string;
+          description: string;
+          icon: string;
+          category: AchievementCategory;
+          requirement_type: 'count' | 'streak' | 'consecutive';
+          requirement_value: number;
+          points: number;
+        }>;
+      };
+      check_and_award_achievements: {
+        Args: { user_id_param: string };
+        Returns: Array<AchievementDefinition>;
+      };
+      increment_ai_calls: {
+        Args: { user_uuid: string };
+        Returns: Array<{
+          success: boolean;
+          calls_used: number;
+          calls_limit: number;
+          calls_remaining: number;
+        }>;
+      };
+      update_subscription_tier: {
+        Args: {
+          user_uuid: string;
+          new_tier: SubscriptionTier;
+          new_stripe_customer_id?: string;
+          new_stripe_subscription_id?: string;
+        };
+        Returns: void;
+      };
     };
     Enums: {
       [_ in never]: never;

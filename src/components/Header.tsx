@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { View, User } from '../types';
 import { BookOpenIcon, PencilSquareIcon, SparklesIcon, CalendarDaysIcon, UserCircleIcon } from './Icons';
+import { StreakDisplay } from './StreakDisplay';
 
 interface HeaderProps {
   currentView: View;
@@ -93,7 +94,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayN
                 <UserCircleIcon className="w-7 h-7" />
             </button>
             {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-20 origin-top-right">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-20 origin-top-right">
                     <div className="px-4 py-3 border-b border-stone-200">
                         <p className="text-sm text-stone-600">Signed in as</p>
                         <p className="font-medium text-stone-800 truncate">{user.email}</p>
@@ -101,7 +102,22 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayN
                             <SyncIndicator status={syncStatus} />
                         </div>
                     </div>
+                    <div className="px-4 py-3 border-b border-stone-200">
+                        <StreakDisplay variant="compact" />
+                    </div>
                     <div className="py-1">
+                        <a
+                            href="/achievements"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                window.dispatchEvent(new CustomEvent('navigate', { detail: '/achievements' }));
+                                window.history.pushState({}, '', '/achievements');
+                                setIsDropdownOpen(false);
+                            }}
+                            className="block w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-100"
+                        >
+                            🏆 Achievements
+                        </a>
                         <a
                             href="/settings"
                             onClick={(e) => {

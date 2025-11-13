@@ -4,7 +4,7 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 const Type = SchemaType;
 type Part = { text: string } | { inlineData: { data: string; mimeType: string } };
 type GenerateContentResponse = any;
-import { JournalEntry, AIAnalysis, Perspective, GuidedSessionType } from '../types';
+import { JournalEntry, AIAnalysis, Perspective, GuidedSessionType, CoachingModuleType } from '../types';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -202,4 +202,153 @@ export const getGuidedPrompt = async (sessionType: GuidedSessionType, history: {
             ];
         }
     }
+};
+
+// Coaching Module Definitions
+export const COACHING_MODULES: Record<CoachingModuleType, {
+  title: string;
+  description: string;
+  steps: string[];
+  systemPrompt: string;
+}> = {
+  'goal-setting': {
+    title: 'Goal Setting & Clarity',
+    description: 'Define clear, achievable goals and create an action plan.',
+    steps: [
+      'What goal or aspiration matters most to you right now?',
+      'What would success look like? How will you know when you\'ve achieved it?',
+      'What resources, skills, or support do you already have?',
+      'What\'s one small, concrete action you can take this week?',
+    ],
+    systemPrompt: 'You are a supportive life coach helping someone clarify and work toward meaningful goals. Use SMART goal principles while maintaining warmth and encouragement.',
+  },
+  'anxiety-management': {
+    title: 'Anxiety Management',
+    description: 'Explore anxious thoughts and develop coping strategies.',
+    steps: [
+      'What\'s been causing you anxiety or worry lately?',
+      'How does this anxiety show up in your body and mind?',
+      'What parts of this situation are within your control?',
+      'What coping strategies have helped you feel calmer in the past?',
+    ],
+    systemPrompt: 'You are a compassionate therapist helping someone work through anxiety. Validate their feelings, help them distinguish between facts and fears, and guide them toward grounding and coping techniques.',
+  },
+  'gratitude-practice': {
+    title: 'Gratitude Practice',
+    description: 'Cultivate appreciation and positive perspective.',
+    steps: [
+      'What are three things you\'re grateful for today, big or small?',
+      'Who in your life has shown you kindness recently?',
+      'What\'s something about yourself that you appreciate?',
+      'How can you carry this sense of gratitude forward?',
+    ],
+    systemPrompt: 'You are a mindfulness coach facilitating gratitude practice. Help the user notice and appreciate positive aspects of their life while maintaining authenticity.',
+  },
+  'self-compassion': {
+    title: 'Self-Compassion Exercise',
+    description: 'Practice treating yourself with kindness and understanding.',
+    steps: [
+      'What\'s something you\'ve been judging or criticizing yourself about?',
+      'If a dear friend told you this about themselves, what would you say to them?',
+      'What does this experience say about your shared humanity?',
+      'How can you offer yourself the same kindness you\'d give a friend?',
+    ],
+    systemPrompt: 'You are a gentle therapist guiding self-compassion practice based on Kristin Neff\'s framework. Help the user recognize their inner critic, normalize their struggles, and practice self-kindness.',
+  },
+  'mindfulness': {
+    title: 'Mindfulness Check-In',
+    description: 'Ground yourself in the present moment.',
+    steps: [
+      'Take a deep breath. What do you notice in your body right now?',
+      'What emotions are present? Can you name them without judgment?',
+      'What thoughts keep recurring? Can you observe them like clouds passing?',
+      'What do you need in this moment?',
+    ],
+    systemPrompt: 'You are a mindfulness teacher guiding present-moment awareness. Help the user observe their experience without judgment, returning gently to the present when the mind wanders.',
+  },
+};
+
+export const getCoachingPrompt = async (
+  moduleType: CoachingModuleType,
+  stepNumber: number,
+  userResponse?: string
+): Promise<{ prompt: string; followUp?: string }> => {
+  const module = COACHING_MODULES[moduleType];
+
+  if (!module) {
+    throw new Error(`Unknown coaching module: ${moduleType}`);
+  }
+
+  // For first step, return the predefined prompt
+  if (stepNumber === 0) {
+    return { prompt: module.steps[0] };
+  }
+
+  // If we have a user response, generate a personalized follow-up
+  if (userResponse && stepNumber < module.steps.length) {
+    try {
+      const prompt = `${module.systemPrompt}
+
+The user is working through: "${module.title}"
+
+They just responded to the prompt: "${module.steps[stepNumber - 1]}"
+
+Their response: "${userResponse}"
+
+Now provide:
+1. A brief (1-2 sentence) validating acknowledgment of their response
+2. The next question: "${module.steps[stepNumber]}"
+
+Format your response as:
+[Acknowledgment]
+
+[Next Question]`;
+
+      const result = await callGeminiProxy([{ text: prompt }]);
+      const textResult = typeof result === 'string' ? result : JSON.stringify(result);
+
+      // Try to parse the acknowledgment and question
+      const parts = textResult.split('\n\n');
+      if (parts.length >= 2) {
+        return {
+          followUp: parts[0].trim(),
+          prompt: parts[1].trim(),
+        };
+      }
+
+      // Fallback to default question
+      return { prompt: module.steps[stepNumber] };
+    } catch (error) {
+      console.error('Error generating coaching follow-up:', error);
+      return { prompt: module.steps[stepNumber] };
+    }
+  }
+
+  // Return predefined step question
+  if (stepNumber < module.steps.length) {
+    return { prompt: module.steps[stepNumber] };
+  }
+
+  // If we've completed all steps, generate a closing reflection
+  try {
+    const prompt = `${module.systemPrompt}
+
+The user has completed the "${module.title}" coaching module. Provide a brief (2-3 sentence) closing reflection that:
+1. Acknowledges their work and effort
+2. Encourages them to carry forward what they've learned
+3. Is warm and empowering
+
+Provide ONLY the closing reflection text.`;
+
+    const result = await callGeminiProxy([{ text: prompt }]);
+    const textResult = typeof result === 'string' ? result : JSON.stringify(result);
+
+    return {
+      prompt: textResult.trim(),
+    };
+  } catch (error) {
+    return {
+      prompt: 'You\'ve completed this coaching session. Great work on taking time for self-reflection and growth! 🌟',
+    };
+  }
 };

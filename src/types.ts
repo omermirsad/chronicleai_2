@@ -1,5 +1,8 @@
 // src/types.ts
 
+// Subscription tiers
+export type SubscriptionTier = 'free' | 'pro' | 'premium';
+
 // public.profiles
 export interface Profile {
   id: string; // uuid
@@ -9,6 +12,13 @@ export interface Profile {
   avatar_url?: string;
   preferences?: Record<string, any>;
   created_at?: string;
+  subscription_tier?: SubscriptionTier;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
+  ai_calls_limit?: number;
+  ai_calls_used?: number;
+  billing_period_start?: string;
+  billing_period_end?: string;
 }
 
 // public.journal_entries
@@ -42,6 +52,13 @@ export interface Database {
           preferences?: Record<string, any>;
           created_at?: string;
           updated_at?: string;
+          subscription_tier?: SubscriptionTier;
+          stripe_customer_id?: string;
+          stripe_subscription_id?: string;
+          ai_calls_limit?: number;
+          ai_calls_used?: number;
+          billing_period_start?: string;
+          billing_period_end?: string;
         };
         Insert: {
           id: string;
@@ -49,12 +66,20 @@ export interface Database {
           full_name?: string;
           avatar_url?: string;
           preferences?: Record<string, any>;
+          subscription_tier?: SubscriptionTier;
+          stripe_customer_id?: string;
+          stripe_subscription_id?: string;
         };
         Update: {
           email?: string;
           full_name?: string;
           avatar_url?: string;
           preferences?: Record<string, any>;
+          subscription_tier?: SubscriptionTier;
+          stripe_customer_id?: string;
+          stripe_subscription_id?: string;
+          ai_calls_limit?: number;
+          ai_calls_used?: number;
         };
         Relationships: [];
       };
@@ -125,10 +150,33 @@ export interface Perspective {
 
 export type View = 'feed' | 'editor' | 'insights' | 'calendar';
 
-export type GuidedSessionType = 
-  | 'gratitude' 
-  | 'challenge' 
-  | 'review' 
-  | 'future-self' 
-  | 'mindful-observation' 
+export type GuidedSessionType =
+  | 'gratitude'
+  | 'challenge'
+  | 'review'
+  | 'future-self'
+  | 'mindful-observation'
   | 'stoic-reflection';
+
+// Subscription and pricing types
+export interface PricingPlan {
+  tier: SubscriptionTier;
+  name: string;
+  price: number; // monthly price in dollars
+  yearlyPrice?: number; // yearly price in dollars (if applicable)
+  stripePriceId?: string;
+  stripeYearlyPriceId?: string;
+  features: string[];
+  aiCallsLimit: number | 'unlimited';
+  popular?: boolean;
+}
+
+export interface SubscriptionUsage {
+  tier: SubscriptionTier;
+  aiCallsUsed: number;
+  aiCallsLimit: number;
+  aiCallsRemaining: number;
+  percentageUsed: number;
+  billingPeriodStart?: string;
+  billingPeriodEnd?: string;
+}

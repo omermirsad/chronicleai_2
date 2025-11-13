@@ -51,6 +51,16 @@ export const config = {
     maxPhotoSize: 5 * 1024 * 1024, // 5MB
     maxPhotosPerEntry: 1,
   },
+
+  // Stripe configuration
+  stripe: {
+    publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '',
+    // Price IDs should be set in environment variables
+    proPriceId: import.meta.env.VITE_STRIPE_PRO_PRICE_ID || '',
+    proYearlyPriceId: import.meta.env.VITE_STRIPE_PRO_YEARLY_PRICE_ID || '',
+    premiumPriceId: import.meta.env.VITE_STRIPE_PREMIUM_PRICE_ID || '',
+    premiumYearlyPriceId: import.meta.env.VITE_STRIPE_PREMIUM_YEARLY_PRICE_ID || '',
+  },
 };
 
 // Validate required environment variables

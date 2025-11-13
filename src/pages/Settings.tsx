@@ -1,6 +1,7 @@
 // src/pages/Settings.tsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useSubscription } from '../hooks/useSubscription';
 import { supabase } from '../lib/supabase';
 import {
   downloadDataAsJSON,
@@ -9,6 +10,7 @@ import {
   requestAccountDeletion,
   getUserDataStats,
 } from '../lib/dataExportService';
+import { navigate } from '../Router';
 import toast from 'react-hot-toast';
 import {
   UserCircleIcon,
@@ -26,6 +28,7 @@ interface DataStats {
 
 const Settings: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { usage, loading: subscriptionLoading } = useSubscription();
   const [loading, setLoading] = useState(false);
   const [dataStats, setDataStats] = useState<DataStats | null>(null);
 
@@ -240,6 +243,27 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleManageSubscription = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-portal-session');
+
+      if (error) throw error;
+
+      if (data?.url) {
+        // Redirect to Stripe Customer Portal
+        window.location.href = data.url;
+      } else {
+        throw new Error('Failed to create portal session');
+      }
+    } catch (error) {
+      console.error('Error opening customer portal:', error);
+      toast.error('Failed to open subscription management. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-rose-50 flex items-center justify-center">
@@ -365,6 +389,111 @@ const Settings: React.FC = () => {
                 {loading ? 'Updating...' : 'Update Password'}
               </button>
             </div>
+          </div>
+
+          {/* Subscription Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-stone-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-stone-800">Subscription</h2>
+              {usage && (
+                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  usage.tier === 'premium' ? 'bg-purple-100 text-purple-800' :
+                  usage.tier === 'pro' ? 'bg-indigo-100 text-indigo-800' :
+                  'bg-stone-100 text-stone-800'
+                }`}>
+                  {usage.tier.charAt(0).toUpperCase() + usage.tier.slice(1)}
+                </span>
+              )}
+            </div>
+
+            {subscriptionLoading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600 mx-auto"></div>
+              </div>
+            ) : usage ? (
+              <div className="space-y-4">
+                {/* AI Usage Stats */}
+                <div className="bg-stone-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-stone-700">
+                      AI Analysis Usage
+                    </span>
+                    <span className="text-sm font-bold text-stone-900">
+                      {usage.aiCallsUsed} / {usage.tier === 'premium' ? '∞' : usage.aiCallsLimit}
+                    </span>
+                  </div>
+
+                  {usage.tier !== 'premium' && (
+                    <>
+                      <div className="h-2 w-full rounded-full bg-stone-200 overflow-hidden">
+                        <div
+                          className={`h-2 rounded-full transition-all ${
+                            usage.percentageUsed >= 100 ? 'bg-red-500' :
+                            usage.percentageUsed >= 80 ? 'bg-yellow-500' :
+                            'bg-green-500'
+                          }`}
+                          style={{ width: `${Math.min(usage.percentageUsed, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-stone-600 mt-1">
+                        {usage.aiCallsRemaining} calls remaining this month
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {/* Billing Period */}
+                {usage.billingPeriodEnd && (
+                  <div className="text-sm text-stone-600">
+                    <p>
+                      Billing period ends: {' '}
+                      <span className="font-medium">
+                        {new Date(usage.billingPeriodEnd).toLocaleDateString()}
+                      </span>
+                    </p>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-3 pt-2">
+                  {usage.tier === 'free' ? (
+                    <button
+                      onClick={() => navigate('/pricing')}
+                      className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                    >
+                      Upgrade to Pro or Premium
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={handleManageSubscription}
+                        disabled={loading}
+                        className="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition disabled:opacity-50"
+                      >
+                        {loading ? 'Loading...' : 'Manage Subscription'}
+                      </button>
+                      {usage.tier === 'pro' && (
+                        <button
+                          onClick={() => navigate('/pricing')}
+                          className="px-6 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition"
+                        >
+                          Upgrade to Premium
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* Info Text */}
+                <p className="text-xs text-stone-500 pt-2">
+                  {usage.tier === 'free'
+                    ? 'Upgrade to get more AI analysis calls and unlock advanced features.'
+                    : 'Manage your billing, payment methods, and subscription settings.'}
+                </p>
+              </div>
+            ) : (
+              <p className="text-stone-600">Loading subscription information...</p>
+            )}
           </div>
 
           {/* Preferences Section */}

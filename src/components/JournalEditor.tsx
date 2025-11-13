@@ -4,8 +4,11 @@ import * as React from 'react';
 import { JournalEntry, View, GuidedSessionType } from '../types';
 import { analyzeEntry, getGuidedPrompt } from '../services/geminiService';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+import { useSubscription } from '../hooks/useSubscription';
+import UpgradeModal from './UpgradeModal';
 import { MicrophoneIcon, PhotoIcon, PaperAirplaneIcon, HeartIcon, MountainIcon, CompassIcon, PencilSquareIcon, ArrowUturnLeftIcon, SparklesIcon, SeedingIcon } from './Icons';
 import { marked } from 'marked';
+import toast from 'react-hot-toast';
 
 interface JournalEditorProps {
   addEntry: (entry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -28,6 +31,8 @@ const GUIDED_DRAFT_KEY = 'chronicle-ai-guided-draft';
 
 // Fix: Use FC type for functional component
 const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
+  const { canMakeAICall, incrementAICallCount, hasReachedLimit } = useSubscription();
+  const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
   const [text, setText] = React.useState('');
   // Fix: Add generic type to useState
   const [photo, setPhoto] = React.useState<{ base64: string; mimeType: string } | null>(null);
@@ -135,13 +140,27 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
   const handleSaveGuidedSession = async () => {
      if (isListening) stopListening();
      setIsProcessing(true);
-     
+
      const finalHistory = currentResponse.trim() ? [...history, { prompt: currentPrompt, response: currentResponse }] : history;
      const formattedText = finalHistory.map(item => `**${item.prompt}**\n\n${item.response}`).join('\n\n---\n\n');
 
      try {
+        // Check if user can make AI call
+        if (!canMakeAICall()) {
+          setShowUpgradeModal(true);
+          setIsProcessing(false);
+          return;
+        }
+
         // Fix: Run analysis before adding entry
         const analysis = await analyzeEntry(formattedText, undefined);
+
+        // Increment AI call count after successful analysis
+        const { success, message } = await incrementAICallCount();
+        if (!success) {
+          toast.error(message || 'Failed to track AI usage');
+        }
+
         const newEntry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'> = {
             date: new Date().toISOString(),
             text: formattedText,
@@ -155,6 +174,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
         setCurrentView('feed');
      } catch (error) {
         console.error("Failed to process guided session:", error);
+        toast.error('Failed to save entry. Please try again.');
      } finally {
         setIsProcessing(false);
      }
@@ -225,8 +245,22 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
     if (isListening) stopListening();
 
     try {
+      // Check if user can make AI call
+      if (!canMakeAICall()) {
+        setShowUpgradeModal(true);
+        setIsProcessing(false);
+        return;
+      }
+
       // Fix: Run analysis before adding entry
       const analysis = await analyzeEntry(text, photo || undefined);
+
+      // Increment AI call count after successful analysis
+      const { success, message } = await incrementAICallCount();
+      if (!success) {
+        toast.error(message || 'Failed to track AI usage');
+      }
+
       const newEntry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'> = {
         date: new Date().toISOString(),
         text,
@@ -239,6 +273,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
       setCurrentView('feed');
     } catch (error) {
       console.error("Failed to process freestyle entry:", error);
+      toast.error('Failed to save entry. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -535,6 +570,12 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
           </button>
         </div>
       </form>
+
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        reason="limit_reached"
+      />
     </div>
   );
 };

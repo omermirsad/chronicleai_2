@@ -8,6 +8,7 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const Settings = lazy(() => import('./pages/Settings'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
+const AchievementsPage = lazy(() => import('./pages/AchievementsPage'));
 const AuthCallback = lazy(() => import('./components/AuthCallback'));
 
 const PageLoader: FC = () => (
@@ -148,6 +149,15 @@ const Router: FC = () => {
     return (
       <Suspense fallback={<PageLoader />}>
         <Settings />
+      </Suspense>
+    );
+  }
+
+  // Handle Achievements route for authenticated users
+  if (user && path === '/achievements') {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <AchievementsPage />
       </Suspense>
     );
   }

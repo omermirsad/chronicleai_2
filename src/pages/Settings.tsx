@@ -45,6 +45,10 @@ const Settings: React.FC = () => {
     theme: 'light',
     emailNotifications: true,
     insightsFrequency: 'weekly',
+    weeklyDigest: true,
+    onThisDay: true,
+    streakReminders: true,
+    achievementNotifications: true,
   });
 
   // Delete account confirmation
@@ -79,6 +83,10 @@ const Settings: React.FC = () => {
             theme: data.preferences.theme || 'light',
             emailNotifications: data.preferences.emailNotifications !== false,
             insightsFrequency: data.preferences.insightsFrequency || 'weekly',
+            weeklyDigest: data.preferences.weeklyDigest !== false,
+            onThisDay: data.preferences.onThisDay !== false,
+            streakReminders: data.preferences.streakReminders !== false,
+            achievementNotifications: data.preferences.achievementNotifications !== false,
           });
         }
       }
@@ -502,7 +510,7 @@ const Settings: React.FC = () => {
               Preferences
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-2">
                   Theme
@@ -520,27 +528,136 @@ const Settings: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-stone-700">
+              {/* Email Notifications Section */}
+              <div className="border-t border-stone-200 pt-4">
+                <h3 className="text-base font-semibold text-stone-800 mb-4">
                   Email Notifications
-                </label>
-                <input
-                  type="checkbox"
-                  checked={preferences.emailNotifications}
-                  onChange={(e) =>
-                    setPreferences({
-                      ...preferences,
-                      emailNotifications: e.target.checked,
-                    })
-                  }
-                  className="w-5 h-5 text-rose-600 border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
-                />
+                </h3>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-medium text-stone-700">
+                        Enable Email Notifications
+                      </label>
+                      <p className="text-xs text-stone-500">
+                        Master switch for all email notifications
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={preferences.emailNotifications}
+                      onChange={(e) =>
+                        setPreferences({
+                          ...preferences,
+                          emailNotifications: e.target.checked,
+                        })
+                      }
+                      className="w-5 h-5 text-rose-600 border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
+                    />
+                  </div>
+
+                  {preferences.emailNotifications && (
+                    <div className="ml-6 space-y-3 border-l-2 border-stone-200 pl-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="text-sm font-medium text-stone-700">
+                            Weekly Digest
+                          </label>
+                          <p className="text-xs text-stone-500">
+                            Personalized summary every Sunday
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={preferences.weeklyDigest}
+                          onChange={(e) =>
+                            setPreferences({
+                              ...preferences,
+                              weeklyDigest: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-rose-600 border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="text-sm font-medium text-stone-700">
+                            On This Day
+                          </label>
+                          <p className="text-xs text-stone-500">
+                            Daily memories from past years
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={preferences.onThisDay}
+                          onChange={(e) =>
+                            setPreferences({
+                              ...preferences,
+                              onThisDay: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-rose-600 border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="text-sm font-medium text-stone-700">
+                            Streak Reminders
+                          </label>
+                          <p className="text-xs text-stone-500">
+                            Keep your journaling streak alive
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={preferences.streakReminders}
+                          onChange={(e) =>
+                            setPreferences({
+                              ...preferences,
+                              streakReminders: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-rose-600 border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="text-sm font-medium text-stone-700">
+                            Achievement Notifications
+                          </label>
+                          <p className="text-xs text-stone-500">
+                            Celebrate your milestones
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={preferences.achievementNotifications}
+                          onChange={(e) =>
+                            setPreferences({
+                              ...preferences,
+                              achievementNotifications: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 text-rose-600 border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-2">
-                  Insights Frequency
+                  Insights Frequency (Deprecated)
                 </label>
+                <p className="text-xs text-stone-500 mb-2">
+                  Use "Weekly Digest" toggle above instead
+                </p>
                 <select
                   value={preferences.insightsFrequency}
                   onChange={(e) =>
@@ -550,6 +667,7 @@ const Settings: React.FC = () => {
                     })
                   }
                   className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  disabled
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>

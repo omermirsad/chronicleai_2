@@ -19,6 +19,9 @@ export interface Profile {
   ai_calls_used?: number;
   billing_period_start?: string;
   billing_period_end?: string;
+  current_streak?: number;
+  longest_streak?: number;
+  last_entry_date?: string;
 }
 
 // public.journal_entries
@@ -59,6 +62,9 @@ export interface Database {
           ai_calls_used?: number;
           billing_period_start?: string;
           billing_period_end?: string;
+          current_streak?: number;
+          longest_streak?: number;
+          last_entry_date?: string;
         };
         Insert: {
           id: string;
@@ -179,4 +185,75 @@ export interface SubscriptionUsage {
   percentageUsed: number;
   billingPeriodStart?: string;
   billingPeriodEnd?: string;
+}
+
+// Gamification types
+export type AchievementCategory = 'streak' | 'entries' | 'insights' | 'exploration';
+
+export interface AchievementDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: AchievementCategory;
+  requirement_type: 'count' | 'streak' | 'consecutive';
+  requirement_value: number;
+  points: number;
+  created_at?: string;
+}
+
+export interface UserAchievement {
+  id: string;
+  user_id: string;
+  achievement_id: string;
+  earned_at: string;
+  achievement?: AchievementDefinition;
+}
+
+export interface GamificationStats {
+  currentStreak: number;
+  longestStreak: number;
+  totalPoints: number;
+  achievements: UserAchievement[];
+  nextMilestone?: {
+    achievement: AchievementDefinition;
+    progress: number;
+    total: number;
+  };
+}
+
+// Email notification preferences
+export interface EmailPreferences {
+  emailNotifications: boolean;
+  insightsFrequency: 'daily' | 'weekly' | 'monthly' | 'never';
+  weeklyDigest: boolean;
+  onThisDay: boolean;
+  streakReminders: boolean;
+  achievementNotifications: boolean;
+}
+
+// Coaching types
+export type CoachingModuleType =
+  | 'goal-setting'
+  | 'anxiety-management'
+  | 'gratitude-practice'
+  | 'self-compassion'
+  | 'mindfulness';
+
+export interface CoachingStep {
+  stepNumber: number;
+  prompt: string;
+  userResponse?: string;
+  aiFollowUp?: string;
+}
+
+export interface CoachingSession {
+  moduleType: CoachingModuleType;
+  title: string;
+  currentStep: number;
+  totalSteps: number;
+  steps: CoachingStep[];
+  completed: boolean;
+  startedAt: string;
+  completedAt?: string;
 }

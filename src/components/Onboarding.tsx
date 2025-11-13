@@ -1,12 +1,13 @@
 // src/components/Onboarding.tsx
 import React, { useState, FC } from 'react';
-import { 
-  BookOpenIcon, 
-  PencilSquareIcon, 
-  SparklesIcon, 
+import {
+  BookOpenIcon,
+  PencilSquareIcon,
+  SparklesIcon,
   HeartIcon,
-  XMarkIcon 
+  XMarkIcon
 } from './Icons';
+import { STORAGE_KEYS } from '../constants';
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -48,13 +49,13 @@ const Onboarding: FC<OnboardingProps> = ({ onComplete, userName }) => {
       setCurrentStep(currentStep + 1);
     } else {
       // Mark onboarding as complete
-      localStorage.setItem('onboarding_completed', 'true');
+      localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
       onComplete();
     }
   };
 
   const handleSkip = () => {
-    localStorage.setItem('onboarding_completed', 'true');
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
     onComplete();
   };
 

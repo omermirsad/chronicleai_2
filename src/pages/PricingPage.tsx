@@ -8,6 +8,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { config } from '../config';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { logger } from '../utils/logger';
 
 const stripePromise = loadStripe(config.stripe.publishableKey);
 
@@ -192,7 +193,7 @@ const PricingPage: React.FC = () => {
         throw redirectError;
       }
     } catch (error) {
-      console.error('Error creating checkout session:', error);
+      logger.error('Error creating checkout session:', error);
       toast.error(
         error instanceof Error
           ? error.message

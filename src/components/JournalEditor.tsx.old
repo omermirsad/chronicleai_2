@@ -9,6 +9,8 @@ import UpgradeModal from './UpgradeModal';
 import { MicrophoneIcon, PhotoIcon, PaperAirplaneIcon, HeartIcon, MountainIcon, CompassIcon, PencilSquareIcon, ArrowUturnLeftIcon, SparklesIcon, SeedingIcon } from './Icons';
 import { marked } from 'marked';
 import toast from 'react-hot-toast';
+import { logger } from '../utils/logger';
+import { STORAGE_KEYS, MOOD_SCALE } from '../constants';
 
 interface JournalEditorProps {
   addEntry: (entry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -27,7 +29,7 @@ const guidedSessions = [
     { type: 'stoic-reflection' as GuidedSessionType, title: "Stoic Reflection", description: "Practice resilience by reflecting on what is in your control.", icon: <CompassIcon />},
 ]
 
-const GUIDED_DRAFT_KEY = 'chronicle-ai-guided-draft';
+// Using STORAGE_KEYS.GUIDED_DRAFT from constants
 
 // Fix: Use FC type for functional component
 const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
@@ -103,13 +105,13 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
 
   React.useEffect(() => {
     try {
-        const savedDraft = localStorage.getItem(GUIDED_DRAFT_KEY);
+        const savedDraft = localStorage.getItem(STORAGE_KEYS.GUIDED_DRAFT);
         if (savedDraft) {
             setDraftToResume(JSON.parse(savedDraft));
         }
     } catch (error) {
-        console.error("Failed to load guided session draft:", error);
-        localStorage.removeItem(GUIDED_DRAFT_KEY); // Clear corrupted draft
+        logger.error("Failed to load guided session draft:", error);
+        localStorage.removeItem(STORAGE_KEYS.GUIDED_DRAFT); // Clear corrupted draft
     }
   }, []);
 
@@ -170,10 +172,10 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
             aiAnalysis: analysis,
         };
         addEntry(newEntry);
-        localStorage.removeItem(GUIDED_DRAFT_KEY);
+        localStorage.removeItem(STORAGE_KEYS.GUIDED_DRAFT);
         setCurrentView('feed');
      } catch (error) {
-        console.error("Failed to process guided session:", error);
+        logger.error("Failed to process guided session:", error);
         toast.error('Failed to save entry. Please try again.');
      } finally {
         setIsProcessing(false);
@@ -193,11 +195,11 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
         energy,
     };
     try {
-        localStorage.setItem(GUIDED_DRAFT_KEY, JSON.stringify(draft));
+        localStorage.setItem(STORAGE_KEYS.GUIDED_DRAFT, JSON.stringify(draft));
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
-        console.error("Failed to save draft:", error);
+        logger.error("Failed to save draft:", error);
         alert("Could not save draft.");
         setSaveStatus('idle');
     }
@@ -217,7 +219,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
   };
 
   const handleDiscardDraft = () => {
-    localStorage.removeItem(GUIDED_DRAFT_KEY);
+    localStorage.removeItem(STORAGE_KEYS.GUIDED_DRAFT);
     setDraftToResume(null);
   };
 
@@ -272,7 +274,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
       addEntry(newEntry);
       setCurrentView('feed');
     } catch (error) {
-      console.error("Failed to process freestyle entry:", error);
+      logger.error("Failed to process freestyle entry:", error);
       toast.error('Failed to save entry. Please try again.');
     } finally {
       setIsProcessing(false);
@@ -293,12 +295,12 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
     setMood(null);
     setEnergy(50);
      try {
-        const savedDraft = localStorage.getItem(GUIDED_DRAFT_KEY);
+        const savedDraft = localStorage.getItem(STORAGE_KEYS.GUIDED_DRAFT);
         if (savedDraft) {
             setDraftToResume(JSON.parse(savedDraft));
         }
     } catch (error) {
-        console.error("Failed to load draft on reset:", error);
+        logger.error("Failed to load draft on reset:", error);
     }
   }
 
@@ -411,7 +413,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
                         <label className="block text-sm font-medium text-stone-700 mb-2">How are you feeling now?</label>
                         <div className="flex justify-around items-center bg-stone-50 p-2 rounded-lg border border-stone-200">
                             {[1, 2, 3, 4, 5].map((level) => {
-                                const emojis = ['😠', '😟', '😐', '🙂', '😄'];
+                                const emojis = MOOD_SCALE.EMOJIS;
                                 return (
                                     <button
                                         type="button"

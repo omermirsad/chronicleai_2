@@ -2,7 +2,20 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
-import type { GamificationStats, UserAchievement, AchievementDefinition } from '../types';
+import type { GamificationStats, UserAchievement, AchievementDefinition, AchievementCategory } from '../types';
+import { logger } from '../utils/logger';
+
+interface RawAchievementData {
+  achievement_id: string;
+  earned_at: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: AchievementCategory;
+  requirement_type: 'count' | 'streak' | 'consecutive';
+  requirement_value: number;
+  points: number;
+}
 
 export const useGamification = () => {
   const { user } = useAuth();
@@ -42,7 +55,7 @@ export const useGamification = () => {
       if (achievementsError) throw achievementsError;
 
       // Transform achievements data
-      const achievements: UserAchievement[] = (achievementsData || []).map((item: any) => ({
+      const achievements: UserAchievement[] = (achievementsData || []).map((item: RawAchievementData) => ({
         id: item.achievement_id,
         user_id: user.id,
         achievement_id: item.achievement_id,
@@ -99,7 +112,7 @@ export const useGamification = () => {
 
       setStats(gamificationStats);
     } catch (err) {
-      console.error('Error loading gamification stats:', err);
+      logger.error('Error loading gamification stats:', err);
       setError(err instanceof Error ? err.message : 'Failed to load stats');
     } finally {
       setLoading(false);
@@ -121,8 +134,8 @@ export const useGamification = () => {
       await loadGamificationStats();
 
       // Return newly awarded achievements
-      const newAchievements = (data as any)?.[0] || [];
-      return newAchievements.map((item: any) => ({
+      const newAchievements = (data?.[0] as AchievementDefinition[]) || [];
+      return newAchievements.map((item: AchievementDefinition) => ({
         id: item.id,
         user_id: user.id,
         achievement_id: item.id,
@@ -132,11 +145,14 @@ export const useGamification = () => {
           name: item.name,
           description: item.description,
           icon: item.icon,
+          category: item.category,
+          requirement_type: item.requirement_type,
+          requirement_value: item.requirement_value,
           points: item.points,
-        } as any,
+        },
       }));
     } catch (err) {
-      console.error('Error checking for achievements:', err);
+      logger.error('Error checking for achievements:', err);
       return [];
     }
   };

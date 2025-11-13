@@ -7,6 +7,7 @@ type GenerateContentResponse = any;
 import { JournalEntry, AIAnalysis, Perspective, GuidedSessionType, CoachingModuleType } from '../types';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { logger } from '../utils/logger';
 
 // A generic proxy invoker that passes parts and config to the backend function
 const callGeminiProxy = async (parts: Part[], config?: object): Promise<any> => {
@@ -18,7 +19,7 @@ const callGeminiProxy = async (parts: Part[], config?: object): Promise<any> => 
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Gemini proxy error:', error);
+    logger.error('Gemini proxy error:', error);
     toast.error('AI service is temporarily unavailable.');
     throw error;
   }
@@ -83,7 +84,7 @@ export const analyzeEntry = async (text: string, photo?: { base64: string; mimeT
     };
 
   } catch (error) {
-    console.error("Error analyzing entry:", error);
+    logger.error("Error analyzing entry:", error);
     return {
         summary: ['Entry has been saved successfully.'],
         tags: [],
@@ -117,7 +118,7 @@ export const getPerspectives = async (entryText: string): Promise<Perspective[]>
             const textContent = typeof content === 'string' ? content : JSON.stringify(content);
             return { title: p.title, content: textContent };
         } catch (error) {
-            console.error(`Error generating perspective "${p.title}":`, error);
+            logger.error(`Error generating perspective "${p.title}":`, error);
             return { title: p.title, content: "Could not generate this perspective at the moment." };
         }
     }));
@@ -319,7 +320,7 @@ Format your response as:
       // Fallback to default question
       return { prompt: module.steps[stepNumber] };
     } catch (error) {
-      console.error('Error generating coaching follow-up:', error);
+      logger.error('Error generating coaching follow-up:', error);
       return { prompt: module.steps[stepNumber] };
     }
   }

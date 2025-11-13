@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useGamification } from '../hooks/useGamification';
 import { supabase } from '../lib/supabase';
 import type { AchievementDefinition, AchievementCategory } from '../types';
+import { logger } from '../utils/logger';
 
 interface AchievementCardProps {
   achievement: AchievementDefinition;
@@ -70,7 +71,7 @@ export const AchievementsGallery: React.FC = () => {
       if (error) throw error;
       setAllAchievements(data || []);
     } catch (error) {
-      console.error('Error loading achievements:', error);
+      logger.error('Error loading achievements:', error);
     }
   };
 

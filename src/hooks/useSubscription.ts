@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { SubscriptionTier, SubscriptionUsage } from '../types';
 import { useAuth } from './useAuth';
+import { logger } from '../utils/logger';
 
 export const useSubscription = () => {
   const { user } = useAuth();
@@ -46,7 +47,7 @@ export const useSubscription = () => {
         });
       }
     } catch (err) {
-      console.error('Error fetching subscription:', err);
+      logger.error('Error fetching subscription:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch subscription');
     } finally {
       setLoading(false);
@@ -109,7 +110,7 @@ export const useSubscription = () => {
 
       return { success: false, message: 'Failed to update AI call count' };
     } catch (err) {
-      console.error('Error incrementing AI call count:', err);
+      logger.error('Error incrementing AI call count:', err);
       return {
         success: false,
         message: err instanceof Error ? err.message : 'Failed to track AI usage'
@@ -140,7 +141,7 @@ export const useSubscription = () => {
       await fetchSubscription();
       return true;
     } catch (err) {
-      console.error('Error updating subscription tier:', err);
+      logger.error('Error updating subscription tier:', err);
       setError(err instanceof Error ? err.message : 'Failed to update subscription');
       return false;
     }

@@ -10,6 +10,7 @@ import { JournalEntry, View } from './types';
 import { FeedSkeleton } from './components/SkeletonLoader';
 import ToastProvider from './components/ToastProvider';
 import toast from 'react-hot-toast';
+import { STORAGE_KEYS } from './constants';
 
 // Lazy load heavy components for better performance
 const JournalEditor = lazy(() => import('./components/JournalEditor'));
@@ -29,7 +30,7 @@ const App: FC = () => {
   // Check if user has completed onboarding
   useEffect(() => {
     if (user && !authLoading) {
-      const onboardingCompleted = localStorage.getItem('onboarding_completed');
+      const onboardingCompleted = localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
       if (!onboardingCompleted) {
         // Small delay to let the main app render first
         setTimeout(() => setShowOnboarding(true), 500);
@@ -69,17 +70,25 @@ const App: FC = () => {
     setShowOnboarding(false);
   };
 
+  // Optimize memo - only depend on entries.length since we're just checking existence
+  // If length changes, we need to recheck; if only content changes, we don't care
   const hasOnThisDayEntries = useMemo(() => {
+    if (entries.length === 0) return false;
+
     const today = new Date();
+    const todayMonth = today.getMonth();
+    const todayDate = today.getDate();
+    const currentYear = today.getFullYear();
+
     return entries.some(entry => {
       const entryDate = new Date(entry.date);
       return (
-        entryDate.getMonth() === today.getMonth() &&
-        entryDate.getDate() === today.getDate() &&
-        entryDate.getFullYear() < today.getFullYear()
+        entryDate.getMonth() === todayMonth &&
+        entryDate.getDate() === todayDate &&
+        entryDate.getFullYear() < currentYear
       );
     });
-  }, [entries]);
+  }, [entries.length]);
 
   const renderView = () => {
     switch (currentView) {

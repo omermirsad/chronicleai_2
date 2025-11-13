@@ -7,6 +7,7 @@
 
 import { supabase } from './supabase';
 import type { JournalEntry, Profile } from '../types';
+import { logger } from '../utils/logger';
 
 /**
  * Export user data in JSON format
@@ -62,7 +63,7 @@ export const exportDataAsJSON = async (userId: string) => {
 
     return exportData;
   } catch (error) {
-    console.error('Error exporting data:', error);
+    logger.error('Error exporting data:', error);
     throw error;
   }
 };
@@ -160,7 +161,7 @@ export const downloadEntriesAsCSV = async (userId: string) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Error exporting CSV:', error);
+    logger.error('Error exporting CSV:', error);
     throw error;
   }
 };
@@ -250,7 +251,7 @@ export const downloadEntriesAsText = async (userId: string) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Error exporting text:', error);
+    logger.error('Error exporting text:', error);
     throw error;
   }
 };
@@ -290,13 +291,13 @@ export const deleteUserData = async (userId: string) => {
     // Note: auth.admin.deleteUser() may not be available in client SDK
     // Alternative: Call a Supabase Edge Function to delete the auth user
     if (authError) {
-      console.warn('Auth user deletion error:', authError);
+      logger.warn('Auth user deletion error:', authError);
       // This might fail in client-side code; ideally handled server-side
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting user data:', error);
+    logger.error('Error deleting user data:', error);
     throw error;
   }
 };
@@ -327,7 +328,7 @@ export const requestAccountDeletion = async () => {
 
     return { success: true };
   } catch (error) {
-    console.error('Error requesting account deletion:', error);
+    logger.error('Error requesting account deletion:', error);
     throw error;
   }
 };
@@ -384,7 +385,7 @@ export const getUserDataStats = async (userId: string) => {
       estimatedSizeKB: Math.round(estimatedSize),
     };
   } catch (error) {
-    console.error('Error getting user data stats:', error);
+    logger.error('Error getting user data stats:', error);
     throw error;
   }
 };
@@ -402,7 +403,7 @@ export const exportAllFormats = async (userId: string) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     await downloadEntriesAsText(userId);
   } catch (error) {
-    console.error('Error exporting all formats:', error);
+    logger.error('Error exporting all formats:', error);
     throw error;
   }
 };

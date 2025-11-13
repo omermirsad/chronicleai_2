@@ -4,6 +4,8 @@
  * Content Security Policy and other security-related functions
  */
 
+import { logger } from '../utils/logger';
+
 /**
  * Generate Content Security Policy header value
  * This should be used in your server/edge function configuration
@@ -199,7 +201,7 @@ export const isRateLimited = (
 
     return false;
   } catch (error) {
-    console.error('Rate limiting error:', error);
+    logger.error('Rate limiting error:', error);
     return false; // Fail open on error
   }
 };
@@ -236,6 +238,6 @@ export const isDevelopment = (): boolean => {
  */
 export const logSecurityEvent = (event: string, details?: any): void => {
   if (isDevelopment()) {
-    console.log(`[SECURITY] ${event}`, details);
+    logger.debug(`[SECURITY] ${event}`, details);
   }
 };

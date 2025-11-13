@@ -3,9 +3,10 @@ import { JournalEntry, DatabaseEntry } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import toast from 'react-hot-toast';
+import { logger } from '../utils/logger';
+import { STORAGE_KEYS } from '../constants';
 
 type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
-const OFFLINE_QUEUE_KEY = 'chronicle-ai-offline-queue';
 
 interface OfflineAction {
   type: 'add' | 'update' | 'delete';
@@ -36,7 +37,7 @@ export const useJournal = () => {
   const processOfflineQueue = useCallback(async () => {
     if (!user || !navigator.onLine) return;
 
-    const queueData = localStorage.getItem(OFFLINE_QUEUE_KEY);
+    const queueData = localStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE);
     if (!queueData) return;
 
     const queue: OfflineAction[] = JSON.parse(queueData);
@@ -57,12 +58,12 @@ export const useJournal = () => {
           await supabase.from('journal_entries').delete().eq('id', action.id);
         }
       } catch (error) {
-        console.error('Failed to sync action:', action, error);
+        logger.error('Failed to sync action:', action, error);
         remainingActions.push(action);
       }
     }
 
-    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(remainingActions));
+    localStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(remainingActions));
     toast.dismiss('syncing');
 
     if (remainingActions.length < queue.length) {
@@ -142,7 +143,7 @@ export const useJournal = () => {
       setEntries((data || []).map(transformDbEntry));
       setSyncStatus('idle');
     } catch (error) {
-      console.error('Error fetching entries:', error);
+      logger.error('Error fetching entries:', error);
       toast.error('Failed to load journal entries.');
       setSyncStatus('error');
     } finally {
@@ -196,10 +197,10 @@ export const useJournal = () => {
   }, [user]);
 
   const addToOfflineQueue = (action: OfflineAction) => {
-    const queueData = localStorage.getItem(OFFLINE_QUEUE_KEY);
+    const queueData = localStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE);
     const queue: OfflineAction[] = queueData ? JSON.parse(queueData) : [];
     queue.push(action);
-    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+    localStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
     setSyncStatus('offline');
   };
 
@@ -241,7 +242,7 @@ export const useJournal = () => {
 
       toast.success('Entry saved');
     } catch (error) {
-      console.warn('Saving entry offline:', error);
+      logger.warn('Saving entry offline:', error);
       addToOfflineQueue({ type: 'add', payload });
       toast.info('Entry saved offline, will sync when connected.');
     }
@@ -269,7 +270,7 @@ export const useJournal = () => {
       const { error } = await (supabase.from('journal_entries') as any).update(payload).eq('id', id);
       if (error) throw error;
     } catch (error) {
-      console.warn('Updating entry offline:', error);
+      logger.warn('Updating entry offline:', error);
       setEntries(originalEntries);
       addToOfflineQueue({ type: 'update', id, payload });
       toast.info('Changes saved offline, will sync when connected.');
@@ -290,7 +291,7 @@ export const useJournal = () => {
 
       toast.success('Entry deleted');
     } catch (error) {
-      console.warn('Deleting entry offline:', error);
+      logger.warn('Deleting entry offline:', error);
       setEntries(originalEntries);
       addToOfflineQueue({ type: 'delete', id });
       toast.info('Deletion saved offline, will sync when connected.');

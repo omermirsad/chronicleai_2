@@ -4,6 +4,8 @@
  * Centralized configuration for environment variables and app settings
  */
 
+import { logger } from '../utils/logger';
+
 export const config = {
   // App settings
   app: {
@@ -98,14 +100,14 @@ validateRequiredEnvVars();
 // Log configuration on app start (dev only)
 if (import.meta.env.DEV) {
   const validation = validateConfig();
-  
+
   if (!validation.valid) {
-    console.error('❌ Missing required environment variables:', validation.missing);
+    logger.error('❌ Missing required environment variables:', validation.missing);
   } else {
-    console.log('✅ Configuration validated successfully');
+    logger.info('✅ Configuration validated successfully');
   }
-  
-  console.log('App configuration:', {
+
+  logger.info('App configuration:', {
     environment: import.meta.env.MODE,
     appUrl: config.app.url,
     analyticsEnabled: config.app.enableAnalytics,

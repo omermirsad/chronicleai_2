@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import type { GamificationStats, UserAchievement, AchievementDefinition } from '../types';
+import { logger } from '../utils/logger';
 
 export const useGamification = () => {
   const { user } = useAuth();
@@ -99,7 +100,7 @@ export const useGamification = () => {
 
       setStats(gamificationStats);
     } catch (err) {
-      console.error('Error loading gamification stats:', err);
+      logger.error('Error loading gamification stats:', err);
       setError(err instanceof Error ? err.message : 'Failed to load stats');
     } finally {
       setLoading(false);
@@ -136,7 +137,7 @@ export const useGamification = () => {
         } as any,
       }));
     } catch (err) {
-      console.error('Error checking for achievements:', err);
+      logger.error('Error checking for achievements:', err);
       return [];
     }
   };

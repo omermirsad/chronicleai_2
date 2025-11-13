@@ -8,11 +8,23 @@ import { STORAGE_KEYS } from '../constants';
 
 type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
 
-interface OfflineAction {
-  type: 'add' | 'update' | 'delete';
-  id?: string;
-  payload?: any;
-}
+type AddAction = {
+  type: 'add';
+  payload: Omit<DatabaseEntry, 'id' | 'created_at' | 'updated_at'>;
+};
+
+type UpdateAction = {
+  type: 'update';
+  id: string;
+  payload: Partial<Omit<DatabaseEntry, 'id' | 'user_id' | 'created_at'>>;
+};
+
+type DeleteAction = {
+  type: 'delete';
+  id: string;
+};
+
+type OfflineAction = AddAction | UpdateAction | DeleteAction;
 
 const transformDbEntry = (dbEntry: DatabaseEntry): JournalEntry => ({
   id: dbEntry.id,
@@ -51,10 +63,10 @@ export const useJournal = () => {
     for (const action of queue) {
       try {
         if (action.type === 'add') {
-          await supabase.from('journal_entries').insert([action.payload] as any);
-        } else if (action.type === 'update' && action.id) {
-          await (supabase.from('journal_entries') as any).update(action.payload).eq('id', action.id);
-        } else if (action.type === 'delete' && action.id) {
+          await supabase.from('journal_entries').insert([action.payload]);
+        } else if (action.type === 'update') {
+          await supabase.from('journal_entries').update(action.payload).eq('id', action.id);
+        } else if (action.type === 'delete') {
           await supabase.from('journal_entries').delete().eq('id', action.id);
         }
       } catch (error) {
@@ -237,7 +249,7 @@ export const useJournal = () => {
     try {
       if (!navigator.onLine) throw new Error('Offline');
 
-      const { error } = await supabase.from('journal_entries').insert([payload] as any);
+      const { error } = await supabase.from('journal_entries').insert([payload]);
       if (error) throw error;
 
       toast.success('Entry saved');
@@ -267,7 +279,7 @@ export const useJournal = () => {
     try {
       if (!navigator.onLine) throw new Error('Offline');
 
-      const { error } = await (supabase.from('journal_entries') as any).update(payload).eq('id', id);
+      const { error} = await supabase.from('journal_entries').update(payload).eq('id', id);
       if (error) throw error;
     } catch (error) {
       logger.warn('Updating entry offline:', error);

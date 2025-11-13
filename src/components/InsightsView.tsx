@@ -17,7 +17,13 @@ const getMoodEmoji = (mood: number) => {
     return emojis[mood - 1] || '😐';
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{ value: number }>;
+    label?: string;
+}
+
+const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         const moodValue = payload[0].value;
         return (

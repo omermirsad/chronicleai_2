@@ -6,7 +6,7 @@
  */
 
 import { supabase } from './supabase';
-import type { JournalEntry, Profile } from '../types';
+import type { JournalEntry, Profile, DatabaseEntry } from '../types';
 import { logger } from '../utils/logger';
 
 /**
@@ -126,7 +126,7 @@ export const downloadEntriesAsCSV = async (userId: string) => {
     ];
 
     // CSV rows
-    const rows = entries.map((entry: any) => {
+    const rows = entries.map((entry: DatabaseEntry) => {
       const aiSummary = entry?.ai_analysis?.summary?.join('; ') || '';
       const tags = entry?.tags?.join(', ') || '';
       const sentiment = entry?.ai_analysis?.sentiment || '';
@@ -135,8 +135,8 @@ export const downloadEntriesAsCSV = async (userId: string) => {
       return [
         entry?.date || '',
         `"${(entry?.text || '').replace(/"/g, '""')}"`, // Escape quotes
-        entry?.mood || '',
-        entry?.energy || '',
+        entry?.mood?.toString() || '',
+        entry?.energy?.toString() || '',
         `"${tags}"`,
         sessionType,
         `"${aiSummary.replace(/"/g, '""')}"`,
@@ -147,7 +147,7 @@ export const downloadEntriesAsCSV = async (userId: string) => {
     // Combine headers and rows
     const csvContent = [
       headers.join(','),
-      ...rows.map((row: any) => row.join(',')),
+      ...rows.map((row: (string | number)[]) => row.join(',')),
     ].join('\n');
 
     // Create blob and download
@@ -190,7 +190,7 @@ export const downloadEntriesAsText = async (userId: string) => {
 
     // Generate text content
     const textContent = entries
-      .map((entry: any, index: number) => {
+      .map((entry: DatabaseEntry, index: number) => {
         const date = new Date(entry?.date || '').toLocaleDateString('en-US', {
           weekday: 'long',
           year: 'numeric',

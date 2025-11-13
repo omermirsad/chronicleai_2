@@ -71,7 +71,7 @@ export function useAsyncAction<T extends (...args: any[]) => Promise<any>>(
         }
 
         // Show error toast with custom message or error message
-        const displayMessage = (err as any)?.message || errorMessage;
+        const displayMessage = errorObj.message || errorMessage;
         toast.error(displayMessage);
 
         if (onError) {
@@ -126,7 +126,8 @@ export async function executeAsyncAction<T>(
       logger.error('Async action error:', err);
     }
 
-    const displayMessage = (err as any)?.message || errorMessage;
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    const displayMessage = errorObj.message || errorMessage;
     toast.error(displayMessage);
 
     if (onError) {

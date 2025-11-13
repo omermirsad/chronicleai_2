@@ -1,8 +1,11 @@
 import * as React from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { JournalEntry } from '../types';
 import JournalEntryCard from './JournalEntryCard';
 import OnThisDay from './OnThisDay';
+import JournalFilters, { FilterOptions } from './JournalFilters';
 import { PencilSquareIcon } from './Icons';
+import { useJournal } from '../hooks/useJournal';
 
 interface JournalFeedProps {
   entries: JournalEntry[];
@@ -11,6 +14,53 @@ interface JournalFeedProps {
 }
 
 const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
+  const { fetchEntries } = useJournal();
+  const [filters, setFilters] = useState<FilterOptions>({
+    searchText: '',
+    dateFrom: '',
+    dateTo: '',
+    selectedTags: [],
+    mood: null,
+    energyMin: null,
+    energyMax: null,
+  });
+
+  // Extract all unique tags from entries for the filter dropdown
+  const availableTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    entries.forEach(entry => {
+      entry.tags?.forEach(tag => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, [entries]);
+
+  // Apply filters whenever they change
+  useEffect(() => {
+    const hasActiveFilters =
+      filters.searchText ||
+      filters.dateFrom ||
+      filters.dateTo ||
+      filters.selectedTags.length > 0 ||
+      filters.mood !== null ||
+      filters.energyMin !== null ||
+      filters.energyMax !== null;
+
+    if (hasActiveFilters) {
+      fetchEntries({
+        searchText: filters.searchText || undefined,
+        dateFrom: filters.dateFrom || undefined,
+        dateTo: filters.dateTo || undefined,
+        selectedTags: filters.selectedTags.length > 0 ? filters.selectedTags : undefined,
+        mood: filters.mood,
+        energyMin: filters.energyMin,
+        energyMax: filters.energyMax,
+      });
+    } else {
+      // No filters, fetch all entries
+      fetchEntries();
+    }
+  }, [filters, fetchEntries]);
+
   // "On This Day" logic
   const today = new Date();
   const onThisDayEntries = entries
@@ -29,7 +79,16 @@ const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLen
     .filter(entry => !onThisDayEntryIds.has(entry.id))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  if (entries.length === 0) {
+  const hasActiveFilters =
+    filters.searchText ||
+    filters.dateFrom ||
+    filters.dateTo ||
+    filters.selectedTags.length > 0 ||
+    filters.mood !== null ||
+    filters.energyMin !== null ||
+    filters.energyMax !== null;
+
+  if (entries.length === 0 && !hasActiveFilters) {
     return (
       <div className="text-center py-16 px-6 bg-white rounded-lg shadow-sm border border-stone-200">
         <PencilSquareIcon className="w-16 h-16 mx-auto text-stone-400" />
@@ -41,24 +100,44 @@ const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLen
   }
 
   return (
-    <div className="space-y-8">
-      {onThisDayEntries.length > 0 && (
-        <OnThisDay 
-            entries={onThisDayEntries} 
-            onOpenPerspectiveLens={onOpenPerspectiveLens} 
-            onDeleteEntry={onDeleteEntry}
-        />
+    <div className="space-y-6">
+      {/* Filters */}
+      <JournalFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        availableTags={availableTags}
+      />
+
+      {/* No results message */}
+      {entries.length === 0 && hasActiveFilters && (
+        <div className="text-center py-12 px-6 bg-white rounded-lg shadow-sm border border-stone-200">
+          <p className="text-lg text-stone-600">No entries match your filters.</p>
+          <p className="mt-2 text-sm text-stone-500">Try adjusting or clearing your search criteria.</p>
+        </div>
       )}
-      <div className="space-y-6">
-        {regularEntries.map((entry) => (
-          <JournalEntryCard 
-            key={entry.id} 
-            entry={entry} 
-            onOpenPerspectiveLens={onOpenPerspectiveLens}
-            onDelete={onDeleteEntry}
-        />
-        ))}
-      </div>
+
+      {/* Entries */}
+      {entries.length > 0 && (
+        <>
+          {onThisDayEntries.length > 0 && (
+            <OnThisDay
+              entries={onThisDayEntries}
+              onOpenPerspectiveLens={onOpenPerspectiveLens}
+              onDeleteEntry={onDeleteEntry}
+            />
+          )}
+          <div className="space-y-6">
+            {regularEntries.map((entry) => (
+              <JournalEntryCard
+                key={entry.id}
+                entry={entry}
+                onOpenPerspectiveLens={onOpenPerspectiveLens}
+                onDelete={onDeleteEntry}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

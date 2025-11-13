@@ -102,6 +102,18 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayN
                         </div>
                     </div>
                     <div className="py-1">
+                        <a
+                            href="/settings"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                window.dispatchEvent(new CustomEvent('navigate', { detail: '/settings' }));
+                                window.history.pushState({}, '', '/settings');
+                                setIsDropdownOpen(false);
+                            }}
+                            className="block w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-100"
+                        >
+                            Settings
+                        </a>
                         <button
                             onClick={() => {
                                 onSignOut();

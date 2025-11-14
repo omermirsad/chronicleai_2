@@ -47,13 +47,11 @@ const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLen
 
     if (hasActiveFilters) {
       fetchEntries({
-        searchText: filters.searchText || undefined,
-        dateFrom: filters.dateFrom || undefined,
-        dateTo: filters.dateTo || undefined,
-        selectedTags: filters.selectedTags.length > 0 ? filters.selectedTags : undefined,
+        search: filters.searchText || undefined,
         mood: filters.mood,
         energyMin: filters.energyMin,
         energyMax: filters.energyMax,
+        tags: filters.selectedTags.length > 0 ? filters.selectedTags : undefined,
       });
     } else {
       // No filters, fetch all entries

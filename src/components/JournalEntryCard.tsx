@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { JournalEntry } from '../types';
 import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, LightningBoltIcon, TrashIcon } from './Icons';
-import toast, { type Toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { marked } from 'marked';
 
 interface JournalEntryCardProps {
@@ -37,7 +37,7 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
 
   const handleDelete = () => {
     if (onDelete) {
-        toast((t: Toast) => (
+        toast((t) => (
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold">Are you sure you want to delete this entry?</p>
                 <div className="flex gap-4">

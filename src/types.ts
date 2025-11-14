@@ -3,6 +3,39 @@
 // Subscription tiers
 export type SubscriptionTier = 'free' | 'pro' | 'premium';
 
+// Guided session types (moved before DatabaseEntry and Database)
+export type GuidedSessionType =
+  | 'gratitude'
+  | 'challenge'
+  | 'review'
+  | 'future-self'
+  | 'mindful-observation'
+  | 'stoic-reflection';
+
+// AI Analysis interface (moved before DatabaseEntry and Database)
+export interface AIAnalysis {
+  summary: string[];
+  tags: string[];
+  sentiment: 'Positive' | 'Negative' | 'Neutral' | 'Mixed' | string;
+  acknowledgement?: string;
+  socraticQuestion?: string;
+}
+
+// Gamification types (moved before Database)
+export type AchievementCategory = 'streak' | 'entries' | 'insights' | 'exploration';
+
+export interface AchievementDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: AchievementCategory;
+  requirement_type: 'count' | 'streak' | 'consecutive';
+  requirement_value: number;
+  points: number;
+  created_at?: string;
+}
+
 // public.profiles
 export interface Profile {
   id: string; // uuid
@@ -96,27 +129,23 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: {
-      [_ in never]: never;
-    };
+    Views: {};
     Functions: {
       get_user_achievements: {
         Args: { user_id_param: string };
         Returns: Array<{
           achievement_id: string;
-          earned_at: string;
           name: string;
           description: string;
           icon: string;
-          category: AchievementCategory;
-          requirement_type: 'count' | 'streak' | 'consecutive';
-          requirement_value: number;
+          category: string;
           points: number;
+          earned_at: string;
         }>;
       };
       check_and_award_achievements: {
         Args: { user_id_param: string };
-        Returns: Array<AchievementDefinition>;
+        Returns: { newly_awarded_achievements: any[] }[];
       };
       increment_ai_calls: {
         Args: { user_uuid: string };
@@ -136,12 +165,6 @@ export interface Database {
         };
         Returns: void;
       };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
     };
   };
 }
@@ -176,28 +199,12 @@ export interface JournalEntry {
   updatedAt?: string;
 }
 
-export interface AIAnalysis {
-  summary: string[];
-  tags: string[];
-  sentiment: 'Positive' | 'Negative' | 'Neutral' | 'Mixed' | string;
-  acknowledgement?: string;
-  socraticQuestion?: string;
-}
-
 export interface Perspective {
   title: string;
   content: string;
 }
 
 export type View = 'feed' | 'editor' | 'insights' | 'calendar';
-
-export type GuidedSessionType =
-  | 'gratitude'
-  | 'challenge'
-  | 'review'
-  | 'future-self'
-  | 'mindful-observation'
-  | 'stoic-reflection';
 
 // Subscription and pricing types
 export interface PricingPlan {
@@ -220,21 +227,6 @@ export interface SubscriptionUsage {
   percentageUsed: number;
   billingPeriodStart?: string;
   billingPeriodEnd?: string;
-}
-
-// Gamification types
-export type AchievementCategory = 'streak' | 'entries' | 'insights' | 'exploration';
-
-export interface AchievementDefinition {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: AchievementCategory;
-  requirement_type: 'count' | 'streak' | 'consecutive';
-  requirement_value: number;
-  points: number;
-  created_at?: string;
 }
 
 export interface UserAchievement {

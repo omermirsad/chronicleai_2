@@ -355,7 +355,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
             </button>
           </div>
         </div>
-        {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
+        {showUpgradeModal && <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />}
       </div>
     );
   }
@@ -471,7 +471,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
           </>
         )}
       </div>
-      {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
+      {showUpgradeModal && <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />}
     </div>
   );
 };

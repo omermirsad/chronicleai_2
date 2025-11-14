@@ -84,7 +84,7 @@ export const DataManagementSection: React.FC = () => {
         throw new Error('Please type DELETE to confirm');
       }
 
-      await requestAccountDeletion(user.id);
+      await requestAccountDeletion();
       await signOut();
       navigate('/');
     },

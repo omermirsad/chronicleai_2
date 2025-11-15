@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useAsyncAction } from '../../hooks/useAsyncAction';
+import { useLanguageSync } from '../../hooks/useLanguageSync';
 import { TOAST_MESSAGES } from '../../constants';
-import type { EmailPreferences } from '../../types';
+import { supportedLanguages } from '../../config/languages';
+import type { UserPreferences } from '../../types';
 
 export const PreferencesSection: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const [preferences, setPreferences] = useState<EmailPreferences>({
+  const { changeLanguage, currentLanguage } = useLanguageSync();
+
+  // Omit language from preferences as it's handled by useLanguageSync
+  const [preferences, setPreferences] = useState<Omit<UserPreferences, 'language'>>({
     emailNotifications: true,
     insightsFrequency: 'weekly',
     weeklyDigest: true,
@@ -53,9 +60,15 @@ export const PreferencesSection: React.FC = () => {
     async () => {
       if (!user) return;
 
+      // Merge language preference with other preferences
       const { error } = await supabase
         .from('profiles')
-        .update({ preferences })
+        .update({
+          preferences: {
+            ...preferences,
+            language: currentLanguage, // Include current language
+          }
+        })
         .eq('id', user.id);
 
       if (error) throw error;
@@ -68,8 +81,37 @@ export const PreferencesSection: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-stone-200 p-6">
+      {/* Language Section */}
       <h3 className="text-xl font-semibold text-stone-800 mb-4">
-        Email Preferences
+        {t('settings.generalTitle')}
+      </h3>
+      <div className="space-y-4 mb-6 pb-6 border-b border-stone-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <label className="text-sm font-medium text-stone-700">
+              {t('settings.language')}
+            </label>
+            <p className="text-xs text-stone-500">
+              {t('settings.languageDesc')}
+            </p>
+          </div>
+          <select
+            value={currentLanguage}
+            onChange={(e) => changeLanguage(e.target.value as any)}
+            className="w-48 text-sm border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
+          >
+            {supportedLanguages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Email Preferences Section */}
+      <h3 className="text-xl font-semibold text-stone-800 mb-4">
+        {t('settings.emailTitle')}
       </h3>
 
       <div className="space-y-4">
@@ -77,10 +119,10 @@ export const PreferencesSection: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <label className="text-sm font-medium text-stone-700">
-                Email Notifications
+                {t('settings.emailNotifications')}
               </label>
               <p className="text-xs text-stone-500">
-                Receive emails about your journaling journey
+                {t('settings.emailNotificationsDesc')}
               </p>
             </div>
             <input
@@ -101,10 +143,10 @@ export const PreferencesSection: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-sm font-medium text-stone-700">
-                    Weekly Digest
+                    {t('settings.weeklyDigest')}
                   </label>
                   <p className="text-xs text-stone-500">
-                    Personalized summary every Sunday
+                    {t('settings.weeklyDigestDesc')}
                   </p>
                 </div>
                 <input
@@ -123,10 +165,10 @@ export const PreferencesSection: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-sm font-medium text-stone-700">
-                    On This Day
+                    {t('settings.onThisDay')}
                   </label>
                   <p className="text-xs text-stone-500">
-                    Daily memories from past years
+                    {t('settings.onThisDayDesc')}
                   </p>
                 </div>
                 <input
@@ -145,10 +187,10 @@ export const PreferencesSection: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-sm font-medium text-stone-700">
-                    Streak Reminders
+                    {t('settings.streakReminders')}
                   </label>
                   <p className="text-xs text-stone-500">
-                    Keep your journaling streak alive
+                    {t('settings.streakRemindersDesc')}
                   </p>
                 </div>
                 <input
@@ -167,10 +209,10 @@ export const PreferencesSection: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-sm font-medium text-stone-700">
-                    Achievement Notifications
+                    {t('settings.achievementNotifications')}
                   </label>
                   <p className="text-xs text-stone-500">
-                    Celebrate your milestones
+                    {t('settings.achievementNotificationsDesc')}
                   </p>
                 </div>
                 <input
@@ -194,7 +236,7 @@ export const PreferencesSection: React.FC = () => {
           disabled={loading}
           className="w-full sm:w-auto px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition disabled:opacity-50"
         >
-          {loading ? 'Saving...' : 'Save Preferences'}
+          {loading ? t('common.saving') : t('common.save')}
         </button>
       </div>
     </div>

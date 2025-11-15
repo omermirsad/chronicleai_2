@@ -4,6 +4,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { generateWeeklyDigest, WeeklyDigestData } from '../_shared/email-templates/weekly-digest.ts';
+import { getTranslator } from '../_shared/i18n.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -59,6 +60,10 @@ serve(async (req) => {
           results.skipped++;
           continue;
         }
+
+        // Get user's language preference
+        const userLanguage = preferences.language || 'en';
+        const t = getTranslator(userLanguage);
 
         // Get user's entries from the past 7 days
         const { data: entries, error: entriesError } = await supabase
@@ -176,6 +181,7 @@ Provide only the summary text, no additional commentary.`;
         const emailHtml = generateWeeklyDigest(emailData);
 
         // Send email using Resend
+        const subject = t('weeklyDigestSubject');
         const resendResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -185,7 +191,7 @@ Provide only the summary text, no additional commentary.`;
           body: JSON.stringify({
             from: 'Chronicle AI <digest@chronicle-ai.app>',
             to: [profile.email],
-            subject: `✨ Your Weekly Reflection: ${emailData.totalEntries} entries, ${emailData.averageMood.toFixed(1)} avg mood`,
+            subject: subject,
             html: emailHtml,
           }),
         });

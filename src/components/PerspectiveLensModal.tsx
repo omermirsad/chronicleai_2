@@ -4,6 +4,8 @@ import * as React from 'react';
 import { JournalEntry, Perspective } from '../types';
 import { getPerspectives } from '../services/geminiService';
 import { XMarkIcon } from './Icons';
+import { useSubscription } from '../hooks/useSubscription';
+import toast from 'react-hot-toast';
 
 interface PerspectiveLensModalProps {
   isOpen: boolean;
@@ -16,15 +18,46 @@ const PerspectiveLensModal: React.FC<PerspectiveLensModalProps> = ({ isOpen, onC
   // Fix: Add generic type to useState
   const [perspectives, setPerspectives] = React.useState<Perspective[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const { usage, canMakeAICall, refresh: refreshSubscription } = useSubscription();
 
   React.useEffect(() => {
     if (isOpen) {
       const fetchPerspectives = async () => {
         setIsLoading(true);
         setPerspectives([]);
-        const result = await getPerspectives(entry.text);
-        setPerspectives(result);
-        setIsLoading(false);
+        setError(null);
+
+        // Check if user has subscription access
+        if (!canMakeAICall()) {
+          setError('You have reached your AI call limit. Please upgrade your subscription to use Perspective Lens.');
+          setIsLoading(false);
+          toast.error('AI call limit reached. Please upgrade to continue.');
+          return;
+        }
+
+        // Warn if user has fewer than 3 calls remaining (Perspective Lens uses 3 calls)
+        const PERSPECTIVES_COUNT = 3;
+        if (usage && usage.aiCallsRemaining < PERSPECTIVES_COUNT) {
+          toast.error(
+            `Perspective Lens requires ${PERSPECTIVES_COUNT} AI calls, but you only have ${usage.aiCallsRemaining} remaining. Some perspectives may fail.`,
+            { duration: 5000 }
+          );
+        }
+
+        try {
+          // Backend now handles AI call limit checking and incrementing for each perspective
+          const result = await getPerspectives(entry.text);
+          setPerspectives(result);
+          // Refresh subscription data to update UI with new usage
+          refreshSubscription();
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : 'Failed to generate perspectives';
+          setError(errorMessage);
+          toast.error(errorMessage);
+        } finally {
+          setIsLoading(false);
+        }
       };
       fetchPerspectives();
     }
@@ -47,7 +80,12 @@ const PerspectiveLensModal: React.FC<PerspectiveLensModalProps> = ({ isOpen, onC
         </div>
 
         <div className="px-6 pb-6 space-y-4">
-          {isLoading ? (
+          {error ? (
+            <div className="bg-rose-50 border border-rose-200 p-4 rounded-md">
+              <p className="text-rose-700 text-sm">{error}</p>
+              <p className="text-stone-600 text-xs mt-2">Visit the Settings page to upgrade your subscription.</p>
+            </div>
+          ) : isLoading ? (
             <div className="text-center p-8">
               <p className="text-stone-600">AI is generating new perspectives...</p>
             </div>

@@ -292,6 +292,70 @@ export function validateEnvVars(required: string[]): { valid: boolean; missing?:
 }
 
 /**
+ * Check and increment AI call usage for a user
+ * Returns { allowed: true, ... } if the user can make the call
+ * Returns { allowed: false, error: "..." } if the limit is reached
+ */
+export async function checkAndIncrementAICalls(
+  userId: string,
+  supabaseUrl: string,
+  supabaseKey: string
+): Promise<{
+  allowed: boolean;
+  callsUsed?: number;
+  callsLimit?: number;
+  callsRemaining?: number;
+  error?: string;
+}> {
+  try {
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data, error } = await supabase
+      .rpc('increment_ai_calls', { user_uuid: userId });
+
+    if (error) {
+      console.error('Error checking AI call limit:', error);
+      return {
+        allowed: false,
+        error: 'Failed to verify subscription limits'
+      };
+    }
+
+    if (!data || data.length === 0) {
+      return {
+        allowed: false,
+        error: 'Failed to retrieve subscription data'
+      };
+    }
+
+    const result = data[0];
+
+    if (!result.success) {
+      return {
+        allowed: false,
+        callsUsed: result.calls_used,
+        callsLimit: result.calls_limit,
+        callsRemaining: 0,
+        error: `AI call limit reached. You've used ${result.calls_used} of ${result.calls_limit} calls this month. Please upgrade your subscription to continue.`
+      };
+    }
+
+    return {
+      allowed: true,
+      callsUsed: result.calls_used,
+      callsLimit: result.calls_limit,
+      callsRemaining: result.calls_remaining
+    };
+  } catch (error) {
+    console.error('Exception in checkAndIncrementAICalls:', error);
+    return {
+      allowed: false,
+      error: error instanceof Error ? error.message : 'Failed to check subscription limits'
+    };
+  }
+}
+
+/**
  * Comprehensive middleware wrapper
  */
 export interface MiddlewareOptions {
@@ -301,6 +365,7 @@ export interface MiddlewareOptions {
   maxBodySize?: number;
   timeout?: number;
   requiredEnvVars?: string[];
+  checkAICallLimit?: boolean; // New option for AI call limit enforcement
 }
 
 export async function withMiddleware(
@@ -362,6 +427,26 @@ export async function withMiddleware(
         );
       }
       userId = authResult.userId!;
+    }
+
+    // AI Call Limit Check (only if authenticated and option enabled)
+    if (options.checkAICallLimit && userId) {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+
+      const aiCallCheck = await checkAndIncrementAICalls(userId, supabaseUrl, supabaseKey);
+
+      if (!aiCallCheck.allowed) {
+        return createErrorResponse(
+          aiCallCheck.error || 'AI call limit reached',
+          429,
+          'AI_LIMIT_EXCEEDED',
+          corsHeaders
+        );
+      }
+
+      // Optionally add usage info to response headers (for client-side tracking)
+      // This will be added to the final response below
     }
 
     // Execute handler with optional timeout

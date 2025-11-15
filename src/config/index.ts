@@ -62,6 +62,8 @@ export const config = {
     proYearlyPriceId: import.meta.env.VITE_STRIPE_PRO_YEARLY_PRICE_ID || '',
     premiumPriceId: import.meta.env.VITE_STRIPE_PREMIUM_PRICE_ID || '',
     premiumYearlyPriceId: import.meta.env.VITE_STRIPE_PREMIUM_YEARLY_PRICE_ID || '',
+    // Consumable AI call packs (one-time purchases)
+    aiCallPack25PriceId: import.meta.env.VITE_STRIPE_AI_CALL_PACK_25_PRICE_ID || '',
   },
 };
 

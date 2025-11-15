@@ -201,3 +201,19 @@ export const STRIPE_CONFIG = {
   checkoutSuccessUrl: `${config.app.url}/settings?payment=success`,
   checkoutCancelUrl: `${config.app.url}/pricing?payment=cancelled`,
 };
+
+/**
+ * Consumable AI Call Packs (one-time purchases)
+ * Available to Pro and Premium users who need extra calls
+ */
+export const AI_CALL_PACKS = [
+  {
+    id: 'pack_25',
+    name: '25 Extra AI Calls',
+    calls: 25,
+    price: 4.99,
+    stripePriceId: config.stripe.aiCallPack25PriceId,
+    description: 'One-time purchase, never expires',
+    popular: true,
+  },
+] as const;

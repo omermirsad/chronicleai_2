@@ -227,6 +227,7 @@ export interface SubscriptionUsage {
   aiCallsLimit: number;
   aiCallsRemaining: number;
   percentageUsed: number;
+  consumableAICalls: number; // One-time AI calls purchased separately
   billingPeriodStart?: string;
   billingPeriodEnd?: string;
 }

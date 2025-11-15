@@ -19,6 +19,7 @@ const JournalFeed = lazy(() => import('./components/JournalFeed'));
 const InsightsView = lazy(() => import('./components/InsightsView'));
 const CalendarView = lazy(() => import('./components/CalendarView'));
 const PerspectiveLensModal = lazy(() => import('./components/PerspectiveLensModal'));
+const UpgradeModal = lazy(() => import('./components/UpgradeModal'));
 
 const App: FC = () => {
   const { user, signOut, loading: authLoading } = useAuth();
@@ -32,6 +33,9 @@ const App: FC = () => {
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<'limit_reached' | 'premium_feature' | 'perspective_lens'>('limit_reached');
+  const [upgradeFeatureName, setUpgradeFeatureName] = useState<string | undefined>(undefined);
 
   // Check if user has completed onboarding
   useEffect(() => {
@@ -72,6 +76,12 @@ const App: FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleOpenUpgradeModal = (reason: 'limit_reached' | 'premium_feature' | 'perspective_lens', featureName?: string) => {
+    setUpgradeReason(reason);
+    setUpgradeFeatureName(featureName);
+    setUpgradeModalOpen(true);
+  };
+
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
   };
@@ -110,18 +120,20 @@ const App: FC = () => {
         return <InsightsView entries={entries} userId={user!.id} />;
       case 'calendar':
         return (
-            <CalendarView 
+            <CalendarView
                 entries={entries}
                 onOpenPerspectiveLens={handleOpenPerspectiveLens}
+                onOpenUpgradeModal={handleOpenUpgradeModal}
                 onDeleteEntry={deleteEntry}
             />
         );
       case 'feed':
       default:
         return (
-            <JournalFeed 
+            <JournalFeed
                 entries={entries}
                 onOpenPerspectiveLens={handleOpenPerspectiveLens}
+                onOpenUpgradeModal={handleOpenUpgradeModal}
                 onDeleteEntry={deleteEntry}
             />
         );
@@ -171,13 +183,14 @@ const App: FC = () => {
           />
         )}
         
-        <Header 
-          currentView={currentView} 
+        <Header
+          currentView={currentView}
           setCurrentView={setCurrentView}
           onThisDayNotification={hasOnThisDayEntries}
           user={user}
           onSignOut={handleSignOut}
           syncStatus={syncStatus}
+          onOpenUpgradeModal={handleOpenUpgradeModal}
         />
         
         <main className="max-w-3xl mx-auto p-4 sm:p-6">
@@ -199,6 +212,15 @@ const App: FC = () => {
             />
           </Suspense>
         )}
+
+        <Suspense fallback={<div />}>
+          <UpgradeModal
+            isOpen={upgradeModalOpen}
+            onClose={() => setUpgradeModalOpen(false)}
+            reason={upgradeReason}
+            featureName={upgradeFeatureName}
+          />
+        </Suspense>
       </div>
     </ErrorBoundary>
   );

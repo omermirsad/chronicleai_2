@@ -7,10 +7,11 @@ import { CalendarDaysIcon } from './Icons';
 interface OnThisDayProps {
   entries: JournalEntry[];
   onOpenPerspectiveLens: (entry: JournalEntry) => void;
+  onOpenUpgradeModal?: (reason: 'limit_reached' | 'premium_feature' | 'perspective_lens', featureName?: string) => void;
   onDeleteEntry: (id: string) => void;
 }
 
-const OnThisDay: React.FC<OnThisDayProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
+const OnThisDay: React.FC<OnThisDayProps> = ({ entries, onOpenPerspectiveLens, onOpenUpgradeModal, onDeleteEntry }) => {
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -31,10 +32,11 @@ const OnThisDay: React.FC<OnThisDayProps> = ({ entries, onOpenPerspectiveLens, o
       </header>
       <div className="space-y-4">
         {entries.map((entry) => (
-          <JournalEntryCard 
-            key={entry.id} 
-            entry={entry} 
-            onOpenPerspectiveLens={onOpenPerspectiveLens} 
+          <JournalEntryCard
+            key={entry.id}
+            entry={entry}
+            onOpenPerspectiveLens={onOpenPerspectiveLens}
+            onOpenUpgradeModal={onOpenUpgradeModal}
             onDelete={onDeleteEntry}
           />
         ))}

@@ -10,10 +10,11 @@ import { useJournal } from '../hooks/useJournal';
 interface JournalFeedProps {
   entries: JournalEntry[];
   onOpenPerspectiveLens: (entry: JournalEntry) => void;
+  onOpenUpgradeModal?: (reason: 'limit_reached' | 'premium_feature' | 'perspective_lens', featureName?: string) => void;
   onDeleteEntry: (id: string) => void;
 }
 
-const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
+const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLens, onOpenUpgradeModal, onDeleteEntry }) => {
   const { fetchEntries } = useJournal();
   const [filters, setFilters] = useState<FilterOptions>({
     searchText: '',
@@ -121,6 +122,7 @@ const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLen
             <OnThisDay
               entries={onThisDayEntries}
               onOpenPerspectiveLens={onOpenPerspectiveLens}
+              onOpenUpgradeModal={onOpenUpgradeModal}
               onDeleteEntry={onDeleteEntry}
             />
           )}
@@ -130,6 +132,7 @@ const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLen
                 key={entry.id}
                 entry={entry}
                 onOpenPerspectiveLens={onOpenPerspectiveLens}
+                onOpenUpgradeModal={onOpenUpgradeModal}
                 onDelete={onDeleteEntry}
               />
             ))}

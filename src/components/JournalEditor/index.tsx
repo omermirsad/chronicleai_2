@@ -158,9 +158,16 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
       toast.success('Entry saved!');
       editorState.resetState();
       setCurrentView('feed');
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Failed to process freestyle entry:', error);
-      toast.error('Failed to save entry');
+
+      // Check if this is an AI limit exceeded error
+      if (error?.code === 'AI_LIMIT_EXCEEDED') {
+        setShowUpgradeModal(true);
+        refreshSubscription(); // Refresh to show updated usage
+      } else {
+        toast.error('Failed to save entry');
+      }
     } finally {
       editorState.setIsProcessing(false);
     }
@@ -218,9 +225,16 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
         editorState.resetState();
         guidedState.resetGuidedSession();
         setMode('selection');
-      } catch (error) {
+      } catch (error: any) {
         logger.error('Failed to save guided session:', error);
-        toast.error('Failed to save session');
+
+        // Check if this is an AI limit exceeded error
+        if (error?.code === 'AI_LIMIT_EXCEEDED') {
+          setShowUpgradeModal(true);
+          refreshSubscription(); // Refresh to show updated usage
+        } else {
+          toast.error('Failed to save session');
+        }
       } finally {
         editorState.setIsProcessing(false);
       }

@@ -4,6 +4,7 @@ import { JournalEntry } from '../types';
 import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, LightningBoltIcon, TrashIcon } from './Icons';
 import toast from 'react-hot-toast';
 import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface JournalEntryCardProps {
   entry: JournalEntry;
@@ -125,7 +126,7 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
         <>
           <div
             className="prose prose-stone max-w-none font-serif text-stone-700 whitespace-pre-wrap leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: marked.parse(displayText || '') }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(displayText || '') as string) }}
           />
           {isTruncatable && (
             <button onClick={() => setIsExpanded(!isExpanded)} className="text-sm font-medium text-rose-600 hover:text-rose-800 transition mt-2">

@@ -12,11 +12,23 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!;
 const APP_URL = Deno.env.get('APP_URL') || 'https://chronicle-ai.app';
 
 serve(async (req) => {
-  // Verify this is a cron request
+  // Verify this is a cron request - FAIL CLOSED
   const authHeader = req.headers.get('Authorization');
   const cronSecret = Deno.env.get('CRON_SECRET');
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  // CRITICAL: Fail closed - if CRON_SECRET is not set, reject the request
+  if (!cronSecret) {
+    console.error('CRON_SECRET is not configured');
+    return new Response(JSON.stringify({
+      error: 'Server configuration error: CRON_SECRET not set'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    console.warn('Unauthorized cron access attempt');
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },

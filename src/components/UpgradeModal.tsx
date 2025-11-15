@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  reason?: 'limit_reached' | 'premium_feature';
+  reason?: 'limit_reached' | 'premium_feature' | 'perspective_lens';
   featureName?: string;
 }
 
@@ -37,12 +37,18 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
     if (reason === 'limit_reached') {
       return "You've reached your AI analysis limit";
     }
+    if (reason === 'perspective_lens') {
+      return "Unlock the Perspective Lens";
+    }
     return `Upgrade to access ${featureName || 'this feature'}`;
   };
 
   const getMessage = () => {
     if (reason === 'limit_reached') {
       return `You've used all ${usage?.aiCallsLimit || 10} AI analysis calls for this month. Upgrade to continue getting AI-powered insights for your journal entries.`;
+    }
+    if (reason === 'perspective_lens') {
+      return "Get 3 unique AI-powered perspectives on every journal entry. The Perspective Lens analyzes your thoughts from different viewpoints, helping you discover deeper insights and patterns you might have missed.";
     }
     return `${featureName || 'This feature'} is available on Pro and Premium plans. Upgrade to unlock advanced analytics and insights.`;
   };

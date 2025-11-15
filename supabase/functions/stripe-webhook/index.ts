@@ -46,42 +46,68 @@ serve(async (req) => {
           break;
         }
 
-        // Get subscription details
-        const subscriptionId = session.subscription as string;
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        // Check if this is a subscription or one-time payment
+        if (session.mode === 'payment') {
+          // One-time payment (AI call pack purchase)
+          const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+          const purchasedItem = lineItems.data[0];
 
-        // Determine tier based on price ID
-        let tier: 'free' | 'pro' | 'premium' = 'free';
-        const priceId = subscription.items.data[0]?.price.id;
+          if (purchasedItem) {
+            const priceId = purchasedItem.price?.id;
+            const aiCallPackPriceId = Deno.env.get('VITE_STRIPE_AI_CALL_PACK_25_PRICE_ID');
 
-        // Match price ID to tier (you'll need to configure these)
-        const proPriceIds = [
-          Deno.env.get('VITE_STRIPE_PRO_PRICE_ID'),
-          Deno.env.get('VITE_STRIPE_PRO_YEARLY_PRICE_ID'),
-        ];
-        const premiumPriceIds = [
-          Deno.env.get('VITE_STRIPE_PREMIUM_PRICE_ID'),
-          Deno.env.get('VITE_STRIPE_PREMIUM_YEARLY_PRICE_ID'),
-        ];
+            if (priceId === aiCallPackPriceId) {
+              // Add 25 consumable AI calls
+              const { error } = await supabase.rpc('add_consumable_calls', {
+                user_uuid: userId,
+                calls_to_add: 25,
+              });
 
-        if (proPriceIds.includes(priceId)) {
-          tier = 'pro';
-        } else if (premiumPriceIds.includes(priceId)) {
-          tier = 'premium';
-        }
+              if (error) {
+                console.error('Error adding consumable calls:', error);
+              } else {
+                console.log(`Added 25 consumable AI calls to user ${userId}`);
+              }
+            }
+          }
+        } else if (session.mode === 'subscription') {
+          // Subscription purchase (Pro or Premium)
+          const subscriptionId = session.subscription as string;
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-        // Update user subscription using the database function
-        const { error } = await supabase.rpc('update_subscription_tier', {
-          user_uuid: userId,
-          new_tier: tier,
-          new_stripe_customer_id: session.customer as string,
-          new_stripe_subscription_id: subscriptionId,
-        });
+          // Determine tier based on price ID
+          let tier: 'free' | 'pro' | 'premium' = 'free';
+          const priceId = subscription.items.data[0]?.price.id;
 
-        if (error) {
-          console.error('Error updating subscription:', error);
-        } else {
-          console.log(`Updated user ${userId} to ${tier} tier`);
+          // Match price ID to tier (you'll need to configure these)
+          const proPriceIds = [
+            Deno.env.get('VITE_STRIPE_PRO_PRICE_ID'),
+            Deno.env.get('VITE_STRIPE_PRO_YEARLY_PRICE_ID'),
+          ];
+          const premiumPriceIds = [
+            Deno.env.get('VITE_STRIPE_PREMIUM_PRICE_ID'),
+            Deno.env.get('VITE_STRIPE_PREMIUM_YEARLY_PRICE_ID'),
+          ];
+
+          if (proPriceIds.includes(priceId)) {
+            tier = 'pro';
+          } else if (premiumPriceIds.includes(priceId)) {
+            tier = 'premium';
+          }
+
+          // Update user subscription using the database function
+          const { error } = await supabase.rpc('update_subscription_tier', {
+            user_uuid: userId,
+            new_tier: tier,
+            new_stripe_customer_id: session.customer as string,
+            new_stripe_subscription_id: subscriptionId,
+          });
+
+          if (error) {
+            console.error('Error updating subscription:', error);
+          } else {
+            console.log(`Updated user ${userId} to ${tier} tier`);
+          }
         }
 
         break;

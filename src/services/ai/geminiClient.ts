@@ -17,11 +17,26 @@ export class GeminiClient {
         body: { parts, config },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if this is an AI limit exceeded error
+        if (error.message?.includes('AI call limit reached') || error.message?.includes('limit reached')) {
+          // Re-throw with specific error type so calling code can handle it
+          const limitError = new Error('AI_LIMIT_EXCEEDED');
+          (limitError as any).code = 'AI_LIMIT_EXCEEDED';
+          (limitError as any).originalError = error;
+          throw limitError;
+        }
+        throw error;
+      }
       return data;
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Gemini proxy error:', error);
-      toast.error('AI service is temporarily unavailable.');
+
+      // Don't show toast for limit errors - let the calling code handle it
+      if (error?.code !== 'AI_LIMIT_EXCEEDED') {
+        toast.error('AI service is temporarily unavailable.');
+      }
+
       throw error;
     }
   }

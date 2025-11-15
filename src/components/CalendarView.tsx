@@ -8,11 +8,12 @@ import { XMarkIcon } from './Icons';
 interface CalendarViewProps {
   entries: JournalEntry[];
   onOpenPerspectiveLens: (entry: JournalEntry) => void;
+  onOpenUpgradeModal?: (reason: 'limit_reached' | 'premium_feature' | 'perspective_lens', featureName?: string) => void;
   onDeleteEntry: (id: string) => void;
 }
 
 // Fix: Use FC type for functional component
-const CalendarView: React.FC<CalendarViewProps> = ({ entries, onOpenPerspectiveLens, onDeleteEntry }) => {
+const CalendarView: React.FC<CalendarViewProps> = ({ entries, onOpenPerspectiveLens, onOpenUpgradeModal, onDeleteEntry }) => {
   const [currentDate, setCurrentDate] = React.useState(new Date());
   // Fix: Add generic type to useState
   const [selectedDayEntries, setSelectedDayEntries] = React.useState<JournalEntry[]>([]);
@@ -118,10 +119,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ entries, onOpenPerspectiveL
             </div>
             <div className="p-6 space-y-4 overflow-y-auto">
               {selectedDayEntries.map(entry => (
-                <JournalEntryCard 
-                    key={entry.id} 
-                    entry={entry} 
+                <JournalEntryCard
+                    key={entry.id}
+                    entry={entry}
                     onOpenPerspectiveLens={onOpenPerspectiveLens}
+                    onOpenUpgradeModal={onOpenUpgradeModal}
                     onDelete={onDeleteEntry}
                 />
               ))}

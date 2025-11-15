@@ -4,6 +4,7 @@ import * as React from 'react';
 import { View, User } from '../types';
 import { BookOpenIcon, PencilSquareIcon, SparklesIcon, CalendarDaysIcon, UserCircleIcon } from './Icons';
 import { StreakDisplay } from './StreakDisplay';
+import { useSubscription } from '../hooks/useSubscription';
 
 interface HeaderProps {
   currentView: View;
@@ -12,6 +13,7 @@ interface HeaderProps {
   user: User;
   onSignOut: () => void;
   syncStatus: 'idle' | 'syncing' | 'error' | 'offline';
+  onOpenUpgradeModal?: (reason: 'limit_reached' | 'premium_feature' | 'perspective_lens', featureName?: string) => void;
 }
 
 // Fix: Use FC type for functional component
@@ -27,10 +29,11 @@ const SyncIndicator: React.FC<{ status: HeaderProps['syncStatus'] }> = ({ status
 }
 
 // Fix: Use FC type for functional component
-const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayNotification, user, onSignOut, syncStatus }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayNotification, user, onSignOut, syncStatus, onOpenUpgradeModal }) => {
   // Fix: Add generic type to useState
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const { usage } = useSubscription();
   
   const navItems = [
     { id: 'feed', label: 'Journal', icon: <BookOpenIcon />, notification: onThisDayNotification },
@@ -82,7 +85,30 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayN
             ))}
             </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+           {/* AI Call Counter - Only for Free Tier */}
+           {usage?.tier === 'free' && (
+             <button
+               onClick={() => {
+                 if (usage.aiCallsRemaining === 0) {
+                   onOpenUpgradeModal?.('limit_reached');
+                 }
+               }}
+               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                 usage.aiCallsRemaining === 0
+                   ? 'bg-red-100 text-red-700 hover:bg-red-200 cursor-pointer'
+                   : usage.percentageUsed >= 80
+                   ? 'bg-yellow-100 text-yellow-700'
+                   : 'bg-indigo-100 text-indigo-700'
+               }`}
+               disabled={usage.aiCallsRemaining > 0}
+             >
+               <SparklesIcon className="w-4 h-4" />
+               <span className="hidden sm:inline">AI Calls: </span>
+               <span className="font-bold">{usage.aiCallsRemaining}/{usage.aiCallsLimit}</span>
+             </button>
+           )}
+
            <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)} 

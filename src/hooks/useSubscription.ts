@@ -24,7 +24,7 @@ export const useSubscription = () => {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('subscription_tier, ai_calls_used, ai_calls_limit, billing_period_start, billing_period_end')
+        .select('subscription_tier, ai_calls_used, ai_calls_limit, consumable_ai_calls, billing_period_start, billing_period_end')
         .eq('id', user.id)
         .single();
 
@@ -35,6 +35,7 @@ export const useSubscription = () => {
         const aiCallsLimit = profile.ai_calls_limit || 10;
         const aiCallsRemaining = Math.max(0, aiCallsLimit - aiCallsUsed);
         const percentageUsed = aiCallsLimit > 0 ? (aiCallsUsed / aiCallsLimit) * 100 : 0;
+        const consumableAICalls = profile.consumable_ai_calls || 0;
 
         setUsage({
           tier: (profile.subscription_tier as SubscriptionTier) || 'free',
@@ -42,6 +43,7 @@ export const useSubscription = () => {
           aiCallsLimit,
           aiCallsRemaining,
           percentageUsed,
+          consumableAICalls,
           billingPeriodStart: profile.billing_period_start || undefined,
           billingPeriodEnd: profile.billing_period_end || undefined,
         });
@@ -54,13 +56,13 @@ export const useSubscription = () => {
     }
   };
 
-  // Check if user has reached their AI calls limit
+  // Check if user has reached their AI calls limit (including consumable calls)
   const hasReachedLimit = (): boolean => {
     if (!usage) return false;
-    return usage.aiCallsRemaining <= 0;
+    return usage.aiCallsRemaining <= 0 && usage.consumableAICalls <= 0;
   };
 
-  // Check if user can make an AI call
+  // Check if user can make an AI call (either monthly or consumable)
   const canMakeAICall = (): boolean => {
     return !hasReachedLimit();
   };
@@ -151,17 +153,18 @@ export const useSubscription = () => {
   const getStatusText = (): string => {
     if (!usage) return 'Loading...';
 
-    const { tier, aiCallsRemaining, aiCallsLimit } = usage;
+    const { tier, aiCallsRemaining, aiCallsLimit, consumableAICalls } = usage;
 
     if (tier === 'premium') {
       return 'Unlimited AI analysis';
     }
 
-    if (aiCallsRemaining === 0) {
+    if (aiCallsRemaining === 0 && consumableAICalls === 0) {
       return 'Limit reached';
     }
 
-    return `${aiCallsRemaining} of ${aiCallsLimit} AI calls remaining`;
+    const totalRemaining = aiCallsRemaining + consumableAICalls;
+    return `${totalRemaining} AI calls remaining (${aiCallsRemaining}/${aiCallsLimit} monthly${consumableAICalls > 0 ? ` + ${consumableAICalls} extra` : ''})`;
   };
 
   // Get usage color (for UI indicators)

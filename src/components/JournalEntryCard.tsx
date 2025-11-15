@@ -5,17 +5,20 @@ import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, Lightnin
 import toast from 'react-hot-toast';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
+import { useSubscription } from '../hooks/useSubscription';
 
 interface JournalEntryCardProps {
   entry: JournalEntry;
   onOpenPerspectiveLens: (entry: JournalEntry) => void;
+  onOpenUpgradeModal?: (reason: 'limit_reached' | 'premium_feature' | 'perspective_lens', featureName?: string) => void;
   onDelete?: (id: string) => void;
 }
 
-const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspectiveLens, onDelete }) => {
+const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspectiveLens, onOpenUpgradeModal, onDelete }) => {
   const [isMounted, setIsMounted] = React.useState(false);
   const [isAnalysisVisible, setIsAnalysisVisible] = React.useState(false);
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const { usage } = useSubscription();
 
   const TEXT_TRUNCATE_LENGTH = 400;
   const isTruncatable = entry.text && entry.text.length > TEXT_TRUNCATE_LENGTH;
@@ -171,7 +174,25 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
           )}
           
           <div className="text-right pt-2">
-            <button onClick={() => onOpenPerspectiveLens(entry)} className="text-sm font-medium text-rose-600 hover:text-rose-800 transition">
+            <button
+              onClick={() => {
+                if (usage?.tier === 'free') {
+                  onOpenUpgradeModal?.('perspective_lens', 'Perspective Lens');
+                } else {
+                  onOpenPerspectiveLens(entry);
+                }
+              }}
+              className={`text-sm font-medium transition inline-flex items-center gap-1.5 ${
+                usage?.tier === 'free'
+                  ? 'text-stone-400 hover:text-rose-600'
+                  : 'text-rose-600 hover:text-rose-800'
+              }`}
+            >
+              {usage?.tier === 'free' && (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+              )}
               View with Perspective Lens →
             </button>
           </div>

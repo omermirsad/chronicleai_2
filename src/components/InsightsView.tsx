@@ -6,6 +6,7 @@ import { generateInsights } from '../services/geminiService';
 import { SparklesIcon, SeedingIcon, ChartBarIcon } from './Icons';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface InsightsViewProps {
   entries: JournalEntry[];
@@ -152,9 +153,9 @@ const InsightsView: React.FC<InsightsViewProps> = ({ entries, userId }) => {
       {insights && (
         <div className="mt-8 pt-6 border-t border-stone-200">
           <h3 className="text-xl font-semibold mb-4 text-stone-700">Your Generated Insights</h3>
-          <div 
+          <div
             className="prose prose-stone max-w-none"
-            dangerouslySetInnerHTML={{ __html: marked.parse(insights) }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(insights) as string) }}
           />
         </div>
       )}

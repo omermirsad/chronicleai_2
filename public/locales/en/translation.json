@@ -1,0 +1,39 @@
+{
+  "common": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "settings": {
+    "preferencesTitle": "Preferences",
+    "generalTitle": "General Settings",
+    "language": "Language",
+    "languageDesc": "Select your preferred app language.",
+    "emailTitle": "Email Preferences",
+    "emailNotifications": "Email Notifications",
+    "emailNotificationsDesc": "Receive email notifications from Chronicle AI",
+    "insightsFrequency": "Insights Frequency",
+    "insightsFrequencyDesc": "How often would you like to receive AI-powered insights?",
+    "weeklyDigest": "Weekly Digest",
+    "weeklyDigestDesc": "Receive a weekly summary of your journal entries",
+    "onThisDay": "On This Day",
+    "onThisDayDesc": "Get reminded of entries from past years",
+    "streakReminders": "Streak Reminders",
+    "streakRemindersDesc": "Receive notifications to maintain your writing streak",
+    "achievementNotifications": "Achievement Notifications",
+    "achievementNotificationsDesc": "Get notified when you unlock new achievements",
+    "frequencyDaily": "Daily",
+    "frequencyWeekly": "Weekly",
+    "frequencyMonthly": "Monthly",
+    "frequencyNever": "Never"
+  },
+  "toast": {
+    "preferencesSaved": "Preferences saved successfully",
+    "preferencesSaveError": "Failed to save preferences"
+  }
+}

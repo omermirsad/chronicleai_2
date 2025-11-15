@@ -4,6 +4,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { generateOnThisDayEmail, OnThisDayData, OnThisDayEntry } from '../_shared/email-templates/on-this-day.ts';
+import { getTranslator } from '../_shared/i18n.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -59,6 +60,10 @@ serve(async (req) => {
           continue;
         }
 
+        // Get user's language preference
+        const userLanguage = preferences.language || 'en';
+        const t = getTranslator(userLanguage);
+
         // Get entries from this day in previous years
         // We'll use the get_on_this_day_entries function
         const { data: entries, error: entriesError } = await supabase
@@ -109,11 +114,8 @@ serve(async (req) => {
           continue;
         }
 
-        // Prepare subject line
-        const yearsText = onThisDayEntries.length === 1
-          ? `${onThisDayEntries[0].yearsAgo} year${onThisDayEntries[0].yearsAgo > 1 ? 's' : ''} ago`
-          : `${onThisDayEntries.length} memories`;
-        const subject = `⏰ On This Day: ${yearsText}`;
+        // Prepare subject line using translated text
+        const subject = t('onThisDaySubject');
 
         // Send email using Resend
         const resendResponse = await fetch('https://api.resend.com/emails', {

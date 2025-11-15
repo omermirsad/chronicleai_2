@@ -1,9 +1,12 @@
 // main.tsx
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import Router from './Router';
 import { initErrorMonitoring } from './lib/errorMonitoring';
 import './index.css';
+
+// Import the i18n configuration
+import './i18n';
 
 // Initialize error monitoring in production
 if (import.meta.env.PROD) {
@@ -30,6 +33,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <Router />
+    {/* Wrap the app in Suspense for translation loading */}
+    <Suspense fallback={<div>Loading...</div>}>
+      <Router />
+    </Suspense>
   </React.StrictMode>
 );

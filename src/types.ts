@@ -1,5 +1,7 @@
 // src/types.ts
 
+import { AppLanguage } from './config/languages';
+
 // Subscription tiers
 export type SubscriptionTier = 'free' | 'pro' | 'premium';
 
@@ -249,15 +251,19 @@ export interface GamificationStats {
   };
 }
 
-// Email notification preferences
-export interface EmailPreferences {
+// User preferences (email notifications and language)
+export interface UserPreferences {
   emailNotifications: boolean;
   insightsFrequency: 'daily' | 'weekly' | 'monthly' | 'never';
   weeklyDigest: boolean;
   onThisDay: boolean;
   streakReminders: boolean;
   achievementNotifications: boolean;
+  language?: AppLanguage;
 }
+
+// Backwards compatibility alias
+export type EmailPreferences = UserPreferences;
 
 // Coaching types
 export type CoachingModuleType =

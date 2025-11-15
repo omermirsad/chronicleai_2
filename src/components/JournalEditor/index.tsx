@@ -28,7 +28,7 @@ interface JournalEditorProps {
 type EditorMode = 'selection' | 'freestyle' | 'guided';
 
 const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
-  const { canMakeAICall, incrementAICallCount, hasReachedLimit } = useSubscription();
+  const { canMakeAICall, hasReachedLimit, refresh: refreshSubscription } = useSubscription();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [mode, setMode] = useState<EditorMode>('selection');
   const [textBeforeRecording, setTextBeforeRecording] = useState('');
@@ -140,8 +140,10 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
     try {
       let aiAnalysis = undefined;
       if (editorState.text.trim()) {
+        // Backend now handles AI call limit checking and incrementing
         aiAnalysis = await analyzeEntry(editorState.text, editorState.photo?.base64);
-        incrementAICallCount();
+        // Refresh subscription data to update UI with new usage
+        refreshSubscription();
       }
 
       addEntry({
@@ -197,8 +199,10 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
       editorState.setIsProcessing(true);
       try {
         const fullText = newHistory.map((h) => `Q: ${h.prompt}\nA: ${h.response}`).join('\n\n');
+        // Backend now handles AI call limit checking and incrementing
         const aiAnalysis = await analyzeEntry(fullText, editorState.photo?.base64);
-        incrementAICallCount();
+        // Refresh subscription data to update UI with new usage
+        refreshSubscription();
 
         addEntry({
           date: new Date().toISOString(),

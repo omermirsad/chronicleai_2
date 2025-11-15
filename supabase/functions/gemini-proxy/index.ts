@@ -100,6 +100,7 @@ serve(async (req: Request) => {
     requireAuth: true,
     rateLimit: true,
     strictRateLimit: true, // Strict rate limit for AI operations
+    checkAICallLimit: true, // Enforce subscription-based AI call limits
     maxBodySize: 1048576, // 1MB
     timeout: 35000, // 35 seconds total timeout (5s buffer over AI timeout)
     requiredEnvVars: ['GEMINI_API_KEY', 'SUPABASE_URL', 'SUPABASE_ANON_KEY'],

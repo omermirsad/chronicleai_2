@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "Speichern",
+    "saving": "Speichern...",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg"
+  },
+  "settings": {
+    "preferencesTitle": "Einstellungen",
+    "generalTitle": "Allgemeine Einstellungen",
+    "language": "Sprache",
+    "languageDesc": "Wählen Sie Ihre bevorzugte App-Sprache.",
+    "emailTitle": "E-Mail-Einstellungen",
+    "emailNotifications": "E-Mail-Benachrichtigungen",
+    "emailNotificationsDesc": "E-Mail-Benachrichtigungen von Chronicle AI erhalten",
+    "insightsFrequency": "Häufigkeit der Einblicke",
+    "insightsFrequencyDesc": "Wie oft möchten Sie KI-gestützte Einblicke erhalten?",
+    "weeklyDigest": "Wöchentliche Zusammenfassung",
+    "weeklyDigestDesc": "Erhalten Sie eine wöchentliche Zusammenfassung Ihrer Tagebucheinträge",
+    "onThisDay": "An diesem Tag",
+    "onThisDayDesc": "Erhalten Sie Erinnerungen an Einträge aus vergangenen Jahren",
+    "streakReminders": "Serien-Erinnerungen",
+    "streakRemindersDesc": "Erhalten Sie Benachrichtigungen, um Ihre Schreibserie aufrechtzuerhalten",
+    "achievementNotifications": "Erfolgsbenachrichtigungen",
+    "achievementNotificationsDesc": "Erhalten Sie Benachrichtigungen, wenn Sie neue Erfolge freischalten",
+    "frequencyDaily": "Täglich",
+    "frequencyWeekly": "Wöchentlich",
+    "frequencyMonthly": "Monatlich",
+    "frequencyNever": "Nie"
+  },
+  "toast": {
+    "preferencesSaved": "Einstellungen erfolgreich gespeichert",
+    "preferencesSaveError": "Fehler beim Speichern der Einstellungen",
+    "languageChanged": "Sprache erfolgreich geändert",
+    "languageChangeError": "Fehler beim Ändern der Sprache"
+  }
+}

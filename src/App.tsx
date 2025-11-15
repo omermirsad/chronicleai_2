@@ -6,6 +6,7 @@ import Auth from './components/Auth';
 import Onboarding from './components/Onboarding';
 import { useJournal } from './hooks/useJournal';
 import { useAuth } from './hooks/useAuth';
+import { useLanguageSync } from './hooks/useLanguageSync';
 import { JournalEntry, View } from './types';
 import { FeedSkeleton } from './components/SkeletonLoader';
 import ToastProvider from './components/ToastProvider';
@@ -22,6 +23,11 @@ const PerspectiveLensModal = lazy(() => import('./components/PerspectiveLensModa
 const App: FC = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const { entries, addEntry, updateEntry, deleteEntry, loading: entriesLoading, syncStatus } = useJournal();
+
+  // Initialize language sync to load user's preferred language from database
+  // and update HTML lang attribute for accessibility
+  useLanguageSync();
+
   const [currentView, setCurrentView] = useState<View>('feed');
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

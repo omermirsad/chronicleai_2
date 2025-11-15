@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  },
+  "settings": {
+    "preferencesTitle": "Preferencias",
+    "generalTitle": "Configuración General",
+    "language": "Idioma",
+    "languageDesc": "Seleccione su idioma preferido para la aplicación.",
+    "emailTitle": "Preferencias de Correo Electrónico",
+    "emailNotifications": "Notificaciones por Correo",
+    "emailNotificationsDesc": "Recibir notificaciones por correo electrónico de Chronicle AI",
+    "insightsFrequency": "Frecuencia de Perspectivas",
+    "insightsFrequencyDesc": "¿Con qué frecuencia desea recibir perspectivas impulsadas por IA?",
+    "weeklyDigest": "Resumen Semanal",
+    "weeklyDigestDesc": "Reciba un resumen semanal de sus entradas de diario",
+    "onThisDay": "En Este Día",
+    "onThisDayDesc": "Reciba recordatorios de entradas de años anteriores",
+    "streakReminders": "Recordatorios de Racha",
+    "streakRemindersDesc": "Reciba notificaciones para mantener su racha de escritura",
+    "achievementNotifications": "Notificaciones de Logros",
+    "achievementNotificationsDesc": "Reciba notificaciones cuando desbloquee nuevos logros",
+    "frequencyDaily": "Diario",
+    "frequencyWeekly": "Semanal",
+    "frequencyMonthly": "Mensual",
+    "frequencyNever": "Nunca"
+  },
+  "toast": {
+    "preferencesSaved": "Preferencias guardadas correctamente",
+    "preferencesSaveError": "Error al guardar las preferencias",
+    "languageChanged": "Idioma cambiado correctamente",
+    "languageChangeError": "Error al cambiar el idioma"
+  }
+}

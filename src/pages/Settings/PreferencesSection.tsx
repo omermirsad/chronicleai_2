@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useAsyncAction } from '../../hooks/useAsyncAction';
 import { useLanguageSync } from '../../hooks/useLanguageSync';
 import { TOAST_MESSAGES } from '../../constants';
-import { supportedLanguages } from '../../config/languages';
+import { supportedLanguages, AppLanguage } from '../../config/languages';
 import type { UserPreferences } from '../../types';
 
 export const PreferencesSection: React.FC = () => {
@@ -97,7 +97,7 @@ export const PreferencesSection: React.FC = () => {
           </div>
           <select
             value={currentLanguage}
-            onChange={(e) => changeLanguage(e.target.value as any)}
+            onChange={(e) => changeLanguage(e.target.value as AppLanguage)}
             className="w-48 text-sm border-stone-300 rounded focus:ring-2 focus:ring-rose-500"
           >
             {supportedLanguages.map((lang) => (

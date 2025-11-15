@@ -34,6 +34,8 @@
   },
   "toast": {
     "preferencesSaved": "Preferences saved successfully",
-    "preferencesSaveError": "Failed to save preferences"
+    "preferencesSaveError": "Failed to save preferences",
+    "languageChanged": "Language changed successfully",
+    "languageChangeError": "Failed to change language"
   }
 }

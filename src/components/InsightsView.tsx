@@ -58,7 +58,7 @@ const InsightsView: React.FC<InsightsViewProps> = ({ entries, userId }) => {
       setIsLoading(false);
     }
   };
-  
+
   const hasEnoughEntries = entries.length >= 3;
 
   const moodData = React.useMemo(() => {
@@ -70,6 +70,29 @@ const InsightsView: React.FC<InsightsViewProps> = ({ entries, userId }) => {
         fullDate: new Date(entry.date)
       }))
       .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
+  }, [entries]);
+
+  // Tag cloud data - aggregate tags from both entry.tags and entry.aiAnalysis.tags
+  const tagCloudData = React.useMemo(() => {
+    const tagCounts = new Map<string, number>();
+
+    entries.forEach(entry => {
+      // Add tags from entry.tags
+      entry.tags?.forEach(tag => {
+        tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+      });
+
+      // Add tags from entry.aiAnalysis.tags
+      entry.aiAnalysis?.tags?.forEach(tag => {
+        tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+      });
+    });
+
+    // Convert to array and sort by frequency
+    return Array.from(tagCounts.entries())
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 30); // Limit to top 30 tags
   }, [entries]);
 
   const hasEnoughMoodData = moodData.length > 1;
@@ -108,37 +131,75 @@ const InsightsView: React.FC<InsightsViewProps> = ({ entries, userId }) => {
       </div>
 
       {hasEnoughEntries && (
-        <div className="mt-8 pt-8 border-t border-stone-200">
-          <div className="text-center mb-6">
-            <ChartBarIcon className="w-10 h-10 mx-auto text-rose-500" />
-            <h3 className="mt-2 text-xl font-bold text-stone-800">Your Mood Over Time</h3>
+        <>
+          <div className="mt-8 pt-8 border-t border-stone-200">
+            <div className="text-center mb-6">
+              <ChartBarIcon className="w-10 h-10 mx-auto text-rose-500" />
+              <h3 className="mt-2 text-xl font-bold text-stone-800">Your Mood Over Time</h3>
+            </div>
+            {hasEnoughMoodData ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart
+                    data={moodData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                    <defs>
+                        <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                    <XAxis dataKey="name" stroke="#57534e" fontSize={12} />
+                    <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} stroke="#57534e" tickFormatter={(tick) => getMoodEmoji(tick)} fontSize={16} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Area type="monotone" dataKey="mood" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorMood)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center py-4 bg-stone-50 rounded-md border border-stone-200">
+                  <p className="text-stone-600">Track your mood when you write an entry to see your trends here.</p>
+                  <p className="mt-1 text-sm text-stone-500">You need at least two entries with mood data.</p>
+              </div>
+            )}
           </div>
-          {hasEnoughMoodData ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart
-                  data={moodData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                  <defs>
-                      <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
-                      </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
-                  <XAxis dataKey="name" stroke="#57534e" fontSize={12} />
-                  <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} stroke="#57534e" tickFormatter={(tick) => getMoodEmoji(tick)} fontSize={16} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Area type="monotone" dataKey="mood" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorMood)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="text-center py-4 bg-stone-50 rounded-md border border-stone-200">
-                <p className="text-stone-600">Track your mood when you write an entry to see your trends here.</p>
-                <p className="mt-1 text-sm text-stone-500">You need at least two entries with mood data.</p>
+
+          {/* Tag Cloud Visualization */}
+          {tagCloudData.length > 0 && (
+            <div className="mt-8 pt-8 border-t border-stone-200">
+              <div className="text-center mb-6">
+                <SparklesIcon className="w-10 h-10 mx-auto text-rose-500" />
+                <h3 className="mt-2 text-xl font-bold text-stone-800">Your Recurring Themes</h3>
+                <p className="mt-1 text-sm text-stone-600">The topics and emotions that appear most often in your journal</p>
+              </div>
+              <div className="flex flex-wrap justify-center items-center gap-3 py-6 px-4 bg-gradient-to-br from-rose-50 to-stone-50 rounded-lg border border-stone-200">
+                {tagCloudData.map(({ tag, count }) => {
+                  // Calculate font size based on frequency (min: 12px, max: 32px)
+                  const maxCount = tagCloudData[0].count;
+                  const minCount = tagCloudData[tagCloudData.length - 1].count;
+                  const fontSize = 12 + ((count - minCount) / (maxCount - minCount || 1)) * 20;
+
+                  // Calculate opacity for visual depth
+                  const opacity = 0.6 + ((count - minCount) / (maxCount - minCount || 1)) * 0.4;
+
+                  return (
+                    <span
+                      key={tag}
+                      className="inline-block px-3 py-1.5 bg-white rounded-full border border-rose-200 text-rose-700 font-medium hover:bg-rose-100 hover:border-rose-300 transition-all cursor-default shadow-sm"
+                      style={{
+                        fontSize: `${fontSize}px`,
+                        opacity: opacity,
+                      }}
+                      title={`Appears ${count} time${count > 1 ? 's' : ''}`}
+                    >
+                      {tag}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {isLoading && (

@@ -31,7 +31,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       '100 AI analysis calls per month',
       'All Free features',
-      'Voice-to-text input',
+      'Voice-to-text (1 min, 40/month)',
       'Advanced insights and analytics',
       'Perspective Lens (3 AI viewpoints)',
       'Calendar heatmap view',
@@ -51,6 +51,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       'Unlimited AI analysis calls',
       'All Pro features',
+      'Voice-to-text (2 min, 99/month)',
       'Advanced pattern recognition',
       'Custom AI prompts',
       'Export to multiple formats',

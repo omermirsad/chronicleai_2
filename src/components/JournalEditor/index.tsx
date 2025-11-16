@@ -7,6 +7,7 @@ import { useEditorState, useGuidedSessionState } from './useEditorState';
 import { MoodEnergySelector } from './MoodEnergySelector';
 import { GuidedSessionSelector } from './GuidedSessionSelector';
 import UpgradeModal from '../UpgradeModal';
+import { VoiceRecordingTimer } from '../VoiceRecordingTimer';
 import {
   MicrophoneIcon,
   PhotoIcon,
@@ -50,7 +51,15 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
     [mode, textBeforeRecording, editorState, guidedState]
   );
 
-  const { isListening, startListening, stopListening, hasSupport } = useSpeechRecognition(handleTranscriptChange);
+  const {
+    isListening,
+    startListening,
+    stopListening,
+    hasSupport,
+    recordingDuration,
+    maxDuration,
+    voiceStatus,
+  } = useSpeechRecognition(handleTranscriptChange, usage?.tier || 'free');
 
   const toggleListening = () => {
     if (isListening) {
@@ -336,15 +345,25 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
 
             <div className="flex items-center gap-3">
               {hasSupport && usage && (usage.tier === 'pro' || usage.tier === 'premium') && (
-                <button
-                  onClick={toggleListening}
-                  className={`p-2 rounded-lg ${
-                    isListening ? 'bg-red-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                  } transition`}
-                  title={isListening ? 'Stop recording' : 'Start voice input'}
-                >
-                  <MicrophoneIcon className="w-5 h-5" />
-                </button>
+                <>
+                  <button
+                    onClick={toggleListening}
+                    className={`p-2 rounded-lg ${
+                      isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    } transition`}
+                    title={isListening ? 'Stop recording' : 'Start voice input'}
+                  >
+                    <MicrophoneIcon className="w-5 h-5" />
+                  </button>
+                  {isListening && (
+                    <VoiceRecordingTimer
+                      currentDuration={recordingDuration}
+                      maxDuration={maxDuration}
+                      tier={usage.tier}
+                      voiceStatus={voiceStatus}
+                    />
+                  )}
+                </>
               )}
 
               <label className="p-2 bg-stone-100 rounded-lg cursor-pointer hover:bg-stone-200 transition">
@@ -458,15 +477,25 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
 
             <div className="flex items-center gap-3 mb-4">
               {hasSupport && usage && (usage.tier === 'pro' || usage.tier === 'premium') && (
-                <button
-                  onClick={toggleListening}
-                  className={`p-2 rounded-lg ${
-                    isListening ? 'bg-red-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                  } transition`}
-                  title={isListening ? 'Stop recording' : 'Start voice input'}
-                >
-                  <MicrophoneIcon className="w-5 h-5" />
-                </button>
+                <>
+                  <button
+                    onClick={toggleListening}
+                    className={`p-2 rounded-lg ${
+                      isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    } transition`}
+                    title={isListening ? 'Stop recording' : 'Start voice input'}
+                  >
+                    <MicrophoneIcon className="w-5 h-5" />
+                  </button>
+                  {isListening && (
+                    <VoiceRecordingTimer
+                      currentDuration={recordingDuration}
+                      maxDuration={maxDuration}
+                      tier={usage.tier}
+                      voiceStatus={voiceStatus}
+                    />
+                  )}
+                </>
               )}
             </div>
 

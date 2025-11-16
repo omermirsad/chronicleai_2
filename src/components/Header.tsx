@@ -2,7 +2,7 @@
 // Fix: Import React types FC, useState, useRef, useEffect
 import * as React from 'react';
 import { View, User } from '../types';
-import { BookOpenIcon, PencilSquareIcon, SparklesIcon, CalendarDaysIcon, UserCircleIcon } from './Icons';
+import { BookOpenIcon, PencilSquareIcon, SparklesIcon, CalendarDaysIcon, UserCircleIcon, HeartIcon } from './Icons';
 import { StreakDisplay } from './StreakDisplay';
 import { useSubscription } from '../hooks/useSubscription';
 
@@ -45,6 +45,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayN
     { id: 'editor', label: 'New Entry', icon: <PencilSquareIcon /> },
     { id: 'calendar', label: 'Calendar', icon: <CalendarDaysIcon /> },
     { id: 'insights', label: 'Insights', icon: <SparklesIcon /> },
+    { id: 'coaching', label: 'Coaching', icon: <HeartIcon /> },
   ];
 
   React.useEffect(() => {

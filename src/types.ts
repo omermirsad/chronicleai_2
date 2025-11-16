@@ -206,7 +206,7 @@ export interface Perspective {
   content: string;
 }
 
-export type View = 'feed' | 'editor' | 'insights' | 'calendar';
+export type View = 'feed' | 'editor' | 'insights' | 'calendar' | 'coaching';
 
 // Subscription and pricing types
 export interface PricingPlan {

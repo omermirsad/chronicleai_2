@@ -18,6 +18,7 @@ const JournalEditor = lazy(() => import('./components/JournalEditor'));
 const JournalFeed = lazy(() => import('./components/JournalFeed'));
 const InsightsView = lazy(() => import('./components/InsightsView'));
 const CalendarView = lazy(() => import('./components/CalendarView'));
+const CoachingHub = lazy(() => import('./components/CoachingHub'));
 const PerspectiveLensModal = lazy(() => import('./components/PerspectiveLensModal'));
 const UpgradeModal = lazy(() => import('./components/UpgradeModal'));
 
@@ -127,6 +128,8 @@ const App: FC = () => {
                 onDeleteEntry={deleteEntry}
             />
         );
+      case 'coaching':
+        return <CoachingHub />;
       case 'feed':
       default:
         return (

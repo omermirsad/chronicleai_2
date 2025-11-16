@@ -11,6 +11,7 @@ const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AchievementsPage = lazy(() => import('./pages/AchievementsPage'));
 const TherapistsPage = lazy(() => import('./pages/TherapistsPage'));
 const AuthCallback = lazy(() => import('./components/AuthCallback'));
+const HealthCheck = lazy(() => import('./pages/HealthCheck'));
 
 const PageLoader: FC = () => (
   <div className="min-h-screen bg-rose-50 flex items-center justify-center">
@@ -109,6 +110,7 @@ const Router: FC = () => {
     '/help': <HelpCenter />,
     '/pricing': <PricingPage />,
     '/therapists': <TherapistsPage />,
+    '/health': <HealthCheck />,
   };
 
   // Handle public routes

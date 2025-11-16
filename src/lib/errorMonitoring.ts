@@ -12,7 +12,9 @@ export const initErrorMonitoring = () => {
 
   // Only initialize Sentry if DSN is provided
   if (!sentryDsn) {
-    console.log('Sentry DSN not configured. Error monitoring disabled.');
+    if (import.meta.env.DEV) {
+      console.info('Sentry DSN not configured. Error monitoring disabled.');
+    }
     return;
   }
 
@@ -57,7 +59,9 @@ export const initErrorMonitoring = () => {
     },
   });
 
-  console.log('Error monitoring initialized');
+  if (import.meta.env.DEV) {
+    console.info('Error monitoring initialized');
+  }
 };
 
 /**

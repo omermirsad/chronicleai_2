@@ -1,2 +1,17 @@
+# robots.txt for Chronicle AI
+
+# Allow all crawlers
 User-agent: *
 Allow: /
+
+# Disallow authenticated pages
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /achievements
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://chronicle-ai.app/sitemap.xml
+
+# Crawl delay (optional - be nice to servers)
+Crawl-delay: 10

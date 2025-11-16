@@ -24,9 +24,12 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    // Only log in development
+    if (import.meta.env.DEV) {
+      console.error('Error caught by boundary:', error, errorInfo);
+    }
 
-    // Log to Sentry in production only
+    // Log to Sentry in production
     if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
       Sentry.captureException(error, {
         contexts: {

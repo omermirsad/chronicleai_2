@@ -105,31 +105,122 @@ export const getGuidedPrompt = async (
   }
 };
 
-// Coaching functions (simplified - can be expanded if needed)
-export const getCoachingModule = async (moduleType: CoachingModuleType) => {
-  // Simplified implementation - returns static module structure
-  const modules: Record<string, any> = {
-    'goal-setting': {
-      title: 'Goal Setting Workshop',
-      steps: [
-        'What is one goal you want to achieve in the next 3 months?',
-        'Why is this goal important to you?',
-        'What would success look like?',
-      ],
-    },
-    // Add more modules as needed
-  };
-
-  return modules[moduleType] || modules['goal-setting'];
+// Coaching Module Descriptions
+const coachingModuleDescriptions: Record<CoachingModuleType, string> = {
+  'goal-setting': 'A structured coaching session to help you clarify, plan, and commit to meaningful goals.',
+  'anxiety-management': 'A supportive session to understand anxiety triggers, develop coping strategies, and build resilience.',
+  'gratitude-practice': 'A practice-focused session to cultivate gratitude and appreciate the positive aspects of your life.',
+  'self-compassion': 'A gentle session to develop kindness toward yourself, especially during difficult times.',
+  'mindfulness': 'A session to develop present-moment awareness and reduce stress through mindful practices.',
 };
 
-export const getCoachingFollowUp = async (
-  module: any,
-  stepNumber: number,
-  userResponse?: string
-): Promise<{ prompt: string; followUp?: string }> => {
-  if (stepNumber < module.steps.length) {
-    return { prompt: module.steps[stepNumber] };
+const coachingModuleTitles: Record<CoachingModuleType, string> = {
+  'goal-setting': 'Goal Setting Workshop',
+  'anxiety-management': 'Anxiety Management Session',
+  'gratitude-practice': 'Gratitude Practice',
+  'self-compassion': 'Self-Compassion Journey',
+  'mindfulness': 'Mindfulness Practice',
+};
+
+// AI-Powered Coaching Module Initialization
+export const getCoachingModule = async (moduleType: CoachingModuleType) => {
+  const description = coachingModuleDescriptions[moduleType];
+  const title = coachingModuleTitles[moduleType];
+
+  const prompt = `You are a professional life coach specializing in "${moduleType}".
+You are starting a personalized coaching session focused on: ${description}
+
+Your task is to create a welcoming introduction and the first coaching question for this session.
+The introduction should be warm, explain what the session will cover, and set a supportive tone.
+Then provide a thoughtful, open-ended first question to begin the coaching journey.
+
+Format your response as a natural, flowing introduction followed by your first question.`;
+
+  try {
+    const initialPrompt = await GeminiClient.callWithText(prompt);
+
+    return {
+      title,
+      description,
+      initialPrompt: initialPrompt.trim(),
+      totalSteps: 5, // AI will dynamically generate 5 steps
+    };
+  } catch (error) {
+    // Fallback to static content if AI fails
+    return {
+      title,
+      description,
+      initialPrompt: `Welcome to the ${title}! Let's begin this journey together. What brings you to this session today?`,
+      totalSteps: 5,
+    };
   }
-  return { prompt: 'Thank you for completing this module!' };
+};
+
+// AI-Powered Coaching Follow-Up (Conversational)
+export const getCoachingFollowUp = async (
+  moduleType: CoachingModuleType,
+  stepNumber: number,
+  conversationHistory: { prompt: string; response: string }[]
+): Promise<{ prompt: string; isComplete: boolean }> => {
+  const description = coachingModuleDescriptions[moduleType];
+  const totalSteps = 5;
+
+  // If we've completed all steps, provide a summary
+  if (stepNumber >= totalSteps) {
+    const summaryPrompt = `You are a professional life coach. You just completed a ${moduleType} coaching session.
+
+Here's the conversation history:
+${conversationHistory.map((h, i) => `Step ${i + 1}:\nCoach: ${h.prompt}\nClient: ${h.response}`).join('\n\n')}
+
+Provide a warm, encouraging closing message that:
+1. Acknowledges the client's insights and progress
+2. Highlights 2-3 key takeaways from the session
+3. Offers a gentle suggestion for how to apply what they learned
+4. Ends with encouragement
+
+Keep it concise (3-4 paragraphs) and personal.`;
+
+    try {
+      const summary = await GeminiClient.callWithText(summaryPrompt);
+      return { prompt: summary.trim(), isComplete: true };
+    } catch (error) {
+      return {
+        prompt: 'Thank you for your thoughtful engagement in this session. Remember to be kind to yourself as you move forward.',
+        isComplete: true,
+      };
+    }
+  }
+
+  // Generate the next coaching question based on conversation history
+  const nextStepPrompt = `You are a professional life coach conducting a ${moduleType} session.
+Session description: ${description}
+
+This is step ${stepNumber + 1} of ${totalSteps}. Here's the conversation so far:
+${conversationHistory.map((h, i) => `Step ${i + 1}:\nCoach: ${h.prompt}\nClient: ${h.response}`).join('\n\n')}
+
+Based on the client's responses, generate the next coaching question or prompt. Your response should:
+1. Acknowledge what the client just shared (briefly and warmly)
+2. Ask a deeper, insightful follow-up question that builds on their response
+3. Guide them toward actionable insights or self-discovery
+4. Match the tone and depth of the session type
+
+Provide ONLY the next coaching prompt. Be conversational, supportive, and specific to their responses.`;
+
+  try {
+    const nextPrompt = await GeminiClient.callWithText(nextStepPrompt);
+    return { prompt: nextPrompt.trim(), isComplete: false };
+  } catch (error) {
+    // Fallback questions if AI fails
+    const fallbackQuestions = [
+      "Can you tell me more about that?",
+      "How does this make you feel?",
+      "What would taking action on this look like?",
+      "What's one small step you could take today?",
+      "How will you know when you've made progress?",
+    ];
+    return {
+      prompt: fallbackQuestions[Math.min(stepNumber, fallbackQuestions.length - 1)],
+      isComplete: false,
+    };
+  }
 };

@@ -19,13 +19,18 @@ interface HeaderProps {
 // Fix: Use FC type for functional component
 const SyncIndicator: React.FC<{ status: HeaderProps['syncStatus'] }> = ({ status }) => {
     const statusMap = {
-        idle: { text: 'Synced', color: 'text-green-600' },
-        syncing: { text: 'Syncing...', color: 'text-blue-600' },
-        error: { text: 'Sync Error', color: 'text-red-600' },
-        offline: { text: 'Offline', color: 'text-stone-500' },
+        idle: { text: 'Synced', color: 'text-green-600', icon: '✓', bgColor: 'bg-green-50' },
+        syncing: { text: 'Syncing...', color: 'text-blue-600', icon: '↻', bgColor: 'bg-blue-50' },
+        error: { text: 'Sync Error', color: 'text-red-600', icon: '⚠', bgColor: 'bg-red-50' },
+        offline: { text: 'Offline', color: 'text-stone-500', icon: '○', bgColor: 'bg-stone-100' },
     };
-    const { text, color } = statusMap[status] || statusMap.idle;
-    return <span className={`text-xs font-medium ${color}`}>{text}</span>;
+    const { text, color, icon } = statusMap[status] || statusMap.idle;
+    return (
+        <div className="flex items-center gap-1.5">
+            <span className={`text-sm ${status === 'syncing' ? 'animate-spin' : ''}`}>{icon}</span>
+            <span className={`text-xs font-medium ${color}`}>{text}</span>
+        </div>
+    );
 }
 
 // Fix: Use FC type for functional component
@@ -108,6 +113,11 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayN
                <span className="font-bold">{usage.aiCallsRemaining}/{usage.aiCallsLimit}</span>
              </button>
            )}
+
+           {/* Persistent Sync Status Indicator */}
+           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-50 border border-stone-200">
+             <SyncIndicator status={syncStatus} />
+           </div>
 
            <div className="relative" ref={dropdownRef}>
             <button 

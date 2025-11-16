@@ -28,7 +28,7 @@ interface JournalEditorProps {
 type EditorMode = 'selection' | 'freestyle' | 'guided';
 
 const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
-  const { canMakeAICall, hasReachedLimit, refresh: refreshSubscription } = useSubscription();
+  const { canMakeAICall, hasReachedLimit, refresh: refreshSubscription, usage } = useSubscription();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [mode, setMode] = useState<EditorMode>('selection');
   const [textBeforeRecording, setTextBeforeRecording] = useState('');
@@ -335,7 +335,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
             />
 
             <div className="flex items-center gap-3">
-              {hasSupport && (
+              {hasSupport && usage && (usage.tier === 'pro' || usage.tier === 'premium') && (
                 <button
                   onClick={toggleListening}
                   className={`p-2 rounded-lg ${
@@ -457,7 +457,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
             )}
 
             <div className="flex items-center gap-3 mb-4">
-              {hasSupport && (
+              {hasSupport && usage && (usage.tier === 'pro' || usage.tier === 'premium') && (
                 <button
                   onClick={toggleListening}
                   className={`p-2 rounded-lg ${

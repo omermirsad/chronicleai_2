@@ -17,7 +17,6 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Basic mood and energy tracking',
       'Guided journaling sessions',
       'Photo uploads',
-      'Voice-to-text input',
       'Data export',
     ],
     aiCallsLimit: 10,
@@ -32,6 +31,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       '100 AI analysis calls per month',
       'All Free features',
+      'Voice-to-text input',
       'Advanced insights and analytics',
       'Perspective Lens (3 AI viewpoints)',
       'Calendar heatmap view',
@@ -118,7 +118,7 @@ export const FEATURE_COMPARISON = [
       },
       {
         name: 'Voice-to-text input',
-        free: true,
+        free: false,
         pro: true,
         premium: true,
       },

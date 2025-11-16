@@ -9,6 +9,7 @@ const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const Settings = lazy(() => import('./pages/Settings'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AchievementsPage = lazy(() => import('./pages/AchievementsPage'));
+const TherapistsPage = lazy(() => import('./pages/TherapistsPage'));
 const AuthCallback = lazy(() => import('./components/AuthCallback'));
 
 const PageLoader: FC = () => (
@@ -107,6 +108,7 @@ const Router: FC = () => {
     '/privacy': <PrivacyPolicy />,
     '/help': <HelpCenter />,
     '/pricing': <PricingPage />,
+    '/therapists': <TherapistsPage />,
   };
 
   // Handle public routes

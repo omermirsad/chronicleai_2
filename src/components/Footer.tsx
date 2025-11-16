@@ -88,6 +88,11 @@ const Footer: FC<FooterProps> = ({ variant = 'app' }) => {
                 </a>
               </li>
               <li>
+                <a href="/therapists" className="hover:text-rose-500 transition">
+                  For Professionals
+                </a>
+              </li>
+              <li>
                 <a href="/help" className="hover:text-rose-500 transition">
                   Help Center
                 </a>

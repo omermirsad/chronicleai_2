@@ -50,7 +50,18 @@ const PerspectiveLensModal: React.FC<PerspectiveLensModalProps> = ({ isOpen, onC
           const result = await getPerspectives(entry.text);
           setPerspectives(result);
           // Refresh subscription data to update UI with new usage
-          refreshSubscription();
+          await refreshSubscription();
+
+          // Show success toast with call cost information
+          // Wait for refresh to complete, then show updated usage
+          setTimeout(() => {
+            const callsUsed = PERSPECTIVES_COUNT;
+            const callsRemaining = usage ? usage.aiCallsRemaining : 0;
+            toast.success(
+              `Perspective analysis complete. ${callsUsed} AI calls used. ${callsRemaining} remaining.`,
+              { duration: 4000 }
+            );
+          }, 500); // Small delay to ensure usage is refreshed
         } catch (err) {
           const errorMessage = err instanceof Error ? err.message : 'Failed to generate perspectives';
           setError(errorMessage);

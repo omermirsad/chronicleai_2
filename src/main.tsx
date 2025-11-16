@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import Router from './Router';
 import { initErrorMonitoring } from './lib/errorMonitoring';
+import { logger } from './utils/logger';
 import './index.css';
 
 // Import the i18n configuration
@@ -18,10 +19,10 @@ if ('serviceWorker' in navigator && import.meta.env.VITE_ENABLE_PWA === 'true') 
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(
       (registration) => {
-        console.log('Service Worker registered:', registration.scope);
+        logger.info('Service Worker registered:', registration.scope);
       },
       (error) => {
-        console.log('Service Worker registration failed:', error);
+        logger.error('Service Worker registration failed:', error);
       }
     );
   });

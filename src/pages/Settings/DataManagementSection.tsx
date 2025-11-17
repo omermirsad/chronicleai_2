@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   downloadDataAsJSON,
@@ -9,7 +10,6 @@ import {
 } from '../../lib/dataExportService';
 import { useAsyncAction } from '../../hooks/useAsyncAction';
 import { TOAST_MESSAGES } from '../../constants';
-import { navigate } from '../../Router';
 
 interface DataStats {
   totalEntries: number;
@@ -21,6 +21,7 @@ interface DataStats {
 }
 
 export const DataManagementSection: React.FC = () => {
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [dataStats, setDataStats] = useState<DataStats | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');

@@ -166,8 +166,8 @@ export default defineConfig(({ mode }) => {
     },
     // Chunk size warning limit
     chunkSizeWarningLimit: 1000,
-    // Target modern browsers for smaller bundle
-    target: 'es2015',
+    // Target modern browsers for smaller bundle (aligned with tsconfig.json)
+    target: 'ES2020',
     // Optimize CSS
     cssCodeSplit: true,
     // Report compressed size (slower but useful)

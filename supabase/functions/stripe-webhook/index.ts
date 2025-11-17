@@ -54,7 +54,7 @@ serve(async (req) => {
 
           if (purchasedItem) {
             const priceId = purchasedItem.price?.id;
-            const aiCallPackPriceId = Deno.env.get('VITE_STRIPE_AI_CALL_PACK_25_PRICE_ID');
+            const aiCallPackPriceId = Deno.env.get('STRIPE_AI_CALL_PACK_25_PRICE_ID');
 
             if (priceId === aiCallPackPriceId) {
               // Add 25 consumable AI calls
@@ -81,12 +81,12 @@ serve(async (req) => {
 
           // Match price ID to tier (you'll need to configure these)
           const proPriceIds = [
-            Deno.env.get('VITE_STRIPE_PRO_PRICE_ID'),
-            Deno.env.get('VITE_STRIPE_PRO_YEARLY_PRICE_ID'),
+            Deno.env.get('STRIPE_PRO_PRICE_ID'),
+            Deno.env.get('STRIPE_PRO_YEARLY_PRICE_ID'),
           ];
           const premiumPriceIds = [
-            Deno.env.get('VITE_STRIPE_PREMIUM_PRICE_ID'),
-            Deno.env.get('VITE_STRIPE_PREMIUM_YEARLY_PRICE_ID'),
+            Deno.env.get('STRIPE_PREMIUM_PRICE_ID'),
+            Deno.env.get('STRIPE_PREMIUM_YEARLY_PRICE_ID'),
           ];
 
           if (proPriceIds.includes(priceId)) {
@@ -129,12 +129,12 @@ serve(async (req) => {
           const priceId = subscription.items.data[0]?.price.id;
 
           const proPriceIds = [
-            Deno.env.get('VITE_STRIPE_PRO_PRICE_ID'),
-            Deno.env.get('VITE_STRIPE_PRO_YEARLY_PRICE_ID'),
+            Deno.env.get('STRIPE_PRO_PRICE_ID'),
+            Deno.env.get('STRIPE_PRO_YEARLY_PRICE_ID'),
           ];
           const premiumPriceIds = [
-            Deno.env.get('VITE_STRIPE_PREMIUM_PRICE_ID'),
-            Deno.env.get('VITE_STRIPE_PREMIUM_YEARLY_PRICE_ID'),
+            Deno.env.get('STRIPE_PREMIUM_PRICE_ID'),
+            Deno.env.get('STRIPE_PREMIUM_YEARLY_PRICE_ID'),
           ];
 
           if (proPriceIds.includes(priceId)) {

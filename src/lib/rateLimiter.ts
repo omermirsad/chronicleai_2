@@ -1,6 +1,11 @@
 /**
- * Client-Side Rate Limiter
- * Prevents excessive API calls and abuse
+ * Client-Side Rate Limiter (UX Feature)
+ *
+ * IMPORTANT: This is NOT a security feature. Client-side rate limiting can be
+ * easily bypassed by malicious users. This is purely for UX to prevent accidental
+ * button spamming and provide user feedback.
+ *
+ * Real security rate limiting is implemented server-side in the Supabase Edge Functions.
  */
 
 import { logger } from '../utils/logger';

@@ -155,3 +155,27 @@ service-account.json
 # Scripts output
 scripts/output/
 scripts/*.log
+
+# Capacitor
+android/app/src/main/assets/public
+android/app/src/main/res/values/strings.xml
+android/.idea
+android/.gradle
+android/build
+android/gradle
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/app/google-services.json
+android/app/build
+android/app/release
+
+ios/App/Pods
+ios/App/build
+ios/App/App.xcworkspace
+ios/App/Podfile.lock
+ios/App/App.xcodeproj/xcuserdata
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata
+
+# Generated native assets
+.capacitor

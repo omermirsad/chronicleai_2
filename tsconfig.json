@@ -22,7 +22,10 @@
     
     /* Additional options */
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+
+    /* Types */
+    "types": ["vite/client", "@capacitor/cli"]
   },
   "include": ["src"],
   "exclude": ["supabase", "node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]

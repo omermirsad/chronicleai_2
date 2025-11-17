@@ -1,5 +1,7 @@
 import * as React from 'react';
 import toast from 'react-hot-toast';
+import { Capacitor } from '@capacitor/core';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import { VOICE_TO_TEXT_LIMITS, formatDuration } from '../config/voiceLimits';
@@ -182,9 +184,10 @@ export const useSpeechRecognition = (
     };
   }, [isListening, hasShownWarning, limits]);
 
-  const startListening = React.useCallback(async () => {
-    if (!recognitionRef.current || isListening || !limits.enabled || !user) {
-      return;
+  // Check limits and increment recording count
+  const checkAndIncrementRecording = React.useCallback(async () => {
+    if (!user) {
+      return null;
     }
 
     // Check monthly recording limit
@@ -196,7 +199,7 @@ export const useSpeechRecognition = (
         }`,
         { duration: 5000, icon: '🔒' }
       );
-      return;
+      return null;
     }
 
     // Increment recording count in backend
@@ -209,7 +212,7 @@ export const useSpeechRecognition = (
 
       if (!data.success) {
         toast.error(data.error || 'Failed to start recording');
-        return;
+        return null;
       }
 
       // Update local status
@@ -227,54 +230,144 @@ export const useSpeechRecognition = (
         );
       }
 
+      return data;
+    } catch (error) {
+      console.error('Error starting voice recording:', error);
+      toast.error('Failed to start recording. Please try again.');
+      return null;
+    }
+  }, [user, voiceStatus, userTier]);
+
+  // Native speech recognition (Capacitor)
+  const startNativeListening = React.useCallback(async () => {
+    try {
+      // Check permissions
+      const hasPermission = await SpeechRecognition.checkPermissions();
+      if (hasPermission.speechRecognition !== 'granted') {
+        const permission = await SpeechRecognition.requestPermissions();
+        if (permission.speechRecognition !== 'granted') {
+          toast.error('Speech permission denied.');
+          return;
+        }
+      }
+
+      // Check limits and increment count
+      const recordingData = await checkAndIncrementRecording();
+      if (!recordingData) return;
+
       // Start recording
       setIsListening(true);
       setRecordingDuration(0);
       setHasShownWarning(false);
       startTimeRef.current = Date.now();
-      recognitionRef.current.start();
+
+      await SpeechRecognition.start({
+        language: 'en-US',
+        partialResults: true,
+        popup: false,
+        maxResults: 1,
+      });
+
+      // Listen for results (both partial and final)
+      SpeechRecognition.addListener('partialResults', (event: any) => {
+        if (event.matches && event.matches.length > 0) {
+          const transcript = event.matches.join(' ');
+          onTranscriptChange(transcript);
+        }
+      });
     } catch (error) {
-      console.error('Error starting voice recording:', error);
+      console.error('Error starting native speech recognition:', error);
       toast.error('Failed to start recording. Please try again.');
+      setIsListening(false);
     }
-  }, [isListening, limits, user, voiceStatus, userTier]);
+  }, [onTranscriptChange, checkAndIncrementRecording]);
+
+  const stopNativeListening = React.useCallback(() => {
+    if (isListening) {
+      SpeechRecognition.stop();
+      SpeechRecognition.removeAllListeners();
+      setIsListening(false);
+    }
+  }, [isListening]);
+
+  // Web speech recognition
+  const startWebListening = React.useCallback(async () => {
+    if (!recognitionRef.current || isListening) {
+      return;
+    }
+
+    // Check limits and increment count
+    const recordingData = await checkAndIncrementRecording();
+    if (!recordingData) return;
+
+    // Start recording
+    setIsListening(true);
+    setRecordingDuration(0);
+    setHasShownWarning(false);
+    startTimeRef.current = Date.now();
+    recognitionRef.current.start();
+  }, [isListening, checkAndIncrementRecording]);
+
+  const stopWebListening = React.useCallback(() => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  }, [isListening]);
+
+  // Unified start/stop functions
+  const startListening = React.useCallback(async () => {
+    if (isListening || !limits.enabled || !user) {
+      return;
+    }
+
+    if (Capacitor.isNativePlatform()) {
+      await startNativeListening();
+    } else {
+      await startWebListening();
+    }
+  }, [isListening, limits, user, startNativeListening, startWebListening]);
 
   const stopListening = React.useCallback(
     (hitDurationLimit: boolean = false) => {
-      if (recognitionRef.current && isListening) {
-        setIsListening(false);
-        recognitionRef.current.stop();
+      if (!isListening) return;
 
-        // Show upgrade prompt if duration limit was hit
-        if (hitDurationLimit) {
-          const currentLimit = formatDuration(limits.maxDurationSeconds);
-          const upgradeMessage =
-            userTier === 'pro'
-              ? `${currentLimit} limit reached! Upgrade to Premium for 2-minute recordings.`
-              : `${currentLimit} recording complete.`;
+      // Stop based on platform
+      if (Capacitor.isNativePlatform()) {
+        stopNativeListening();
+      } else {
+        stopWebListening();
+      }
 
-          if (userTier === 'pro') {
-            toast.error(upgradeMessage, {
-              duration: 5000,
-              icon: '🔒',
-            });
-          } else {
-            toast.success(upgradeMessage, {
-              duration: 3000,
-              icon: '✅',
-            });
-          }
+      // Show upgrade prompt if duration limit was hit
+      if (hitDurationLimit) {
+        const currentLimit = formatDuration(limits.maxDurationSeconds);
+        const upgradeMessage =
+          userTier === 'pro'
+            ? `${currentLimit} limit reached! Upgrade to Premium for 2-minute recordings.`
+            : `${currentLimit} recording complete.`;
+
+        if (userTier === 'pro') {
+          toast.error(upgradeMessage, {
+            duration: 5000,
+            icon: '🔒',
+          });
+        } else {
+          toast.success(upgradeMessage, {
+            duration: 3000,
+            icon: '✅',
+          });
         }
       }
     },
-    [isListening, userTier, limits]
+    [isListening, userTier, limits, stopNativeListening, stopWebListening]
   );
 
   return {
     isListening,
     startListening,
     stopListening,
-    hasSupport: !!SpeechRecognitionAPI,
+    hasSupport: Capacitor.isNativePlatform() || !!SpeechRecognitionAPI,
     recordingDuration,
     maxDuration: limits.maxDurationSeconds,
     remainingDuration: Math.max(0, limits.maxDurationSeconds - recordingDuration),

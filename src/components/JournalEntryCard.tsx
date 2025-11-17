@@ -1,5 +1,7 @@
 
 import * as React from 'react';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { JournalEntry } from '../types';
 import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, LightningBoltIcon, TrashIcon } from './Icons';
 import toast from 'react-hot-toast';
@@ -39,22 +41,39 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
     }
   }, [entry.aiAnalysis]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (onDelete) {
+        // Haptic feedback for warning
+        if (Capacitor.isNativePlatform()) {
+          try {
+            await Haptics.notification({ type: NotificationType.Warning });
+          } catch (error) {
+            console.error('Haptics error:', error);
+          }
+        }
+
         toast((t) => (
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold">Are you sure you want to delete this entry?</p>
                 <div className="flex gap-4">
-                    <button 
-                        onClick={() => {
+                    <button
+                        onClick={async () => {
+                            // Haptic feedback for delete action
+                            if (Capacitor.isNativePlatform()) {
+                              try {
+                                await Haptics.impact({ style: ImpactStyle.Heavy });
+                              } catch (error) {
+                                console.error('Haptics error:', error);
+                              }
+                            }
                             onDelete(entry.id);
                             toast.dismiss(t.id);
-                        }} 
+                        }}
                         className="px-4 py-1 bg-red-500 text-white rounded-md text-sm"
                     >
                         Delete
                     </button>
-                    <button 
+                    <button
                         onClick={() => toast.dismiss(t.id)}
                         className="px-4 py-1 bg-stone-200 text-stone-700 rounded-md text-sm"
                     >

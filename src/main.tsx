@@ -1,6 +1,7 @@
 // main.tsx
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
 import { initErrorMonitoring } from './lib/errorMonitoring';
 import { logger } from './utils/logger';
@@ -81,9 +82,11 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    {/* Wrap the app in Suspense for translation loading */}
-    <Suspense fallback={<div>Loading...</div>}>
-      <Router />
-    </Suspense>
+    <BrowserRouter>
+      {/* Wrap the app in Suspense for translation loading */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <Router />
+      </Suspense>
+    </BrowserRouter>
   </React.StrictMode>
 );

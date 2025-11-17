@@ -1,4 +1,5 @@
 import { FC, lazy, Suspense, useEffect, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 
 const App = lazy(() => import('./App'));
@@ -54,42 +55,37 @@ const ErrorScreen: FC<ErrorScreenProps> = ({ error, onRetry }) => (
   </div>
 );
 
+// Protected Route Component
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 const Router: FC = () => {
-  const { user, loading, error } = useAuth();
-  const [path, setPath] = useState(window.location.pathname);
+  const { user, error } = useAuth();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      setPath(window.location.pathname);
-    };
-
-    const handleNavigate = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      setPath(customEvent.detail);
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    window.addEventListener('navigate', handleNavigate);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('navigate', handleNavigate);
-    };
-  }, []);
 
   // Add timeout for loading state (20 seconds)
   useEffect(() => {
-    if (loading) {
-      const timeoutId = setTimeout(() => {
-        setLoadingTimeout(true);
-      }, 20000);
+    const timeoutId = setTimeout(() => {
+      setLoadingTimeout(true);
+    }, 20000);
 
-      return () => clearTimeout(timeoutId);
-    } else {
-      setLoadingTimeout(false);
-    }
-  }, [loading]);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   // Handle retry
   const handleRetry = () => {
@@ -102,81 +98,59 @@ const Router: FC = () => {
     return <ErrorScreen error={errorMessage} onRetry={handleRetry} />;
   }
 
-  // Public routes configuration
-  const publicRoutes: Record<string, JSX.Element> = {
-    '/': <LandingPage />,
-    '/terms': <TermsOfService />,
-    '/privacy': <PrivacyPolicy />,
-    '/help': <HelpCenter />,
-    '/pricing': <PricingPage />,
-    '/therapists': <TherapistsPage />,
-    '/health': <HealthCheck />,
-  };
-
-  // Handle public routes
-  if (publicRoutes[path]) {
-    return <Suspense fallback={<PageLoader />}>{publicRoutes[path]}</Suspense>;
-  }
-
-  // Handle auth callback route (email confirmation, password reset)
-  if (path === '/auth/callback') {
-    return (
-      <Suspense fallback={<PageLoader />}>
-        <AuthCallback />
-      </Suspense>
-    );
-  }
-
-  // Handle auth route
-  if (path === '/auth' || path.startsWith('/auth/')) {
-    return (
-      <Suspense fallback={<PageLoader />}>
-        <App />
-      </Suspense>
-    );
-  }
-
-  // Protected route logic
-  if (loading) {
-    return <PageLoader />;
-  }
-
-  if (!user && path !== '/') {
-    // Redirect to landing if not authenticated
-    window.history.replaceState({}, '', '/');
-    setPath('/');
-    return <PageLoader />;
-  }
-
-  // Handle Settings route for authenticated users
-  if (user && path === '/settings') {
-    return (
-      <Suspense fallback={<PageLoader />}>
-        <Settings />
-      </Suspense>
-    );
-  }
-
-  // Handle Achievements route for authenticated users
-  if (user && path === '/achievements') {
-    return (
-      <Suspense fallback={<PageLoader />}>
-        <AchievementsPage />
-      </Suspense>
-    );
-  }
-
-  // Show app for authenticated users
   return (
     <Suspense fallback={<PageLoader />}>
-      <App />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/therapists" element={<TherapistsPage />} />
+        <Route path="/health" element={<HealthCheck />} />
+
+        {/* Auth Routes */}
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route
+          path="/auth"
+          element={user ? <Navigate to="/app" replace /> : <App />}
+        />
+
+        {/* Protected App Routes */}
+        <Route
+          path="/app"
+          element={
+            <ProtectedRoute>
+              <App />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/achievements"
+          element={
+            <ProtectedRoute>
+              <AchievementsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all - redirect to landing or app */}
+        <Route
+          path="*"
+          element={user ? <Navigate to="/app" replace /> : <Navigate to="/" replace />}
+        />
+      </Routes>
     </Suspense>
   );
-};
-
-export const navigate = (path: string): void => {
-  window.history.pushState({}, '', path);
-  window.dispatchEvent(new CustomEvent('navigate', { detail: path }));
 };
 
 export default Router;

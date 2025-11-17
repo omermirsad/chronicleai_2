@@ -51,6 +51,51 @@ async function handleRequest(req: Request, userId?: string): Promise<Response> {
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     const model = GEMINI_MODEL;
 
+    // Check if client supports streaming
+    const acceptHeader = req.headers.get('accept') || '';
+    const supportsStreaming = acceptHeader.includes('text/event-stream');
+
+    if (supportsStreaming && config?.responseMimeType !== 'application/json') {
+      // Streaming response for better UX
+      const stream = new ReadableStream({
+        async start(controller) {
+          const encoder = new TextEncoder();
+          try {
+            const streamResponse = await ai.models.generateContentStream({
+              model,
+              contents: [{ parts }],
+              config,
+            });
+
+            for await (const chunk of streamResponse.stream) {
+              const text = chunk.text;
+              if (text) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
+              }
+            }
+
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+            controller.close();
+          } catch (error: any) {
+            console.error('Streaming error:', error);
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ error: error.message })}\n\n`)
+            );
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      });
+    }
+
+    // Non-streaming response (for JSON or clients that don't support streaming)
     // Create timeout promise
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('AI request timed out')), AI_TIMEOUT_MS);

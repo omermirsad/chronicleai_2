@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
 import { initErrorMonitoring } from './lib/errorMonitoring';
+import { validateEnv } from './lib/envValidation';
 import { logger } from './utils/logger';
 import './index.css';
 
@@ -16,6 +17,17 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { App as CapApp } from '@capacitor/app';
 import { platformClass } from './utils/platform';
+
+// Validate environment variables early to catch configuration issues
+try {
+  validateEnv();
+} catch (error) {
+  logger.error('Environment validation failed:', error);
+  // In production, we want to fail fast on invalid configuration
+  if (import.meta.env.PROD) {
+    throw error;
+  }
+}
 
 // Initialize error monitoring in production
 if (import.meta.env.PROD) {

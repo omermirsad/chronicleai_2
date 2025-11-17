@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import compression from 'vite-plugin-compression';
@@ -6,26 +6,9 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  plugins: [
+export default defineConfig(({ mode }) => {
+  const plugins: PluginOption[] = [
     react(),
-    // Gzip compression for production
-    mode === 'production' && compression({
-      algorithm: 'gzip',
-      ext: '.gz',
-    }),
-    // Brotli compression for production
-    mode === 'production' && compression({
-      algorithm: 'brotliCompress',
-      ext: '.br',
-    }),
-    // Bundle analyzer (run with ANALYZE=true npm run build)
-    process.env.ANALYZE && visualizer({
-      filename: './dist/stats.html',
-      open: true,
-      gzipSize: true,
-      brotliSize: true,
-    }),
     // PWA Configuration
     VitePWA({
       registerType: 'autoUpdate',
@@ -104,7 +87,36 @@ export default defineConfig(({ mode }) => ({
         enabled: false, // Disable PWA in development
       }
     }),
-  ].filter(Boolean),
+  ];
+
+  // Add production-only plugins
+  if (mode === 'production') {
+    plugins.push(
+      compression({
+        algorithm: 'gzip',
+        ext: '.gz',
+      }),
+      compression({
+        algorithm: 'brotliCompress',
+        ext: '.br',
+      })
+    );
+  }
+
+  // Add bundle analyzer if ANALYZE env var is set
+  if (process.env.ANALYZE) {
+    plugins.push(
+      visualizer({
+        filename: './dist/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }) as PluginOption
+    );
+  }
+
+  return {
+    plugins,
   define: {
     global: 'globalThis',
   },
@@ -184,4 +196,5 @@ export default defineConfig(({ mode }) => ({
     strictPort: true,
     host: true,
   },
-}));
+  };
+});

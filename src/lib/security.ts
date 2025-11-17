@@ -125,12 +125,23 @@ export const getSecurityHeaders = () => {
 
 /**
  * Sanitize user input to prevent XSS attacks
- * Use this for any user-generated content displayed in the UI
+ * Use this for plain text - creates text node and returns escaped HTML
+ * For rich HTML content, use DOMPurify library directly
  *
  * @param input - Raw user input string
- * @returns Sanitized string
+ * @returns Sanitized string with HTML entities escaped
  */
 export const sanitizeInput = (input: string): string => {
+  if (typeof document === 'undefined') {
+    // Server-side or non-browser environment
+    return input
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
   const div = document.createElement('div');
   div.textContent = input;
   return div.innerHTML;

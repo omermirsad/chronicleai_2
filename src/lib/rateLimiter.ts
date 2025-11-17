@@ -18,12 +18,12 @@ interface RateLimitEntry {
 
 class RateLimiter {
   private storage: Map<string, RateLimitEntry> = new Map();
-  private cleanupInterval: number | null = null;
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     // Clean up expired entries every minute
     if (typeof window !== 'undefined') {
-      this.cleanupInterval = window.setInterval(() => {
+      this.cleanupInterval = setInterval(() => {
         this.cleanup();
       }, 60000);
     }

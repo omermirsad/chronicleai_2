@@ -16,16 +16,26 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+
     /* Additional options */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "exactOptionalPropertyTypes": false,
 
     /* Types */
-    "types": ["vite/client", "@capacitor/cli"]
+    "types": ["vite/client", "@capacitor/cli"],
+
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["supabase", "node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]

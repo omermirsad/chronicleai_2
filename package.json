@@ -46,7 +46,12 @@
     "cap:copy:android": "npx cap copy android",
     "cap:update": "npx cap update",
     "cap:run:ios": "npx cap run ios",
-    "cap:run:android": "npx cap run android"
+    "cap:run:android": "npx cap run android",
+    "prepare": "husky install",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@capacitor-community/speech-recognition": "^7.0.1",
@@ -85,6 +90,9 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "@playwright/test": "^1.40.1",
     "@sentry/vite-plugin": "^2.25.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
@@ -102,8 +110,11 @@
     "eslint": "^9.19.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.18",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-security": "^3.0.1",
+    "husky": "^8.0.3",
     "jsdom": "^25.0.1",
+    "lint-staged": "^15.2.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "rollup-plugin-visualizer": "^5.12.0",

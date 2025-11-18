@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { enUS } from 'date-fns/locale';
 import type { Locale } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export const useDateLocale = () => {
   const { i18n } = useTranslation();
@@ -29,7 +30,7 @@ export const useDateLocale = () => {
         }
         setDateLocale(localeModule.default || enUS);
       } catch (error) {
-        console.warn('Could not load date-fns locale:', error);
+        logger.warn('Could not load date-fns locale', { error });
         setDateLocale(enUS); // Fallback to English
       }
     };

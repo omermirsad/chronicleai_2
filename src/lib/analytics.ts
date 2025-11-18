@@ -7,7 +7,7 @@
  */
 
 import { config } from '../config';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 interface AnalyticsEvent {
   name: string;

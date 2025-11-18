@@ -2,10 +2,11 @@ import * as React from 'react';
 import toast from 'react-hot-toast';
 import { Capacitor } from '@capacitor/core';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
-import { supabase } from '../lib/supabase';
-import { useAuth } from './useAuth';
-import { VOICE_TO_TEXT_LIMITS, formatDuration } from '../config/voiceLimits';
-import { SubscriptionTier } from '../types';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { VOICE_TO_TEXT_LIMITS, formatDuration } from '@/config/voiceLimits';
+import { SubscriptionTier } from '@/types';
+import { logger } from '@/lib/logger';
 
 // Custom type definitions for the Web Speech API for cross-browser compatibility
 // and to resolve TypeScript errors, as these types are not always standard.
@@ -104,7 +105,7 @@ export const useSpeechRecognition = (
           });
         }
       } catch (error) {
-        console.error('Error fetching voice recording status:', error);
+        logger.error('Error fetching voice recording status', error as Error);
       } finally {
         setIsLoadingStatus(false);
       }
@@ -116,7 +117,7 @@ export const useSpeechRecognition = (
   // Initialize Speech Recognition
   React.useEffect(() => {
     if (!SpeechRecognitionAPI) {
-      console.error("Speech Recognition API not supported in this browser.");
+      logger.warn('Speech Recognition API not supported in this browser');
       return;
     }
 
@@ -134,7 +135,7 @@ export const useSpeechRecognition = (
     };
 
     recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
+      logger.error('Speech recognition error', undefined, { errorType: event.error });
       if (isListening) {
         setIsListening(false);
         toast.error('Speech recognition error. Please try again.');
@@ -232,7 +233,7 @@ export const useSpeechRecognition = (
 
       return data;
     } catch (error) {
-      console.error('Error starting voice recording:', error);
+      logger.error('Error starting voice recording', error as Error);
       toast.error('Failed to start recording. Please try again.');
       return null;
     }
@@ -276,7 +277,7 @@ export const useSpeechRecognition = (
         }
       });
     } catch (error) {
-      console.error('Error starting native speech recognition:', error);
+      logger.error('Error starting native speech recognition', error as Error);
       toast.error('Failed to start recording. Please try again.');
       setIsListening(false);
     }

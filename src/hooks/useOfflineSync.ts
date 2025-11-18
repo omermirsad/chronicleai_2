@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { JournalService } from '../services/journal/journalService';
 import { STORAGE_KEYS } from '../constants';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
 import type { DatabaseEntry } from '../types';
 

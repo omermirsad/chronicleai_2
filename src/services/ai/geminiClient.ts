@@ -1,5 +1,5 @@
 import { supabase } from '../../lib/supabase';
-import { logger } from '../../utils/logger';
+import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
 
 type Part = { text: string } | { inlineData: { data: string; mimeType: string } };

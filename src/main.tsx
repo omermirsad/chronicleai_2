@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
 import { initErrorMonitoring } from './lib/errorMonitoring';
 import { validateEnv } from './lib/envValidation';
-import { logger } from './utils/logger';
+import { logger } from '@/lib/logger';
 import './index.css';
 
 // Import the i18n configuration

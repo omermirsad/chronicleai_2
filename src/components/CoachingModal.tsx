@@ -1,9 +1,10 @@
 // src/components/CoachingModal.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import { CoachingModuleType } from '../types';
-import { getCoachingModule, getCoachingFollowUp } from '../services/geminiService';
-import { XMarkIcon, SparklesIcon } from './Icons';
-import { useSubscription } from '../hooks/useSubscription';
+import { CoachingModuleType } from '@/types';
+import { getCoachingModule, getCoachingFollowUp } from '@/services/geminiService';
+import { XMarkIcon, SparklesIcon } from '@/components/Icons';
+import { useSubscription } from '@/hooks/useSubscription';
+import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
 
 interface CoachingModalProps {
@@ -74,7 +75,7 @@ const CoachingModal: React.FC<CoachingModalProps> = ({
       // Track AI call for initialization
       await trackAICall();
     } catch (error) {
-      console.error('Error initializing coaching:', error);
+      logger.error('Error initializing coaching', error as Error);
       toast.error('Failed to start coaching session');
       onClose();
     } finally {
@@ -129,7 +130,7 @@ const CoachingModal: React.FC<CoachingModalProps> = ({
         }, 100);
       }
     } catch (error) {
-      console.error('Error getting coaching follow-up:', error);
+      logger.error('Error getting coaching follow-up', error as Error);
       toast.error('Failed to continue session. Please try again.');
       setIsLoading(false);
     } finally {

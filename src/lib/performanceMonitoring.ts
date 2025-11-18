@@ -4,7 +4,7 @@
  */
 
 import * as Sentry from '@sentry/react';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 interface PerformanceMetric {
   name: string;

@@ -4,7 +4,7 @@
  * Content Security Policy and other security-related functions
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 /**
  * Generate Content Security Policy header value

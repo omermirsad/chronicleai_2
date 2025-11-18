@@ -1,5 +1,5 @@
 import { GeminiClient } from './geminiClient';
-import { logger } from '../../utils/logger';
+import { logger } from '@/lib/logger';
 import type { Perspective } from '../../types';
 
 /**

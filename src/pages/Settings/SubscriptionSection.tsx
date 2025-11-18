@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useSubscription } from '../../hooks/useSubscription';
-import { useNavigate } from '../../hooks/useNavigate';
-import { supabase } from '../../lib/supabase';
-import { useAsyncAction } from '../../hooks/useAsyncAction';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useNavigate } from '@/hooks/useNavigate';
+import { supabase } from '@/lib/supabase';
+import { useAsyncAction } from '@/hooks/useAsyncAction';
+import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
-import { AI_CALL_PACKS } from '../../config/pricing';
+import { AI_CALL_PACKS } from '@/config/pricing';
 import { loadStripe } from '@stripe/stripe-js';
-import { config } from '../../config';
+import { config } from '@/config';
 
 const stripePromise = loadStripe(config.stripe.publishableKey);
 
@@ -69,7 +70,7 @@ export const SubscriptionSection: React.FC = () => {
         throw redirectError;
       }
     } catch (error) {
-      console.error('Error purchasing AI Call Pack:', error);
+      logger.error('Error purchasing AI Call Pack', error as Error);
       toast.error(
         error instanceof Error
           ? error.message
@@ -277,7 +278,7 @@ const WaitlistFeature: React.FC<{
           setOnWaitlist(true);
         }
       } catch (error) {
-        console.error('Error checking waitlist status:', error);
+        logger.error('Error checking waitlist status', error as Error);
       } finally {
         setCheckingStatus(false);
       }
@@ -302,7 +303,7 @@ const WaitlistFeature: React.FC<{
         throw new Error(data?.error || 'Failed to join waitlist');
       }
     } catch (error) {
-      console.error('Error joining waitlist:', error);
+      logger.error('Error joining waitlist', error as Error);
       toast.error(
         error instanceof Error ? error.message : 'Failed to join waitlist. Please try again.'
       );

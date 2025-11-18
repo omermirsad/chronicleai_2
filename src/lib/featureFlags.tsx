@@ -3,6 +3,7 @@
  * Facebook/Meta-level feature management and A/B testing
  */
 
+import React from 'react';
 import { logger } from './logger';
 
 export interface FeatureFlag {

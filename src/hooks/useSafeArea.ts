@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { logger } from '@/lib/logger';
 
 interface SafeAreaInsets {
   top: number;
@@ -29,7 +30,7 @@ export const useSafeArea = () => {
 
           setInsets({ top, right, bottom, left });
         } catch (error) {
-          console.error('Error getting safe area:', error);
+          logger.error('Error getting safe area', error as Error);
         }
       }
     };

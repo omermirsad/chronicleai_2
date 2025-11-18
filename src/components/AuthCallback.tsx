@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { BookOpenIcon } from './Icons';
+import { supabase } from '@/lib/supabase';
+import { BookOpenIcon } from '@/components/Icons';
+import { logger } from '@/lib/logger';
 
 // Timeout utility
 const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
@@ -57,7 +58,7 @@ const AuthCallback = () => {
             }, 1000);
           } else {
             // If no session after polling, show error
-            console.error('No session established after callback');
+            logger.error('No session established after callback');
             setError('Failed to establish session. The link may have expired.');
             setStatus('error');
           }
@@ -70,7 +71,7 @@ const AuthCallback = () => {
           }, 1000);
         }
       } catch (error) {
-        console.error('Error handling auth callback:', error);
+        logger.error('Error handling auth callback', error as Error);
         const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
         setError(errorMessage);
         setStatus('error');

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { JournalEntry } from '../types';
-import { JournalService } from '../services/journal/journalService';
-import { useAuth } from './useAuth';
-import { useOfflineSync } from './useOfflineSync';
-import { logger } from '../utils/logger';
+import { JournalEntry } from '@/types';
+import { JournalService } from '@/services/journal/journalService';
+import { useAuth } from '@/hooks/useAuth';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
+import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
 
 /**
@@ -82,7 +82,7 @@ export const useJournal = () => {
         try {
           await Haptics.impact({ style: ImpactStyle.Light });
         } catch (error) {
-          console.error('Haptics error:', error);
+          logger.debug('Haptics not available', { error });
         }
       }
 
@@ -127,7 +127,7 @@ export const useJournal = () => {
         try {
           await Haptics.impact({ style: ImpactStyle.Light });
         } catch (error) {
-          console.error('Haptics error:', error);
+          logger.debug('Haptics not available', { error });
         }
       }
     } catch (error) {

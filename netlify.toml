@@ -9,6 +9,7 @@
   NODE_VERSION = "18"
   NPM_VERSION = "9"
   NODE_ENV = "production"
+  SUPABASE_CLI_NO_DOWNLOAD = "true"
 
 # Redirect all requests to index.html for SPA routing
 [[redirects]]

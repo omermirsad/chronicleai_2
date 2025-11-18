@@ -76,11 +76,13 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "SUPABASE_CLI_NO_DOWNLOAD": "true"
   },
   "build": {
     "env": {
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "SUPABASE_CLI_NO_DOWNLOAD": "true"
     }
   },
   "regions": ["iad1"],

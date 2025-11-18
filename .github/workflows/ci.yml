@@ -32,6 +32,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
+        env:
+          SUPABASE_CLI_NO_DOWNLOAD: true
 
       - name: Run ESLint
         run: npm run lint
@@ -65,6 +67,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
+        env:
+          SUPABASE_CLI_NO_DOWNLOAD: true
 
       - name: Run type check
         run: npm run type-check
@@ -87,6 +91,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
+        env:
+          SUPABASE_CLI_NO_DOWNLOAD: true
 
       - name: Run tests with coverage
         run: npm run test:coverage
@@ -123,6 +129,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
+        env:
+          SUPABASE_CLI_NO_DOWNLOAD: true
 
       - name: Run npm audit
         run: npm audit --audit-level=moderate
@@ -150,6 +158,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
+        env:
+          SUPABASE_CLI_NO_DOWNLOAD: true
 
       - name: Build production bundle
         run: npm run build:prod
@@ -195,6 +205,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
+        env:
+          SUPABASE_CLI_NO_DOWNLOAD: true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4

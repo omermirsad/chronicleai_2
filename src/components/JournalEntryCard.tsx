@@ -1,13 +1,13 @@
-
 import * as React from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-import { JournalEntry } from '../types';
-import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, LightningBoltIcon, TrashIcon } from './Icons';
+import { JournalEntry } from '@/types';
+import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, LightningBoltIcon, TrashIcon } from '@/components/Icons';
 import toast from 'react-hot-toast';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
-import { useSubscription } from '../hooks/useSubscription';
+import { useSubscription } from '@/hooks/useSubscription';
+import { logger } from '@/lib/logger';
 
 interface JournalEntryCardProps {
   entry: JournalEntry;
@@ -48,7 +48,7 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
           try {
             await Haptics.notification({ type: NotificationType.Warning });
           } catch (error) {
-            console.error('Haptics error:', error);
+            logger.debug('Haptics not available', { error });
           }
         }
 
@@ -63,7 +63,7 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
                               try {
                                 await Haptics.impact({ style: ImpactStyle.Heavy });
                               } catch (error) {
-                                console.error('Haptics error:', error);
+                                logger.debug('Haptics not available', { error });
                               }
                             }
                             onDelete(entry.id);

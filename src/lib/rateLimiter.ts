@@ -8,7 +8,7 @@
  * Real security rate limiting is implemented server-side in the Supabase Edge Functions.
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 interface RateLimitConfig {
   maxRequests: number;

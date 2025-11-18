@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import type { GamificationStats, UserAchievement, AchievementDefinition, AchievementCategory } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 interface RawAchievementData {
   achievement_id: string;

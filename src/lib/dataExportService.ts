@@ -7,7 +7,7 @@
 
 import { supabase } from './supabase';
 import type { JournalEntry, Profile, DatabaseEntry } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 /**
  * Export user data in JSON format

@@ -1,6 +1,6 @@
 import { SchemaType } from '@google/generative-ai';
 import { GeminiClient } from './geminiClient';
-import { logger } from '../../utils/logger';
+import { logger } from '@/lib/logger';
 import type { AIAnalysis } from '../../types';
 
 const Type = SchemaType;

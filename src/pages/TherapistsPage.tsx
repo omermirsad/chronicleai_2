@@ -1,9 +1,10 @@
 // src/pages/TherapistsPage.tsx
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../hooks/useAuth';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
-import Footer from '../components/Footer';
+import Footer from '@/components/Footer';
 
 const TherapistsPage: React.FC = () => {
   const { user } = useAuth();
@@ -42,7 +43,7 @@ const TherapistsPage: React.FC = () => {
         throw new Error(data?.error || 'Failed to join waitlist');
       }
     } catch (error) {
-      console.error('Error joining waitlist:', error);
+      logger.error('Error joining waitlist', error as Error);
       toast.error(
         error instanceof Error ? error.message : 'Failed to join waitlist. Please try again.'
       );

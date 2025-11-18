@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useGamification } from '../hooks/useGamification';
 import { supabase } from '../lib/supabase';
 import type { AchievementDefinition, AchievementCategory } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 interface AchievementCardProps {
   achievement: AchievementDefinition;

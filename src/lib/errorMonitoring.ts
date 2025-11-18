@@ -5,6 +5,7 @@
  */
 
 import * as Sentry from '@sentry/react';
+import { logger } from '@/lib/logger';
 
 export const initErrorMonitoring = () => {
   const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
@@ -12,9 +13,7 @@ export const initErrorMonitoring = () => {
 
   // Only initialize Sentry if DSN is provided
   if (!sentryDsn) {
-    if (import.meta.env.DEV) {
-      console.info('Sentry DSN not configured. Error monitoring disabled.');
-    }
+    logger.info('Sentry DSN not configured. Error monitoring disabled.');
     return;
   }
 
@@ -59,9 +58,7 @@ export const initErrorMonitoring = () => {
     },
   });
 
-  if (import.meta.env.DEV) {
-    console.info('Error monitoring initialized');
-  }
+  logger.info('Error monitoring initialized');
 };
 
 /**
@@ -73,7 +70,7 @@ export const captureException = (error: Error, context?: Record<string, any>) =>
       extra: context,
     });
   } else {
-    console.error('Error captured:', error, context);
+    logger.error('Error captured', error, context);
   }
 };
 

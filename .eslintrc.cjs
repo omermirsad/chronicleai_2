@@ -29,6 +29,7 @@ module.exports = {
       }
     ],
     '@typescript-eslint/ban-ts-comment': 'warn',
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    // Enforce using logger instead of console
+    'no-console': ['error', { allow: [] }],
   },
 };

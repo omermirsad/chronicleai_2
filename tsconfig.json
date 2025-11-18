@@ -28,9 +28,6 @@
     "allowSyntheticDefaultImports": true,
     "exactOptionalPropertyTypes": false,
 
-    /* Types */
-    "types": ["vite/client", "@capacitor/cli"],
-
     /* Path aliases */
     "baseUrl": ".",
     "paths": {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { User } from '../types';
-import { supabase } from '../lib/supabase';
+import { User } from '@/types';
+import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import type { Session } from '@supabase/supabase-js';
 
 interface Profile {
@@ -52,7 +53,7 @@ export const useAuth = () => {
         });
         setError(null);
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        logger.error('Error fetching profile', error as Error);
         // Fallback to basic user info if profile fetch fails
         setUser({
           id: session.user.id,
@@ -80,7 +81,7 @@ export const useAuth = () => {
           await processSession(session);
         }
       } catch (error) {
-        console.error('Error getting session:', error);
+        logger.error('Error getting session', error as Error);
         if (mounted) {
           setError(error instanceof Error ? error.message : 'Failed to initialize authentication');
           setUser(null);
@@ -112,7 +113,7 @@ export const useAuth = () => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Sign out error:', error);
+      logger.error('Sign out error', error);
       throw error;
     }
     setUser(null);

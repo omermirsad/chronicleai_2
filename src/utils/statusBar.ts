@@ -1,5 +1,6 @@
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
+import { logger } from '@/lib/logger';
 
 export const configureStatusBar = async (options: {
   style?: 'light' | 'dark';
@@ -18,7 +19,7 @@ export const configureStatusBar = async (options: {
       await StatusBar.setBackgroundColor({ color: options.backgroundColor });
     }
   } catch (error) {
-    console.error('Status bar configuration error:', error);
+    logger.error('Status bar configuration error', error as Error);
   }
 };
 

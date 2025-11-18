@@ -8,7 +8,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { config } from '../config';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 const stripePromise = loadStripe(config.stripe.publishableKey);
 

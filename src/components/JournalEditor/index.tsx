@@ -17,7 +17,7 @@ import {
 } from '../Icons';
 import { marked } from 'marked';
 import toast from 'react-hot-toast';
-import { logger } from '../../utils/logger';
+import { logger } from '@/lib/logger';
 import { STORAGE_KEYS } from '../../constants';
 
 interface JournalEditorProps {

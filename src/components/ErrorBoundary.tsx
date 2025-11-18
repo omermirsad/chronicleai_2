@@ -1,5 +1,6 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import * as Sentry from '@sentry/react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -24,10 +25,8 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Only log in development
-    if (import.meta.env.DEV) {
-      console.error('Error caught by boundary:', error, errorInfo);
-    }
+    // Log error
+    logger.error('Error caught by boundary', error, { componentStack: errorInfo.componentStack });
 
     // Log to Sentry in production
     if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {

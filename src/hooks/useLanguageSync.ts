@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { useAuth } from './useAuth';
-import { supabase } from '../lib/supabase';
-import { AppLanguage, UserPreferences } from '../types';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
+import { AppLanguage, UserPreferences } from '@/types';
+import { logger } from '@/lib/logger';
 
 export const useLanguageSync = () => {
   const { i18n } = useTranslation();
@@ -75,7 +76,7 @@ export const useLanguageSync = () => {
 
         if (updateError) throw updateError;
       } catch (error) {
-        console.error('Failed to save language preference:', error);
+        logger.error('Failed to save language preference', error as Error);
         toast.error(i18n.t('toast.languageChangeError'));
       }
     }

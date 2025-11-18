@@ -4,7 +4,7 @@
  */
 
 import { captureException } from './errorMonitoring';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
 
 export enum ErrorType {

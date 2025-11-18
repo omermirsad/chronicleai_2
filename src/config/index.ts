@@ -4,7 +4,7 @@
  * Centralized configuration for environment variables and app settings
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 export const config = {
   // App settings

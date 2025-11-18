@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 /**
  * Environment variable schema

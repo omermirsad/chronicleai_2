@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { SubscriptionTier, SubscriptionUsage } from '../types';
 import { useAuth } from './useAuth';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 export const useSubscription = () => {
   const { user } = useAuth();

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { logger } from '../utils/logger';
+import { logger } from '@/lib/logger';
 
 interface UseAsyncActionOptions {
   successMessage?: string;

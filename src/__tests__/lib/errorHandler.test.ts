@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   handleError,
-  createAppError,
+  createErrorDetails,
   ErrorType,
   withErrorHandling,
   retryOperation,
@@ -31,43 +31,43 @@ describe('Error Handler', () => {
     vi.clearAllMocks();
   });
 
-  describe('createAppError', () => {
-    it('should create app error from generic error', () => {
+  describe('createErrorDetails', () => {
+    it('should create error details from generic error', () => {
       const error = new Error('Test error');
-      const appError = createAppError(error);
+      const errorDetails = createErrorDetails(error);
 
-      expect(appError.type).toBe(ErrorType.UNKNOWN);
-      expect(appError.message).toBe('Test error');
-      expect(appError.originalError).toBe(error);
+      expect(errorDetails.type).toBe(ErrorType.UNKNOWN);
+      expect(errorDetails.message).toBe('Test error');
+      expect(errorDetails.originalError).toBe(error);
     });
 
     it('should detect network errors', () => {
       const error = new Error('Network request failed');
-      const appError = createAppError(error);
+      const errorDetails = createErrorDetails(error);
 
-      expect(appError.type).toBe(ErrorType.NETWORK);
+      expect(errorDetails.type).toBe(ErrorType.NETWORK);
     });
 
     it('should detect auth errors', () => {
       const error = new Error('Unauthorized access');
-      const appError = createAppError(error);
+      const errorDetails = createErrorDetails(error);
 
-      expect(appError.type).toBe(ErrorType.AUTH);
+      expect(errorDetails.type).toBe(ErrorType.AUTH);
     });
 
     it('should use provided error type', () => {
       const error = new Error('Test error');
-      const appError = createAppError(error, ErrorType.VALIDATION);
+      const errorDetails = createErrorDetails(error, ErrorType.VALIDATION);
 
-      expect(appError.type).toBe(ErrorType.VALIDATION);
+      expect(errorDetails.type).toBe(ErrorType.VALIDATION);
     });
 
     it('should include context', () => {
       const error = new Error('Test error');
       const context = { userId: '123', action: 'test' };
-      const appError = createAppError(error, ErrorType.UNKNOWN, context);
+      const errorDetails = createErrorDetails(error, ErrorType.UNKNOWN, context);
 
-      expect(appError.context).toEqual(context);
+      expect(errorDetails.context).toEqual(context);
     });
   });
 

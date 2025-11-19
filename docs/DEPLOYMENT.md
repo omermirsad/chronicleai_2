@@ -357,10 +357,11 @@ Use Vercel/Netlify edge network:
 ### Content Security Policy
 
 ```typescript
-// Configured in src/lib/security/headers.ts
-import { applySecurityHeaders } from './lib/security/headers';
+// Configured in src/lib/security.ts
+import { getSecurityHeaders } from '@/lib/security';
 
-applySecurityHeaders();
+// Security headers are automatically applied via hosting platform configs
+// (vercel.json / netlify.toml)
 ```
 
 ### Rate Limiting

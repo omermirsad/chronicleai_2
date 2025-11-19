@@ -160,7 +160,7 @@ const data = await fetchWithRetry('/api/endpoint', {}, {
 
 ### 7. Security Enhancements
 
-#### Security Headers (`/src/lib/security/headers.ts`)
+#### Security Headers (`/src/lib/security.ts`)
 - ✅ Content Security Policy (CSP)
 - ✅ X-Frame-Options: DENY
 - ✅ X-Content-Type-Options: nosniff
@@ -354,14 +354,13 @@ git push
    }
    ```
 
-5. **Apply Security Headers**:
+5. **Security Headers**:
    ```typescript
-   // In src/main.tsx
-   import { applySecurityHeaders } from './lib/security/headers';
+   // Security headers are applied via hosting configs (vercel.json / netlify.toml)
+   // For programmatic access to CSP:
+   import { getSecurityHeaders, generateCSPHeader } from '@/lib/security';
 
-   if (import.meta.env.PROD) {
-     applySecurityHeaders();
-   }
+   const headers = getSecurityHeaders();
    ```
 
 ## Best Practices

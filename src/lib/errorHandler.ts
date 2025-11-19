@@ -5,6 +5,7 @@
 
 import { captureException } from './errorMonitoring';
 import { logger } from '@/lib/logger';
+import { AppError as AppErrorClass, isOperationalError } from './errors';
 import toast from 'react-hot-toast';
 
 export enum ErrorType {
@@ -18,7 +19,7 @@ export enum ErrorType {
   UNKNOWN = 'unknown',
 }
 
-export interface AppError {
+export interface ErrorDetails {
   type: ErrorType;
   message: string;
   originalError?: Error;
@@ -43,27 +44,27 @@ const ERROR_MESSAGES: Record<ErrorType, string> = {
 /**
  * Handle errors globally
  */
-export function handleError(error: Error | AppError, showToast = true): void {
-  const appError = isAppError(error) ? error : createAppError(error);
+export function handleError(error: Error | ErrorDetails, showToast = true): void {
+  const errorDetails = isErrorDetails(error) ? error : createErrorDetails(error);
 
   // Log error
   logger.error('Error occurred:', {
-    type: appError.type,
-    message: appError.message,
-    context: appError.context,
+    type: errorDetails.type,
+    message: errorDetails.message,
+    context: errorDetails.context,
   });
 
   // Send to error monitoring service
-  if (appError.originalError) {
-    captureException(appError.originalError, {
-      type: appError.type,
-      ...appError.context,
+  if (errorDetails.originalError) {
+    captureException(errorDetails.originalError, {
+      type: errorDetails.type,
+      ...errorDetails.context,
     });
   }
 
   // Show user-friendly message
   if (showToast) {
-    const userMessage = appError.userMessage || ERROR_MESSAGES[appError.type];
+    const userMessage = errorDetails.userMessage || ERROR_MESSAGES[errorDetails.type];
     toast.error(userMessage, {
       duration: 5000,
       position: 'top-center',
@@ -72,13 +73,13 @@ export function handleError(error: Error | AppError, showToast = true): void {
 }
 
 /**
- * Create an AppError from a generic error
+ * Create ErrorDetails from a generic error
  */
-export function createAppError(
+export function createErrorDetails(
   error: Error,
   type: ErrorType = ErrorType.UNKNOWN,
   context?: Record<string, any>
-): AppError {
+): ErrorDetails {
   // Detect error type from error message
   const detectedType = detectErrorType(error);
 
@@ -122,9 +123,9 @@ function detectErrorType(error: Error): ErrorType {
 }
 
 /**
- * Type guard for AppError
+ * Type guard for ErrorDetails
  */
-function isAppError(error: any): error is AppError {
+function isErrorDetails(error: any): error is ErrorDetails {
   return error && typeof error.type === 'string' && typeof error.message === 'string';
 }
 
@@ -140,7 +141,7 @@ export async function withErrorHandling<T>(
     return await operation();
   } catch (error) {
     handleError(
-      createAppError(error as Error, errorType || ErrorType.UNKNOWN, context)
+      createErrorDetails(error as Error, errorType || ErrorType.UNKNOWN, context)
     );
     return null;
   }

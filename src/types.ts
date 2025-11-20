@@ -266,6 +266,11 @@ export interface UserPreferences {
 // Backwards compatibility alias
 export type EmailPreferences = UserPreferences;
 
+// Gemini API types (centralized from geminiClient.ts)
+export type GeminiPart =
+  | { text: string }
+  | { inlineData: { data: string; mimeType: string } };
+
 // Coaching types
 export type CoachingModuleType =
   | 'goal-setting'

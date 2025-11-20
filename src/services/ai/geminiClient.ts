@@ -1,44 +1,53 @@
 import { supabase } from '../../lib/supabase';
-import { logger } from '@/lib/logger';
+import { retryOperation } from '@/lib/errorHandler';
 import toast from 'react-hot-toast';
-
-type Part = { text: string } | { inlineData: { data: string; mimeType: string } };
+import { GeminiPart } from '../../types';
 
 /**
  * Base Gemini API client that proxies calls through Supabase Edge Function
+ * with exponential backoff retry logic for resilience
  */
 export class GeminiClient {
   /**
    * Call the Gemini proxy with parts and optional configuration
+   * Includes automatic retry with exponential backoff for transient failures
    */
-  static async callProxy(parts: Part[], config?: object): Promise<any> {
-    try {
-      const { data, error } = await supabase.functions.invoke('gemini-proxy', {
-        body: { parts, config },
-      });
+  static async callProxy(parts: GeminiPart[], config?: object): Promise<any> {
+    return retryOperation(
+      async () => {
+        const { data, error } = await supabase.functions.invoke('gemini-proxy', {
+          body: { parts, config },
+        });
 
-      if (error) {
-        // Check if this is an AI limit exceeded error
-        if (error.message?.includes('AI call limit reached') || error.message?.includes('limit reached')) {
-          // Re-throw with specific error type so calling code can handle it
-          const limitError = new Error('AI_LIMIT_EXCEEDED');
-          (limitError as any).code = 'AI_LIMIT_EXCEEDED';
-          (limitError as any).originalError = error;
-          throw limitError;
+        if (error) {
+          // Check if this is an AI limit exceeded error
+          if (error.message?.includes('AI call limit reached') || error.message?.includes('limit reached')) {
+            // Re-throw with specific error type so calling code can handle it
+            const limitError = new Error('AI_LIMIT_EXCEEDED');
+            (limitError as any).code = 'AI_LIMIT_EXCEEDED';
+            (limitError as any).originalError = error;
+            throw limitError;
+          }
+          throw error;
         }
-        throw error;
+        return data;
+      },
+      {
+        maxRetries: 3,
+        delayMs: 1000,
+        onRetry: (attempt) => {
+          if (attempt === 1) {
+            toast.loading('Retrying AI request...', { duration: 2000 });
+          }
+        },
       }
-      return data;
-    } catch (error: any) {
-      logger.error('Gemini proxy error:', error);
-
+    ).catch((error: any) => {
       // Don't show toast for limit errors - let the calling code handle it
       if (error?.code !== 'AI_LIMIT_EXCEEDED') {
         toast.error('AI service is temporarily unavailable.');
       }
-
       throw error;
-    }
+    });
   }
 
   /**
@@ -53,7 +62,7 @@ export class GeminiClient {
    * Call the Gemini proxy with text and optional image
    */
   static async callWithTextAndImage(text: string, imageBase64?: string): Promise<any> {
-    const parts: Part[] = [{ text }];
+    const parts: GeminiPart[] = [{ text }];
 
     if (imageBase64) {
       parts.push({
@@ -70,7 +79,7 @@ export class GeminiClient {
   /**
    * Call the Gemini proxy with structured output configuration
    */
-  static async callWithSchema(parts: Part[], schema: object): Promise<any> {
+  static async callWithSchema(parts: GeminiPart[], schema: object): Promise<any> {
     return this.callProxy(parts, {
       response_mime_type: 'application/json',
       response_schema: schema,

@@ -1,11 +1,3 @@
-// Fix: Add type declaration for Deno to satisfy TypeScript in environments without native Deno types.
-declare const Deno: {
-  env: {
-    get(key: string): string | undefined;
-  };
-};
-
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // Fix: Use npm specifier to import the Google GenAI SDK in a Deno environment.
 import { GoogleGenAI, GenerateContentResponse } from "npm:@google/genai";
 import { withMiddleware, parseJsonBody, createErrorResponse, createSuccessResponse } from "../_shared/middleware.ts";
@@ -140,7 +132,8 @@ async function handleRequest(req: Request, userId?: string): Promise<Response> {
   }
 }
 
-serve(async (req: Request) => {
+// Use native Deno.serve for better cold-start performance
+Deno.serve(async (req: Request) => {
   return withMiddleware(req, handleRequest, {
     requireAuth: true,
     rateLimit: true,

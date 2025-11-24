@@ -1,0 +1,345 @@
+﻿
+src/App.tsx(2,8): 
+error TS6133: 
+'React' is declared 
+but its value is 
+never read.
+src/components/Achiev
+ementsGallery.tsx(74,
+51): error TS2769: 
+No overload matches 
+this call.
+src/components/Calend
+arView.tsx(27,20): 
+error TS2345: 
+Argument of type 
+'string | undefined' 
+is not assignable to 
+parameter of type 
+'string'.
+src/components/Calend
+arView.tsx(28,17): 
+error TS2345: 
+Argument of type 
+'string | undefined' 
+is not assignable to 
+parameter of type 
+'string'.
+src/components/Calend
+arView.tsx(30,15): 
+error TS2345: 
+Argument of type 
+'string | undefined' 
+is not assignable to 
+parameter of type 
+'string'.
+src/components/Calend
+arView.tsx(51,42): 
+error TS2345: 
+Argument of type 
+'string | undefined' 
+is not assignable to 
+parameter of type 
+'string'.
+src/components/Calend
+arView.tsx(72,44): 
+error TS2345: 
+Argument of type 
+'string | undefined' 
+is not assignable to 
+parameter of type 
+'string'.
+src/components/Calend
+arView.tsx(113,73): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/Footer
+.tsx(2,8): error 
+TS6133: 'React' is 
+declared but its 
+value is never read.
+src/components/Insigh
+tsView.tsx(31,27): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/Insigh
+tsView.tsx(182,36): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/Insigh
+tsView.tsx(183,36): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/Journa
+lEditor.tsx(32,66): 
+error TS6133: 
+'updateEntry' is 
+declared but its 
+value is never read.
+src/components/Journa
+lEditor.tsx(88,26): 
+error TS2345: 
+Argument of type 
+'string | undefined' 
+is not assignable to 
+parameter of type 'Se
+tStateAction<string>'
+.
+src/components/Journa
+lEditor.tsx(213,20): 
+error TS2322: Type 
+'string | undefined' 
+is not assignable to 
+type 'string'.
+src/components/Journa
+lEditor.tsx(231,49): 
+error TS2345: 
+Argument of type '{ 
+base64: string; 
+mimeType: string; } 
+| undefined' is not 
+assignable to 
+parameter of type 
+'string | undefined'.
+src/components/Journa
+lEditor/FreestyleEdit
+or.tsx(75,9): error 
+TS2322: Type 'string 
+| undefined' is not 
+assignable to type 
+'string'.
+src/components/Journa
+lEditor/GuidedEditor.
+tsx(2,24): error 
+TS6133: 'View' is 
+declared but its 
+value is never read.
+src/components/Journa
+lEditor/index.tsx(22,
+66): error TS6133: 
+'updateEntry' is 
+declared but its 
+value is never read.
+src/components/Journa
+lEntryCard.tsx(37,19)
+: error TS7030: Not 
+all code paths 
+return a value.
+src/components/Onboar
+ding.tsx(2,8): error 
+TS6133: 'React' is 
+declared but its 
+value is never read.
+src/components/Onboar
+ding.tsx(77,14): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/Onboar
+ding.tsx(81,14): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/Onboar
+ding.tsx(85,14): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/Onboar
+ding.tsx(111,14): 
+error TS2532: Object 
+is possibly 
+'undefined'.
+src/components/ToastP
+rovider.tsx(1,1): 
+error TS6133: 
+'React' is declared 
+but its value is 
+never read.
+src/components/VoiceR
+ecordingTimer.tsx(15,
+3): error TS6133: 
+'tier' is declared 
+but its value is 
+never read.
+src/hooks/useAsyncAct
+ion.ts(70,47): error 
+TS2769: No overload 
+matches this call.
+src/hooks/useAsyncAct
+ion.ts(126,43): 
+error TS2769: No 
+overload matches 
+this call.
+src/hooks/useDateLoca
+le.ts(17,13): error 
+TS2741: Property 
+'default' is missing 
+in type 'typeof impor
+t("C:/Users/omerm/One
+Drive/Masa\u00FCst\u0
+0FC/chronicleai_2-mai
+n/node_modules/date-f
+ns/locale/es")' but 
+required in type '{ 
+default: Locale; }'.
+src/hooks/useDateLoca
+le.ts(20,13): error 
+TS2741: Property 
+'default' is missing 
+in type 'typeof impor
+t("C:/Users/omerm/One
+Drive/Masa\u00FCst\u0
+0FC/chronicleai_2-mai
+n/node_modules/date-f
+ns/locale/fr")' but 
+required in type '{ 
+default: Locale; }'.
+src/hooks/useDateLoca
+le.ts(23,13): error 
+TS2741: Property 
+'default' is missing 
+in type 'typeof impor
+t("C:/Users/omerm/One
+Drive/Masa\u00FCst\u0
+0FC/chronicleai_2-mai
+n/node_modules/date-f
+ns/locale/de")' but 
+required in type '{ 
+default: Locale; }'.
+src/hooks/useDateLoca
+le.ts(26,13): error 
+TS2741: Property 
+'default' is missing 
+in type 'typeof impor
+t("C:/Users/omerm/One
+Drive/Masa\u00FCst\u0
+0FC/chronicleai_2-mai
+n/node_modules/date-f
+ns/locale/tr")' but 
+required in type '{ 
+default: Locale; }'.
+src/hooks/useDateLoca
+le.ts(29,13): error 
+TS2741: Property 
+'default' is missing 
+in type 'typeof impor
+t("C:/Users/omerm/One
+Drive/Masa\u00FCst\u0
+0FC/chronicleai_2-mai
+n/node_modules/date-f
+ns/locale/en-US")' 
+but required in type 
+'{ default: Locale; 
+}'.
+src/hooks/useGamifica
+tion.ts(53,39): 
+error TS2345: 
+Argument of type '{ 
+user_id_param: 
+string; }' is not 
+assignable to 
+parameter of type 
+'undefined'.
+src/hooks/useGamifica
+tion.ts(58,72): 
+error TS2339: 
+Property 'map' does 
+not exist on type 
+'never'.
+src/hooks/useGamifica
+tion.ts(95,53): 
+error TS2339: 
+Property 
+'current_streak' 
+does not exist on 
+type 'never'.
+src/hooks/useGamifica
+tion.ts(100,33): 
+error TS2339: 
+Property 
+'current_streak' 
+does not exist on 
+type 'never'.
+src/hooks/useGamifica
+tion.ts(101,33): 
+error TS2339: 
+Property 
+'longest_streak' 
+does not exist on 
+type 'never'.
+src/hooks/useGamifica
+tion.ts(107,34): 
+error TS2339: 
+Property 
+'current_streak' 
+does not exist on 
+type 'never'.
+src/hooks/useGamifica
+tion.ts(108,44): 
+error TS2339: 
+Property 
+'requirement_value' 
+does not exist on 
+type 'never'.
+src/hooks/useGamifica
+tion.ts(115,57): 
+error TS2769: No 
+overload matches 
+this call.
+src/hooks/useGamifica
+tion.ts(127,82): 
+error TS2345: 
+Argument of type '{ 
+user_id_param: 
+string; }' is not 
+assignable to 
+parameter of type 
+'undefined'.
+src/hooks/useGamifica
+tion.ts(155,56): 
+error TS2769: No 
+overload matches 
+this call.
+src/hooks/useGuidedSe
+ssion.ts(1,33): 
+error TS6133: 
+'useEffect' is 
+declared but its 
+value is never read.
+src/hooks/useGuidedSe
+ssion.ts(41,28): 
+error TS2345: 
+Argument of type 
+'string | undefined' 
+is not assignable to 
+parameter of type 'Se
+tStateAction<string>'
+.
+src/hooks/useGuidedSe
+ssion.ts(46,54): 
+error TS2769: No 
+overload matches 
+this call.
+src/hooks/useGuidedSe
+ssion.ts(105,60): 
+error TS2769: No 
+overload matches 
+this call.
+src/hooks/useJournal.
+ts(39,49): error 
+TS2769: No overload 
+matches this call.
+src/hooks/useLanguage
+Sync.ts(27,32): 
+error TS2339: 
+Property 
+'preferences' does 
+not exist on type 
+'never'.
+
+

@@ -1,0 +1,7 @@
+{
+  "name": "Chronicle AI Second",
+  "description": "An intelligent, reflective companion that helps you capture your life frictionlessly, understand your own narratives, and foster deep self-awareness through AI-guided journaling.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

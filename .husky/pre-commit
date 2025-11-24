@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged
+npx lint-staged
+
+# Check for console.log in staged files
+if git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx)$' | xargs grep -n "console\.log" 2>/dev/null; then
+  echo "⚠️  Warning: console.log found in staged files. Please remove or use console.warn/error"
+  # Don't fail, just warn
+fi
+
+echo "✅ Pre-commit checks passed!"

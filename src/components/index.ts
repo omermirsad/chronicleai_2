@@ -6,7 +6,6 @@
 // Layout components
 export { default as Header } from './Header';
 export { default as Footer } from './Footer';
-export { SafeAreaView } from './SafeAreaView';
 
 // Auth components
 export { default as Auth } from './Auth';

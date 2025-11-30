@@ -1,5 +1,5 @@
 // src/components/JournalFilters.tsx
-import * as React from 'react';
+import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
 import { useState } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from './Icons';
 
@@ -19,22 +19,22 @@ interface JournalFiltersProps {
   availableTags: string[];
 }
 
-const JournalFilters: React.FC<JournalFiltersProps> = ({
+const JournalFilters: FC<JournalFiltersProps> = ({
   filters,
   onFiltersChange,
   availableTags,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({ ...filters, searchText: e.target.value });
   };
 
-  const handleDateFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateFromChange = (e: ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({ ...filters, dateFrom: e.target.value });
   };
 
-  const handleDateToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateToChange = (e: ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({ ...filters, dateTo: e.target.value });
   };
 
@@ -42,14 +42,14 @@ const JournalFilters: React.FC<JournalFiltersProps> = ({
     onFiltersChange({ ...filters, mood });
   };
 
-  const handleEnergyMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEnergyMinChange = (e: ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({
       ...filters,
       energyMin: e.target.value ? parseInt(e.target.value) : null,
     });
   };
 
-  const handleEnergyMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEnergyMaxChange = (e: ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({
       ...filters,
       energyMax: e.target.value ? parseInt(e.target.value) : null,

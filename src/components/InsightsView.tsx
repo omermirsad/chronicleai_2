@@ -1,6 +1,4 @@
-
-// Fix: Import React types FC, useState, useMemo
-import * as React from 'react';
+import { FC, useState, useMemo } from 'react';
 import { JournalEntry } from '../types';
 import { generateInsights } from '../services/geminiService';
 import { SparklesIcon, SeedingIcon, ChartBarIcon } from './Icons';
@@ -9,16 +7,12 @@ import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import { useSubscription } from '../hooks/useSubscription';
 import { useNavigate } from '../hooks/useNavigate';
+import { getMoodEmoji } from '../utils/helpers';
 
 interface InsightsViewProps {
   entries: JournalEntry[];
   userId: string;
 }
-
-const getMoodEmoji = (mood: number) => {
-    const emojis = ['😠', '😟', '😐', '🙂', '😄'];
-    return emojis[mood - 1] || '😐';
-};
 
 interface TooltipProps {
     active?: boolean;
@@ -26,7 +20,7 @@ interface TooltipProps {
     label?: string;
 }
 
-const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
+const CustomTooltip: FC<TooltipProps> = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         const moodValue = payload[0].value;
         return (
@@ -39,13 +33,10 @@ const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
     return null;
 };
 
-// Fix: Use FC type for functional component
-const InsightsView: React.FC<InsightsViewProps> = ({ entries, userId }) => {
-  // Fix: Add generic type to useState
-  const [insights, setInsights] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  // Fix: Add generic type to useState
-  const [error, setError] = React.useState<string | null>(null);
+const InsightsView: FC<InsightsViewProps> = ({ entries, userId }) => {
+  const [insights, setInsights] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { usage } = useSubscription();
   const navigate = useNavigate();
 

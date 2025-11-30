@@ -12,6 +12,7 @@ import { FeedSkeleton } from './components/SkeletonLoader';
 import ToastProvider from './components/ToastProvider';
 import toast from 'react-hot-toast';
 import { STORAGE_KEYS } from './constants';
+import { hasOnThisDayEntries as checkOnThisDayEntries } from './utils/helpers';
 
 // Lazy load heavy components for better performance
 const JournalEditor = lazy(() => import('./components/JournalEditor'));
@@ -90,21 +91,7 @@ const App: FC = () => {
   // Optimize memo - only depend on entries.length since we're just checking existence
   // If length changes, we need to recheck; if only content changes, we don't care
   const hasOnThisDayEntries = useMemo(() => {
-    if (entries.length === 0) return false;
-
-    const today = new Date();
-    const todayMonth = today.getMonth();
-    const todayDate = today.getDate();
-    const currentYear = today.getFullYear();
-
-    return entries.some(entry => {
-      const entryDate = new Date(entry.date);
-      return (
-        entryDate.getMonth() === todayMonth &&
-        entryDate.getDate() === todayDate &&
-        entryDate.getFullYear() < currentYear
-      );
-    });
+    return checkOnThisDayEntries(entries.map(e => ({ ...e, created_at: e.date })));
   }, [entries.length]);
 
   const renderView = () => {

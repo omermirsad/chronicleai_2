@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Capacitor } from '@capacitor/core';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { JournalEntry } from '@/types';
 import { JournalService } from '@/services/journal/journalService';
 import { useAuth } from '@/hooks/useAuth';
@@ -77,15 +75,6 @@ export const useJournal = () => {
 
       await JournalService.insertEntry(payload);
 
-      // Haptic feedback for successful save
-      if (Capacitor.isNativePlatform()) {
-        try {
-          await Haptics.impact({ style: ImpactStyle.Light });
-        } catch (error) {
-          logger.debug('Haptics not available', { error });
-        }
-      }
-
       toast.success('Entry saved');
 
       // Refresh entries to get the real entry from the server
@@ -121,15 +110,6 @@ export const useJournal = () => {
       if (!navigator.onLine) throw new Error('Offline');
 
       await JournalService.updateEntry(id, payload);
-
-      // Haptic feedback for successful update
-      if (Capacitor.isNativePlatform()) {
-        try {
-          await Haptics.impact({ style: ImpactStyle.Light });
-        } catch (error) {
-          logger.debug('Haptics not available', { error });
-        }
-      }
     } catch (error) {
       logger.warn('Updating entry offline:', { error });
       setEntries(originalEntries);

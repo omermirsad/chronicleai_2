@@ -1,9 +1,7 @@
-// main.tsx
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
-import { initErrorMonitoring } from './lib/errorMonitoring';
 import { validateEnv } from './lib/envValidation';
 import { logger } from '@/lib/logger';
 import './index.css';
@@ -11,91 +9,27 @@ import './index.css';
 // Import the i18n configuration
 import './i18n';
 
-// Capacitor imports
-import { Capacitor } from '@capacitor/core';
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { SplashScreen } from '@capacitor/splash-screen';
-import { App as CapApp } from '@capacitor/app';
-import { platformClass } from './utils/platform';
-
-// Validate environment variables early to catch configuration issues
+// Validate environment variables early
 try {
   validateEnv();
 } catch (error) {
   logger.error('Environment validation failed:', error);
-  // In production, we want to fail fast on invalid configuration
-  if (import.meta.env.PROD) {
-    throw error;
-  }
+  if (import.meta.env.PROD) throw error;
 }
 
-// Initialize error monitoring in production
-if (import.meta.env.PROD) {
-  initErrorMonitoring();
-}
-
-// Initialize Capacitor plugins for native apps
-const initCapacitor = async () => {
-  if (Capacitor.isNativePlatform()) {
-    try {
-      // Configure Status Bar
-      await StatusBar.setStyle({ style: Style.Light });
-      await StatusBar.setBackgroundColor({ color: '#44403c' });
-
-      // Hide splash screen after app is ready
-      await SplashScreen.hide();
-
-      // Handle app state changes
-      CapApp.addListener('appStateChange', ({ isActive }) => {
-        logger.info('App state changed. Active:', isActive);
-      });
-
-      // Handle back button on Android
-      CapApp.addListener('backButton', ({ canGoBack }) => {
-        if (!canGoBack) {
-          CapApp.exitApp();
-        } else {
-          window.history.back();
-        }
-      });
-
-      logger.info('Capacitor initialized successfully');
-    } catch (error) {
-      logger.error('Capacitor initialization error:', error);
-    }
-  }
-};
-
-// Add platform class to HTML element
-document.documentElement.classList.add(platformClass());
-
-// Register service worker for PWA (web only)
-if ('serviceWorker' in navigator &&
-    import.meta.env.VITE_ENABLE_PWA === 'true' &&
-    !Capacitor.isNativePlatform()) {
+// Register service worker for PWA
+if ('serviceWorker' in navigator && import.meta.env.VITE_ENABLE_PWA === 'true') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(
-      (registration) => {
-        logger.info('Service Worker registered:', registration.scope);
-      },
-      (error) => {
-        logger.error('Service Worker registration failed:', error);
-      }
+      (registration) => logger.info('Service Worker registered:', registration.scope),
+      (error) => logger.error('Service Worker registration failed:', error)
     );
   });
 }
 
-// Initialize Capacitor before rendering
-initCapacitor();
-
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-
-root.render(
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
-      {/* Wrap the app in Suspense for translation loading */}
       <Suspense fallback={<div>Loading...</div>}>
         <Router />
       </Suspense>

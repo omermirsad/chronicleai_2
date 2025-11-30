@@ -11,7 +11,5 @@ export { useJournal } from './useJournal';
 export { useLanguageSync } from './useLanguageSync';
 export { useNavigate } from './useNavigate';
 export { useOfflineSync } from './useOfflineSync';
-export { usePlatform } from './usePlatform';
-export { useSafeArea } from './useSafeArea';
 export { useSpeechRecognition } from './useSpeechRecognition';
 export { useSubscription } from './useSubscription';

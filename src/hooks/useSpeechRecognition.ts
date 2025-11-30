@@ -1,7 +1,5 @@
 import * as React from 'react';
 import toast from 'react-hot-toast';
-import { Capacitor } from '@capacitor/core';
-import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { VOICE_TO_TEXT_LIMITS, formatDuration } from '@/config/voiceLimits';
@@ -239,58 +237,6 @@ export const useSpeechRecognition = (
     }
   }, [user, voiceStatus, userTier]);
 
-  // Native speech recognition (Capacitor)
-  const startNativeListening = React.useCallback(async () => {
-    try {
-      // Check permissions
-      const hasPermission = await SpeechRecognition.checkPermissions();
-      if (hasPermission.speechRecognition !== 'granted') {
-        const permission = await SpeechRecognition.requestPermissions();
-        if (permission.speechRecognition !== 'granted') {
-          toast.error('Speech permission denied.');
-          return;
-        }
-      }
-
-      // Check limits and increment count
-      const recordingData = await checkAndIncrementRecording();
-      if (!recordingData) return;
-
-      // Start recording
-      setIsListening(true);
-      setRecordingDuration(0);
-      setHasShownWarning(false);
-      startTimeRef.current = Date.now();
-
-      await SpeechRecognition.start({
-        language: 'en-US',
-        partialResults: true,
-        popup: false,
-        maxResults: 1,
-      });
-
-      // Listen for results (both partial and final)
-      SpeechRecognition.addListener('partialResults', (event: any) => {
-        if (event.matches && event.matches.length > 0) {
-          const transcript = event.matches.join(' ');
-          onTranscriptChange(transcript);
-        }
-      });
-    } catch (error) {
-      logger.error('Error starting native speech recognition', error as Error);
-      toast.error('Failed to start recording. Please try again.');
-      setIsListening(false);
-    }
-  }, [onTranscriptChange, checkAndIncrementRecording]);
-
-  const stopNativeListening = React.useCallback(() => {
-    if (isListening) {
-      SpeechRecognition.stop();
-      SpeechRecognition.removeAllListeners();
-      setIsListening(false);
-    }
-  }, [isListening]);
-
   // Web speech recognition
   const startWebListening = React.useCallback(async () => {
     if (!recognitionRef.current || isListening) {
@@ -322,23 +268,14 @@ export const useSpeechRecognition = (
       return;
     }
 
-    if (Capacitor.isNativePlatform()) {
-      await startNativeListening();
-    } else {
-      await startWebListening();
-    }
-  }, [isListening, limits, user, startNativeListening, startWebListening]);
+    await startWebListening();
+  }, [isListening, limits, user, startWebListening]);
 
   const stopListening = React.useCallback(
     (hitDurationLimit: boolean = false) => {
       if (!isListening) return;
 
-      // Stop based on platform
-      if (Capacitor.isNativePlatform()) {
-        stopNativeListening();
-      } else {
-        stopWebListening();
-      }
+      stopWebListening();
 
       // Show upgrade prompt if duration limit was hit
       if (hitDurationLimit) {
@@ -361,14 +298,14 @@ export const useSpeechRecognition = (
         }
       }
     },
-    [isListening, userTier, limits, stopNativeListening, stopWebListening]
+    [isListening, userTier, limits, stopWebListening]
   );
 
   return {
     isListening,
     startListening,
     stopListening,
-    hasSupport: Capacitor.isNativePlatform() || !!SpeechRecognitionAPI,
+    hasSupport: !!SpeechRecognitionAPI,
     recordingDuration,
     maxDuration: limits.maxDurationSeconds,
     remainingDuration: Math.max(0, limits.maxDurationSeconds - recordingDuration),

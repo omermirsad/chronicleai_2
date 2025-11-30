@@ -71,3 +71,47 @@ export const debounce = <T extends (...args: any[]) => any>(
     timeout = setTimeout(() => func(...args), wait);
   };
 };
+
+/**
+ * Check if entries exist for "On This Day" (same day/month in previous years)
+ */
+export const hasOnThisDayEntries = (entries: any[]): boolean => {
+  if (entries.length === 0) return false;
+
+  const today = new Date();
+  const todayMonth = today.getMonth();
+  const todayDay = today.getDate();
+  const currentYear = today.getFullYear();
+
+  return entries.some(entry => {
+    const entryDate = new Date(entry.created_at);
+    const entryYear = entryDate.getFullYear();
+
+    return (
+      entryYear < currentYear &&
+      entryDate.getMonth() === todayMonth &&
+      entryDate.getDate() === todayDay
+    );
+  });
+};
+
+/**
+ * Filter entries for "On This Day" (same day/month in previous years)
+ */
+export const getOnThisDayEntries = (entries: any[]): any[] => {
+  const today = new Date();
+  const todayMonth = today.getMonth();
+  const todayDay = today.getDate();
+  const currentYear = today.getFullYear();
+
+  return entries.filter(entry => {
+    const entryDate = new Date(entry.created_at);
+    const entryYear = entryDate.getFullYear();
+
+    return (
+      entryYear < currentYear &&
+      entryDate.getMonth() === todayMonth &&
+      entryDate.getDate() === todayDay
+    );
+  });
+};

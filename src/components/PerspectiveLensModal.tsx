@@ -1,6 +1,6 @@
 
 // Fix: Import React types FC, useState, useEffect
-import * as React from 'react';
+import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
 import { JournalEntry, Perspective } from '../types';
 import { getPerspectives } from '../services/geminiService';
 import { XMarkIcon } from './Icons';
@@ -14,14 +14,14 @@ interface PerspectiveLensModalProps {
 }
 
 // Fix: Use FC type for functional component
-const PerspectiveLensModal: React.FC<PerspectiveLensModalProps> = ({ isOpen, onClose, entry }) => {
+const PerspectiveLensModal: FC<PerspectiveLensModalProps> = ({ isOpen, onClose, entry }) => {
   // Fix: Add generic type to useState
-  const [perspectives, setPerspectives] = React.useState<Perspective[]>([]);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [perspectives, setPerspectives] = useState<Perspective[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { usage, canMakeAICall, refresh: refreshSubscription } = useSubscription();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       const fetchPerspectives = async () => {
         setIsLoading(true);

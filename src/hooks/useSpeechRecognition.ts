@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -67,21 +67,21 @@ export const useSpeechRecognition = (
   userTier: SubscriptionTier = 'free'
 ) => {
   const { user } = useAuth();
-  const [isListening, setIsListening] = React.useState(false);
-  const [recordingDuration, setRecordingDuration] = React.useState(0);
-  const [hasShownWarning, setHasShownWarning] = React.useState(false);
-  const [voiceStatus, setVoiceStatus] = React.useState<VoiceRecordingStatus | null>(null);
-  const [isLoadingStatus, setIsLoadingStatus] = React.useState(true);
+  const [isListening, setIsListening] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [hasShownWarning, setHasShownWarning] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState<VoiceRecordingStatus | null>(null);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
-  const recognitionRef = React.useRef<ISpeechRecognition | null>(null);
-  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = React.useRef<number>(0);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
 
   // Get limits for current tier
   const limits = VOICE_TO_TEXT_LIMITS[userTier];
 
   // Fetch voice recording status on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchVoiceStatus = async () => {
       if (!user || userTier === 'free') {
         setIsLoadingStatus(false);
@@ -113,7 +113,7 @@ export const useSpeechRecognition = (
   }, [user, userTier]);
 
   // Initialize Speech Recognition
-  React.useEffect(() => {
+  useEffect(() => {
     if (!SpeechRecognitionAPI) {
       logger.warn('Speech Recognition API not supported in this browser');
       return;
@@ -144,7 +144,7 @@ export const useSpeechRecognition = (
   }, [onTranscriptChange, isListening]);
 
   // Timer effect - runs every second while listening
-  React.useEffect(() => {
+  useEffect(() => {
     if (isListening) {
       timerRef.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
@@ -184,7 +184,7 @@ export const useSpeechRecognition = (
   }, [isListening, hasShownWarning, limits]);
 
   // Check limits and increment recording count
-  const checkAndIncrementRecording = React.useCallback(async () => {
+  const checkAndIncrementRecording = useCallback(async () => {
     if (!user) {
       return null;
     }
@@ -238,7 +238,7 @@ export const useSpeechRecognition = (
   }, [user, voiceStatus, userTier]);
 
   // Web speech recognition
-  const startWebListening = React.useCallback(async () => {
+  const startWebListening = useCallback(async () => {
     if (!recognitionRef.current || isListening) {
       return;
     }
@@ -255,7 +255,7 @@ export const useSpeechRecognition = (
     recognitionRef.current.start();
   }, [isListening, checkAndIncrementRecording]);
 
-  const stopWebListening = React.useCallback(() => {
+  const stopWebListening = useCallback(() => {
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
@@ -263,7 +263,7 @@ export const useSpeechRecognition = (
   }, [isListening]);
 
   // Unified start/stop functions
-  const startListening = React.useCallback(async () => {
+  const startListening = useCallback(async () => {
     if (isListening || !limits.enabled || !user) {
       return;
     }
@@ -271,7 +271,7 @@ export const useSpeechRecognition = (
     await startWebListening();
   }, [isListening, limits, user, startWebListening]);
 
-  const stopListening = React.useCallback(
+  const stopListening = useCallback(
     (hitDurationLimit: boolean = false) => {
       if (!isListening) return;
 

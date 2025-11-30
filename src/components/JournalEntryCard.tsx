@@ -1,10 +1,11 @@
-import * as React from 'react';
+import { FC, useState, useEffect } from 'react';
 import { JournalEntry } from '@/types';
 import { SparklesIcon, TagIcon, ChatBubbleLeftRightIcon, LightBulbIcon, LightningBoltIcon, TrashIcon } from '@/components/Icons';
 import toast from 'react-hot-toast';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import { useSubscription } from '@/hooks/useSubscription';
+import { formatDate, getMoodEmoji } from '@/utils/helpers';
 
 interface JournalEntryCardProps {
   entry: JournalEntry;
@@ -13,10 +14,10 @@ interface JournalEntryCardProps {
   onDelete?: (id: string) => void;
 }
 
-const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspectiveLens, onOpenUpgradeModal, onDelete }) => {
-  const [isMounted, setIsMounted] = React.useState(false);
-  const [isAnalysisVisible, setIsAnalysisVisible] = React.useState(false);
-  const [isExpanded, setIsExpanded] = React.useState(false);
+const JournalEntryCard: FC<JournalEntryCardProps> = ({ entry, onOpenPerspectiveLens, onOpenUpgradeModal, onDelete }) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { usage } = useSubscription();
 
   const TEXT_TRUNCATE_LENGTH = 400;
@@ -26,12 +27,12 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
     : entry.text;
 
 
-  React.useEffect(() => {
+  useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 10);
     return () => clearTimeout(mountTimer);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (entry.aiAnalysis) {
       const analysisTimer = setTimeout(() => setIsAnalysisVisible(true), 50);
       return () => clearTimeout(analysisTimer);
@@ -65,21 +66,6 @@ const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onOpenPerspe
           duration: 10000,
         });
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
-    });
-  };
-
-  const getMoodEmoji = (mood: number) => {
-    const emojis = ['😠', '😟', '😐', '🙂', '😄'];
-    return emojis[mood - 1] || '😐';
   };
 
   const sentimentBorders: { [key: string]: string } = {

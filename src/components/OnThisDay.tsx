@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
 import { JournalEntry } from '../types';
 import JournalEntryCard from './JournalEntryCard';
 import { CalendarDaysIcon } from './Icons';
@@ -11,10 +11,10 @@ interface OnThisDayProps {
   onDeleteEntry: (id: string) => void;
 }
 
-const OnThisDay: React.FC<OnThisDayProps> = ({ entries, onOpenPerspectiveLens, onOpenUpgradeModal, onDeleteEntry }) => {
-  const [isMounted, setIsMounted] = React.useState(false);
+const OnThisDay: FC<OnThisDayProps> = ({ entries, onOpenPerspectiveLens, onOpenUpgradeModal, onDeleteEntry }) => {
+  const [isMounted, setIsMounted] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 10);
     return () => clearTimeout(timer);
   }, []);

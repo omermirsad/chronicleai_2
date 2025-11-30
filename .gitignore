@@ -33,6 +33,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Debug and build output files
+*_output*.txt
+*_log*.txt
+*_errors*.txt
+*_results*.txt
+build_*.txt
+lint_*.txt
+type_*.txt
+eslint_*.txt
+final_*.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

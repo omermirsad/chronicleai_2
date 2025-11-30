@@ -1,11 +1,11 @@
-import * as React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { FC, useState, useEffect, useMemo } from 'react';
 import { JournalEntry } from '../types';
 import JournalEntryCard from './JournalEntryCard';
 import OnThisDay from './OnThisDay';
 import JournalFilters, { FilterOptions } from './JournalFilters';
 import { PencilSquareIcon } from './Icons';
 import { useJournal } from '../hooks/useJournal';
+import { getOnThisDayEntries } from '../utils/helpers';
 
 interface JournalFeedProps {
   entries: JournalEntry[];
@@ -14,7 +14,7 @@ interface JournalFeedProps {
   onDeleteEntry: (id: string) => void;
 }
 
-const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLens, onOpenUpgradeModal, onDeleteEntry }) => {
+const JournalFeed: FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLens, onOpenUpgradeModal, onDeleteEntry }) => {
   const { fetchEntries } = useJournal();
   const [filters, setFilters] = useState<FilterOptions>({
     searchText: '',
@@ -61,17 +61,9 @@ const JournalFeed: React.FC<JournalFeedProps> = ({ entries, onOpenPerspectiveLen
   }, [filters, fetchEntries]);
 
   // "On This Day" logic
-  const today = new Date();
-  const onThisDayEntries = entries
-    .filter(entry => {
-      const entryDate = new Date(entry.date);
-      return (
-        entryDate.getMonth() === today.getMonth() &&
-        entryDate.getDate() === today.getDate() &&
-        entryDate.getFullYear() < today.getFullYear()
-      );
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const onThisDayEntries = getOnThisDayEntries(entries.map(e => ({ ...e, created_at: e.date })))
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .map(e => ({ ...e, date: e.created_at }));
 
   const onThisDayEntryIds = new Set(onThisDayEntries.map(e => e.id));
   const regularEntries = entries

@@ -1,6 +1,6 @@
 
 // Fix: Import React types FC, useState, useRef, useEffect
-import * as React from 'react';
+import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
 import { View, User } from '../types';
 import { BookOpenIcon, PencilSquareIcon, SparklesIcon, CalendarDaysIcon, UserCircleIcon, HeartIcon } from './Icons';
 import { StreakDisplay } from './StreakDisplay';
@@ -17,7 +17,7 @@ interface HeaderProps {
 }
 
 // Fix: Use FC type for functional component
-const SyncIndicator: React.FC<{ status: HeaderProps['syncStatus'] }> = ({ status }) => {
+const SyncIndicator: FC<{ status: HeaderProps['syncStatus'] }> = ({ status }) => {
     const statusMap = {
         idle: { text: 'Synced', color: 'text-green-600', icon: '✓', bgColor: 'bg-green-50' },
         syncing: { text: 'Syncing...', color: 'text-blue-600', icon: '↻', bgColor: 'bg-blue-50' },
@@ -34,10 +34,10 @@ const SyncIndicator: React.FC<{ status: HeaderProps['syncStatus'] }> = ({ status
 }
 
 // Fix: Use FC type for functional component
-const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayNotification, user, onSignOut, syncStatus, onOpenUpgradeModal }) => {
+const Header: FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayNotification, user, onSignOut, syncStatus, onOpenUpgradeModal }) => {
   // Fix: Add generic type to useState
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { usage } = useSubscription();
   
   const navItems = [
@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, onThisDayN
     { id: 'coaching', label: 'Coaching', icon: <HeartIcon /> },
   ];
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);

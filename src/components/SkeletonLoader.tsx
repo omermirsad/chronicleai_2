@@ -1,8 +1,8 @@
 
 // src/components/SkeletonLoader.tsx
-import * as React from 'react';
+import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
 
-export const EntryCardSkeleton: React.FC = () => (
+export const EntryCardSkeleton: FC = () => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-stone-200 animate-pulse">
     <div className="flex justify-between items-center mb-4">
       <div className="h-4 bg-stone-200 rounded w-32"></div>
@@ -27,7 +27,7 @@ export const EntryCardSkeleton: React.FC = () => (
   </div>
 );
 
-export const FeedSkeleton: React.FC = () => (
+export const FeedSkeleton: FC = () => (
   <div className="space-y-6">
     {[1, 2, 3].map(i => (
       <EntryCardSkeleton key={i} />
@@ -35,7 +35,7 @@ export const FeedSkeleton: React.FC = () => (
   </div>
 );
 
-export const InsightsSkeleton: React.FC = () => (
+export const InsightsSkeleton: FC = () => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-stone-200 animate-pulse">
     <div className="text-center mb-8">
       <div className="w-12 h-12 bg-stone-200 rounded-full mx-auto mb-4"></div>
@@ -53,7 +53,7 @@ export const InsightsSkeleton: React.FC = () => (
   </div>
 );
 
-export const CalendarSkeleton: React.FC = () => (
+export const CalendarSkeleton: FC = () => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-stone-200 animate-pulse">
     <div className="flex justify-between items-center mb-4">
       <div className="h-8 w-20 bg-stone-200 rounded"></div>
@@ -68,7 +68,7 @@ export const CalendarSkeleton: React.FC = () => (
   </div>
 );
 
-export const EditorSkeleton: React.FC = () => (
+export const EditorSkeleton: FC = () => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-stone-200 animate-pulse">
     <div className="h-6 bg-stone-200 rounded w-32 mb-4"></div>
     <div className="h-48 bg-stone-100 rounded mb-4"></div>

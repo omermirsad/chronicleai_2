@@ -1,13 +1,11 @@
-
-// Fix: Import React types
-import * as React from 'react';
+import { FC, useState, useEffect, useRef, useCallback, cloneElement, ChangeEvent, FormEvent } from 'react';
 import { JournalEntry, View, GuidedSessionType } from '../types';
 import { analyzeEntry, getGuidedPrompt } from '../services/geminiService';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { MicrophoneIcon, PhotoIcon, PaperAirplaneIcon, HeartIcon, MountainIcon, CompassIcon, PencilSquareIcon, ArrowUturnLeftIcon, SparklesIcon, SeedingIcon } from './Icons';
-
-// @ts-ignore
-const marked = window.marked;
+import { marked } from 'marked';
+import { logger } from '@/lib/logger';
+import toast from 'react-hot-toast';
 
 interface JournalEditorProps {
   addEntry: (entry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -28,38 +26,29 @@ const guidedSessions = [
 
 const GUIDED_DRAFT_KEY = 'chronicle-ai-guided-draft';
 
-// Fix: Use FC type for functional component
-const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
-  const [text, setText] = React.useState('');
-  // Fix: Add generic type to useState
-  const [photo, setPhoto] = React.useState<{ base64: string; mimeType: string } | null>(null);
-  const [isProcessing, setIsProcessing] = React.useState(false);
-  // Fix: Add generic type to useState
-  const [mode, setMode] = React.useState<EditorMode>('selection');
-  const [textBeforeRecording, setTextBeforeRecording] = React.useState('');
-  // Fix: Add generic type to useState
-  const [mood, setMood] = React.useState<number | null>(null);
-  const [energy, setEnergy] = React.useState<number>(50);
-  
+const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
+  const [text, setText] = useState('');
+  const [photo, setPhoto] = useState<{ base64: string; mimeType: string } | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [mode, setMode] = useState<EditorMode>('selection');
+  const [textBeforeRecording, setTextBeforeRecording] = useState('');
+  const [mood, setMood] = useState<number | null>(null);
+  const [energy, setEnergy] = useState<number>(50);
+
   // Guided session state
-  // Fix: Add generic type to useState
-  const [session, setSession] = React.useState<{type: GuidedSessionType, title: string} | null>(null);
-  // Fix: Add generic type to useState
-  const [history, setHistory] = React.useState<{ prompt: string; response: string }[]>([]);
-  const [currentPrompt, setCurrentPrompt] = React.useState('');
-  // Fix: Add generic type to useState
-  const [promptChoices, setPromptChoices] = React.useState<string[]>([]);
-  const [currentResponse, setCurrentResponse] = React.useState('');
-  const [isThinking, setIsThinking] = React.useState(false);
+  const [session, setSession] = useState<{type: GuidedSessionType, title: string} | null>(null);
+  const [history, setHistory] = useState<{ prompt: string; response: string }[]>([]);
+  const [currentPrompt, setCurrentPrompt] = useState('');
+  const [promptChoices, setPromptChoices] = useState<string[]>([]);
+  const [currentResponse, setCurrentResponse] = useState('');
+  const [isThinking, setIsThinking] = useState(false);
 
   // Draft state
-  // Fix: Add generic type to useState
-  const [draftToResume, setDraftToResume] = React.useState<any | null>(null);
-  // Fix: Add generic type to useState
-  const [saveStatus, setSaveStatus] = React.useState<'idle' | 'saving' | 'saved'>('idle');
+  const [draftToResume, setDraftToResume] = useState<any | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
 
-  const handleTranscriptChange = React.useCallback((transcript: string) => {
+  const handleTranscriptChange = useCallback((transcript: string) => {
     const prefix = textBeforeRecording ? textBeforeRecording + ' ' : '';
     if (mode === 'freestyle') {
       setText(prefix + transcript);
@@ -79,7 +68,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
     }
   }
 
-  const fetchNextPrompt = React.useCallback(async (sessionType: GuidedSessionType, currentHistory: { prompt: string; response: string }[]) => {
+  const fetchNextPrompt = useCallback(async (sessionType: GuidedSessionType, currentHistory: { prompt: string; response: string }[]) => {
     setIsThinking(true);
     setCurrentPrompt('');
     setPromptChoices([]);
@@ -92,20 +81,20 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
     setIsThinking(false);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mode === 'guided' && session && history.length === 0 && !currentPrompt && promptChoices.length === 0) {
       fetchNextPrompt(session.type, []);
     }
   }, [mode, session, history, fetchNextPrompt, currentPrompt, promptChoices]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     try {
         const savedDraft = localStorage.getItem(GUIDED_DRAFT_KEY);
         if (savedDraft) {
             setDraftToResume(JSON.parse(savedDraft));
         }
     } catch (error) {
-        console.error("Failed to load guided session draft:", error);
+        logger.error("Failed to load guided session draft:", error);
         localStorage.removeItem(GUIDED_DRAFT_KEY); // Clear corrupted draft
     }
   }, []);
@@ -125,7 +114,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
   
   const handleNextPrompt = () => {
     if (!currentResponse.trim()) {
-      alert("Please write a response before continuing.");
+      toast.error("Please write a response before continuing");
       return;
     }
     const newHistory = [...history, { prompt: currentPrompt, response: currentResponse }];
@@ -156,7 +145,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
         localStorage.removeItem(GUIDED_DRAFT_KEY);
         setCurrentView('feed');
      } catch (error) {
-        console.error("Failed to process guided session:", error);
+        logger.error("Failed to process guided session:", error);
      } finally {
         setIsProcessing(false);
      }
@@ -179,8 +168,8 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
-        console.error("Failed to save draft:", error);
-        alert("Could not save draft.");
+        logger.error("Failed to save draft:", error);
+        toast.error("Could not save draft");
         setSaveStatus('idle');
     }
   };
@@ -204,7 +193,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
   };
 
   // Fix: Use ChangeEvent type for event parameter
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -217,10 +206,10 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
   };
 
   // Fix: Use FormEvent type for event parameter
-  const handleSubmitFreestyle = async (e: React.FormEvent) => {
+  const handleSubmitFreestyle = async (e: FormEvent) => {
     e.preventDefault();
     if (!text.trim() && !photo) {
-      alert("Please write something or upload a photo.");
+      toast.error("Please write something or upload a photo");
       return;
     }
     setIsProcessing(true);
@@ -240,7 +229,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
       addEntry(newEntry);
       setCurrentView('feed');
     } catch (error) {
-      console.error("Failed to process freestyle entry:", error);
+      logger.error("Failed to process freestyle entry:", error);
     } finally {
       setIsProcessing(false);
     }
@@ -265,7 +254,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
             setDraftToResume(JSON.parse(savedDraft));
         }
     } catch (error) {
-        console.error("Failed to load draft on reset:", error);
+        logger.error("Failed to load draft on reset:", error);
     }
   }
 
@@ -305,7 +294,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ addEntry, updateEntry, se
             <div className="space-y-3">
                 {guidedSessions.map(s => (
                     <button key={s.type} onClick={() => handleStartSession(s.type, s.title)} className="w-full p-4 bg-stone-50 rounded-lg border border-stone-200 hover:border-rose-400 hover:bg-rose-50 transition text-left flex items-start gap-4">
-                        <div className="bg-rose-100 p-2 rounded-full">{React.cloneElement(s.icon, { className: 'w-6 h-6 text-rose-600' })}</div>
+                        <div className="bg-rose-100 p-2 rounded-full">{cloneElement(s.icon, { className: 'w-6 h-6 text-rose-600' })}</div>
                         <div>
                             <h4 className="font-bold text-stone-800">{s.title}</h4>
                             <p className="text-sm text-stone-600">{s.description}</p>

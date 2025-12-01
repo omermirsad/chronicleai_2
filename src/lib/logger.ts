@@ -119,8 +119,6 @@ class Logger {
 
     // Console output
     if (import.meta.env.DEV) {
-      const style = this.getConsoleStyle(entry.level);
-
       if (entry.error) {
         console.error(`${prefix} ${entry.message}`, entry.context, entry.error);
       } else {
@@ -238,7 +236,7 @@ class Logger {
   }
 
   fatal(message: string, error?: Error, context?: LogContext): void {
-    this.log(this.createLogEntry(LogLevel.FATAL, message, error, context));
+    this.log(this.createLogEntry(LogLevel.FATAL, message, context, error));
 
     // Fatal errors should always be reported to Sentry immediately
     if (window.Sentry && error) {

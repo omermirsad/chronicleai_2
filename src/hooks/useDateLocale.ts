@@ -10,27 +10,27 @@ export const useDateLocale = () => {
 
   useEffect(() => {
     const loadLocale = async () => {
-      let localeModule: { default: Locale };
       try {
+        let locale: Locale;
         switch (i18n.language) {
           case 'es':
-            localeModule = await import('date-fns/locale/es');
+            locale = (await import('date-fns/locale/es')).es;
             break;
           case 'fr':
-            localeModule = await import('date-fns/locale/fr');
+            locale = (await import('date-fns/locale/fr')).fr;
             break;
           case 'de':
-            localeModule = await import('date-fns/locale/de');
+            locale = (await import('date-fns/locale/de')).de;
             break;
           case 'tr':
-            localeModule = await import('date-fns/locale/tr');
+            locale = (await import('date-fns/locale/tr')).tr;
             break;
           default:
-            localeModule = await import('date-fns/locale/en-US');
+            locale = enUS;
         }
-        setDateLocale(localeModule.default || enUS);
+        setDateLocale(locale);
       } catch (error) {
-        logger.warn('Could not load date-fns locale', { error });
+        logger.warn('Could not load date-fns locale', { error: error instanceof Error ? error : new Error(String(error)) });
         setDateLocale(enUS); // Fallback to English
       }
     };

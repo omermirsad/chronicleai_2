@@ -5,7 +5,6 @@
 
 import { captureException } from './errorMonitoring';
 import { logger } from '@/lib/logger';
-import { AppError as AppErrorClass, isOperationalError } from './errors';
 import toast from 'react-hot-toast';
 
 export enum ErrorType {

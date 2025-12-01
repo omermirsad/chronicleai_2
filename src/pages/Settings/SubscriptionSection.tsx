@@ -269,7 +269,7 @@ const WaitlistFeature: React.FC<{
   React.useEffect(() => {
     const checkStatus = async () => {
       try {
-        const { data, error } = await supabase.rpc('check_waitlist_status', {
+        const { data, error } = await supabase.rpc<{ on_waitlist: boolean }>('check_waitlist_status', {
           p_feature_id: featureId,
         });
 
@@ -290,7 +290,7 @@ const WaitlistFeature: React.FC<{
   const handleJoinWaitlist = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('join_waitlist', {
+      const { data, error } = await supabase.rpc<{ success: boolean; error?: string }>('join_waitlist', {
         p_feature_id: featureId,
       });
 

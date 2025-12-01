@@ -150,14 +150,14 @@ class Analytics {
         this.queue = this.queue.slice(-100);
       }
     } catch (error) {
-      logger.error('Analytics error:', error);
+      logger.error('Analytics error:', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
   /**
    * Send to custom analytics endpoint (example)
    */
-  private async sendToCustomEndpoint(event: AnalyticsEvent): Promise<void> {
+  private async _sendToCustomEndpoint(event: AnalyticsEvent): Promise<void> {
     try {
       await fetch('/api/analytics', {
         method: 'POST',
@@ -173,7 +173,7 @@ class Analytics {
         }),
       });
     } catch (error) {
-      logger.error('Failed to send analytics event:', error);
+      logger.error('Failed to send analytics event:', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -241,10 +241,8 @@ export function usePageTracking(): void {
   window.addEventListener('navigate', handleNavigation);
   window.addEventListener('popstate', handleNavigation);
 
-  return () => {
-    window.removeEventListener('navigate', handleNavigation);
-    window.removeEventListener('popstate', handleNavigation);
-  };
+  // Note: Cleanup should be done via useEffect in component
+  // This function is kept for backward compatibility
 }
 
 /**

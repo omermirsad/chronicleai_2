@@ -1,6 +1,5 @@
 // src/components/JournalFilters.tsx
-import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
-import { useState } from 'react';
+import { FC, useState, ChangeEvent } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from './Icons';
 
 export interface FilterOptions {

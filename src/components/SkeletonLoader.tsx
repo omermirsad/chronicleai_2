@@ -1,6 +1,6 @@
 
 // src/components/SkeletonLoader.tsx
-import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
+import { FC } from 'react';
 
 export const EntryCardSkeleton: FC = () => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-stone-200 animate-pulse">

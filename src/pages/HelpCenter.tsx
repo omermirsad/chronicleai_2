@@ -1,12 +1,10 @@
 // src/pages/HelpCenter.tsx
-import React, { useState, FC } from 'react';
+import { useState, FC } from 'react';
 import { 
   BookOpenIcon, 
   SparklesIcon, 
   PencilSquareIcon,
-  HeartIcon,
   ChatBubbleLeftRightIcon,
-  CalendarDaysIcon,
   ChartBarIcon,
   LightningBoltIcon
 } from '../components/Icons';

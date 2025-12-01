@@ -1,5 +1,5 @@
 // src/components/Onboarding.tsx
-import React, { useState, FC } from 'react';
+import { useState, FC } from 'react';
 import {
   BookOpenIcon,
   PencilSquareIcon,
@@ -74,15 +74,15 @@ const Onboarding: FC<OnboardingProps> = ({ onComplete, userName }) => {
         {/* Content */}
         <div className="text-center mb-8">
           <div className="mb-6 flex justify-center">
-            {steps[currentStep].icon}
+            {currentStep < steps.length ? steps[currentStep].icon : null}
           </div>
           
           <h2 className="text-2xl font-bold text-stone-900 mb-3">
-            {steps[currentStep].title}
+            {currentStep < steps.length ? steps[currentStep].title : ""}
           </h2>
           
           <p className="text-stone-600 text-lg">
-            {steps[currentStep].description}
+            {currentStep < steps.length ? steps[currentStep].description : ""}
           </p>
         </div>
 
@@ -108,7 +108,7 @@ const Onboarding: FC<OnboardingProps> = ({ onComplete, userName }) => {
             onClick={handleNext}
             className="w-full py-3 px-4 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-semibold transition"
           >
-            {steps[currentStep].action}
+            {currentStep < steps.length ? steps[currentStep].action : ""}
           </button>
           
           {currentStep > 0 && (

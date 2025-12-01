@@ -50,7 +50,7 @@ export const useGamification = () => {
 
       // Fetch user's achievements with details
       const { data: achievementsData, error: achievementsError } = await supabase
-        .rpc('get_user_achievements', { user_id_param: user.id });
+        .rpc<RawAchievementData[]>('get_user_achievements', { user_id_param: user.id });
 
       if (achievementsError) throw achievementsError;
 
@@ -105,14 +105,14 @@ export const useGamification = () => {
           ? {
               achievement: nextStreakAchievement,
               progress: profile?.current_streak || 0,
-              total: nextStreakAchievement.requirement_value,
+              total: (nextStreakAchievement as any)?.requirement_value || 0,
             }
           : undefined,
       };
 
       setStats(gamificationStats);
     } catch (err) {
-      logger.error('Error loading gamification stats:', err);
+      logger.error('Error loading gamification stats:', err instanceof Error ? err : new Error(String(err)));
       setError(err instanceof Error ? err.message : 'Failed to load stats');
     } finally {
       setLoading(false);
@@ -124,7 +124,7 @@ export const useGamification = () => {
 
     try {
       // Call the check_and_award_achievements function
-      const { data, error } = await supabase.rpc('check_and_award_achievements', {
+      const { data, error } = await supabase.rpc<string[]>('check_and_award_achievements', {
         user_id_param: user.id,
       });
 
@@ -152,7 +152,7 @@ export const useGamification = () => {
         },
       }));
     } catch (err) {
-      logger.error('Error checking for achievements:', err);
+      logger.error('Error checking for achievements:', err instanceof Error ? err : new Error(String(err)));
       return [];
     }
   };

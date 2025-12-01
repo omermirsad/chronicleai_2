@@ -67,7 +67,7 @@ export function useAsyncAction<T extends (...args: any[]) => Promise<any>>(
         setError(errorObj);
 
         if (logError) {
-          logger.error('Async action error:', err);
+          logger.error('Async action error:', err instanceof Error ? err : new Error(String(err)));
         }
 
         // Show error toast with custom message or error message
@@ -123,7 +123,7 @@ export async function executeAsyncAction<T>(
     return result;
   } catch (err) {
     if (logError) {
-      logger.error('Async action error:', err);
+      logger.error('Async action error:', err instanceof Error ? err : new Error(String(err)));
     }
 
     const errorObj = err instanceof Error ? err : new Error(String(err));

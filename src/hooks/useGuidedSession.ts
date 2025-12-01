@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { GuidedSessionType } from '../types';
 import { getGuidedPrompt } from '../services/geminiService';
 import { logger } from '@/lib/logger';
@@ -38,12 +38,12 @@ export const useGuidedSession = () => {
       try {
         const prompts = await getGuidedPrompt(sessionType, currentHistory);
         if (prompts.length === 1) {
-          setCurrentPrompt(prompts[0]);
+          setCurrentPrompt(prompts[0] || '');
         } else {
           setPromptChoices(prompts);
         }
       } catch (error) {
-        logger.error('Failed to fetch next prompt:', error);
+        logger.error('Failed to fetch next prompt:', error instanceof Error ? error : new Error(String(error)));
         throw error;
       } finally {
         setIsThinking(false);
@@ -102,7 +102,7 @@ export const useGuidedSession = () => {
 
       return null;
     } catch (error) {
-      logger.error('Failed to load guided session draft:', error);
+      logger.error('Failed to load guided session draft:', error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }, []);

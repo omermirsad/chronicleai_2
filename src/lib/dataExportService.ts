@@ -6,7 +6,7 @@
  */
 
 import { supabase } from './supabase';
-import type { JournalEntry, Profile, DatabaseEntry } from '../types';
+import type { DatabaseEntry } from '../types';
 import { logger } from '@/lib/logger';
 
 /**
@@ -63,7 +63,7 @@ export const exportDataAsJSON = async (userId: string) => {
 
     return exportData;
   } catch (error) {
-    logger.error('Error exporting data:', error);
+    logger.error('Error exporting data:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -161,7 +161,7 @@ export const downloadEntriesAsCSV = async (userId: string) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    logger.error('Error exporting CSV:', error);
+    logger.error('Error exporting CSV:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -251,7 +251,7 @@ export const downloadEntriesAsText = async (userId: string) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    logger.error('Error exporting text:', error);
+    logger.error('Error exporting text:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -297,7 +297,7 @@ export const deleteUserData = async (userId: string) => {
 
     return { success: true };
   } catch (error) {
-    logger.error('Error deleting user data:', error);
+    logger.error('Error deleting user data:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -328,7 +328,7 @@ export const requestAccountDeletion = async () => {
 
     return { success: true };
   } catch (error) {
-    logger.error('Error requesting account deletion:', error);
+    logger.error('Error requesting account deletion:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -385,7 +385,7 @@ export const getUserDataStats = async (userId: string) => {
       estimatedSizeKB: Math.round(estimatedSize),
     };
   } catch (error) {
-    logger.error('Error getting user data stats:', error);
+    logger.error('Error getting user data stats:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -403,7 +403,7 @@ export const exportAllFormats = async (userId: string) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     await downloadEntriesAsText(userId);
   } catch (error) {
-    logger.error('Error exporting all formats:', error);
+    logger.error('Error exporting all formats:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };

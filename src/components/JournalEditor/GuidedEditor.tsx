@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { JournalEntry, View } from '../../types';
+import { JournalEntry } from '../../types';
 import { analyzeEntry } from '../../services/geminiService';
 import { useSpeechRecognition } from '../../hooks/useSpeechRecognition';
 import { useSubscription } from '../../hooks/useSubscription';

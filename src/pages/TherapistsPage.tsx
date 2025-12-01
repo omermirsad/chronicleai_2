@@ -24,7 +24,7 @@ const TherapistsPage: React.FC = () => {
         return;
       }
 
-      const { data, error } = await supabase.rpc('join_waitlist', {
+      const { data, error } = await supabase.rpc<{ success: boolean; error?: string }>('join_waitlist', {
         p_feature_id: 'therapist_portal',
         p_email: email,
         p_metadata: {

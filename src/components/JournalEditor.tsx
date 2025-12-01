@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef, useCallback, cloneElement, ChangeEvent, FormEvent } from 'react';
+import { FC, useState, useEffect, useCallback, ChangeEvent, FormEvent } from 'react';
 import { JournalEntry, View, GuidedSessionType } from '../types';
 import { analyzeEntry, getGuidedPrompt } from '../services/geminiService';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
@@ -26,7 +26,7 @@ const guidedSessions = [
 
 const GUIDED_DRAFT_KEY = 'chronicle-ai-guided-draft';
 
-const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurrentView }) => {
+const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry: _updateEntry, setCurrentView }) => {
   const [text, setText] = useState('');
   const [photo, setPhoto] = useState<{ base64: string; mimeType: string } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -74,7 +74,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
     setPromptChoices([]);
     const prompts = await getGuidedPrompt(sessionType, currentHistory);
     if (prompts.length === 1) {
-        setCurrentPrompt(prompts[0]);
+        setCurrentPrompt(prompts[0] || '');
     } else {
         setPromptChoices(prompts);
     }
@@ -94,7 +94,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
             setDraftToResume(JSON.parse(savedDraft));
         }
     } catch (error) {
-        logger.error("Failed to load guided session draft:", error);
+        logger.error("Failed to load guided session draft:", error instanceof Error ? error : new Error(String(error)));
         localStorage.removeItem(GUIDED_DRAFT_KEY); // Clear corrupted draft
     }
   }, []);
@@ -145,7 +145,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
         localStorage.removeItem(GUIDED_DRAFT_KEY);
         setCurrentView('feed');
      } catch (error) {
-        logger.error("Failed to process guided session:", error);
+        logger.error("Failed to process guided session:", error instanceof Error ? error : new Error(String(error)));
      } finally {
         setIsProcessing(false);
      }
@@ -168,7 +168,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
-        logger.error("Failed to save draft:", error);
+        logger.error("Failed to save draft:", error instanceof Error ? error : new Error(String(error)));
         toast.error("Could not save draft");
         setSaveStatus('idle');
     }
@@ -217,7 +217,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
 
     try {
       // Fix: Run analysis before adding entry
-      const analysis = await analyzeEntry(text, photo || undefined);
+      const analysis = await analyzeEntry(text, photo?.base64);
       const newEntry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'> = {
         date: new Date().toISOString(),
         text,
@@ -229,7 +229,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
       addEntry(newEntry);
       setCurrentView('feed');
     } catch (error) {
-      logger.error("Failed to process freestyle entry:", error);
+      logger.error("Failed to process freestyle entry:", error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsProcessing(false);
     }
@@ -254,7 +254,7 @@ const JournalEditor: FC<JournalEditorProps> = ({ addEntry, updateEntry, setCurre
             setDraftToResume(JSON.parse(savedDraft));
         }
     } catch (error) {
-        logger.error("Failed to load draft on reset:", error);
+        logger.error("Failed to load draft on reset:", error instanceof Error ? error : new Error(String(error)));
     }
   }
 

@@ -19,7 +19,7 @@ export const getPerspectives = (entryText: string): Promise<Perspective[]> => {
   return PerspectivesService.getPerspectives(entryText);
 };
 
-export const generateInsights = async (entries: JournalEntry[], userId: string): Promise<string> => {
+export const generateInsights = async (entries: JournalEntry[], _userId: string): Promise<string> => {
   if (entries.length < 3) {
     return 'Not enough entries to generate insights. Keep journaling to discover patterns over time!';
   }
@@ -219,7 +219,7 @@ Provide ONLY the next coaching prompt. Be conversational, supportive, and specif
       "How will you know when you've made progress?",
     ];
     return {
-      prompt: fallbackQuestions[Math.min(stepNumber, fallbackQuestions.length - 1)],
+      prompt: fallbackQuestions[Math.min(stepNumber, fallbackQuestions.length - 1)] || ""[Math.min(stepNumber, fallbackQuestions.length - 1)],
       isComplete: false,
     };
   }

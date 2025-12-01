@@ -193,7 +193,7 @@ const PricingPage: React.FC = () => {
         throw redirectError;
       }
     } catch (error) {
-      logger.error('Error creating checkout session:', error);
+      logger.error('Error creating checkout session:', error instanceof Error ? error : new Error(String(error)));
       toast.error(
         error instanceof Error
           ? error.message

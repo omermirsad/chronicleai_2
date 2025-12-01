@@ -212,7 +212,7 @@ export const isRateLimited = (
 
     return false;
   } catch (error) {
-    logger.error('Rate limiting error:', error);
+    logger.error('Rate limiting error:', error instanceof Error ? error : new Error(String(error)));
     return false; // Fail open on error
   }
 };

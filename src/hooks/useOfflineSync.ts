@@ -40,7 +40,7 @@ export function useOfflineSync() {
       const stored = localStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE);
       return stored ? JSON.parse(stored) : [];
     } catch (error) {
-      logger.error('Failed to load offline queue:', error);
+      logger.error('Failed to load offline queue:', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }, []);
@@ -52,7 +52,7 @@ export function useOfflineSync() {
     try {
       localStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
     } catch (error) {
-      logger.error('Failed to save offline queue:', error);
+      logger.error('Failed to save offline queue:', error instanceof Error ? error : new Error(String(error)));
     }
   }, []);
 

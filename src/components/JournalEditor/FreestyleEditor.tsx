@@ -72,7 +72,7 @@ export const FreestyleEditor: React.FC<FreestyleEditorProps> = ({ addEntry, setC
     reader.onloadend = () => {
       const base64 = reader.result as string;
       editorState.setPhoto({
-        base64: base64.split(',')[1],
+        base64: base64?.split(',')[1] || '',
         mimeType: file.type,
       });
     };

@@ -1,6 +1,6 @@
 
 // Fix: Import React types FC, useState, useEffect
-import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { JournalEntry, Perspective } from '../types';
 import { getPerspectives } from '../services/geminiService';
 import { XMarkIcon } from './Icons';

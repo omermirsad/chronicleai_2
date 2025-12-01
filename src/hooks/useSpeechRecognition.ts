@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -89,7 +89,7 @@ export const useSpeechRecognition = (
       }
 
       try {
-        const { data, error } = await supabase.rpc('get_voice_recording_status', {
+        const { data, error } = await supabase.rpc<{ recordings_used: number; recordings_limit: number; recordings_remaining: number }>('get_voice_recording_status', {
           p_user_id: user.id,
         });
 
@@ -97,9 +97,9 @@ export const useSpeechRecognition = (
 
         if (data) {
           setVoiceStatus({
-            recordingsUsed: data.recordings_used || 0,
-            recordingsLimit: data.recordings_limit || 0,
-            recordingsRemaining: data.recordings_remaining || 0,
+            recordingsUsed: (data as any)?.recordings_used || 0,
+            recordingsLimit: (data as any)?.recordings_limit || 0,
+            recordingsRemaining: (data as any)?.recordings_remaining || 0,
           });
         }
       } catch (error) {
@@ -127,7 +127,7 @@ export const useSpeechRecognition = (
     recognition.onresult = (event) => {
       const transcript = Array.from(event.results)
         .map(result => result[0])
-        .map(result => result.transcript)
+        .map(result => result?.[0]?.transcript || "")
         .join('');
       onTranscriptChange(transcript);
     };
@@ -203,28 +203,28 @@ export const useSpeechRecognition = (
 
     // Increment recording count in backend
     try {
-      const { data, error } = await supabase.rpc('increment_voice_recording_count', {
+      const { data, error } = await supabase.rpc<{ success: boolean; error?: string; recordings_used: number; recordings_limit: number; recordings_remaining: number }>('increment_voice_recording_count', {
         p_user_id: user.id,
       });
 
       if (error) throw error;
 
-      if (!data.success) {
-        toast.error(data.error || 'Failed to start recording');
+      if (!(data as any)?.success) {
+        toast.error((data as any)?.error || 'Failed to start recording');
         return null;
       }
 
       // Update local status
       setVoiceStatus({
-        recordingsUsed: data.recordings_used,
-        recordingsLimit: data.recordings_limit,
-        recordingsRemaining: data.recordings_remaining,
+        recordingsUsed: (data as any)?.recordings_used,
+        recordingsLimit: (data as any)?.recordings_limit,
+        recordingsRemaining: (data as any)?.recordings_remaining,
       });
 
       // Show remaining count if getting low
-      if (data.recordings_remaining <= 5 && data.recordings_remaining > 0) {
+      if ((data as any)?.recordings_remaining <= 5 && (data as any)?.recordings_remaining > 0) {
         toast.info(
-          `${data.recordings_remaining} recordings remaining this month`,
+          `${(data as any)?.recordings_remaining} recordings remaining this month`,
           { duration: 3000, icon: 'ℹ️' }
         );
       }

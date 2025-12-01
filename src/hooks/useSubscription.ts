@@ -31,25 +31,25 @@ export const useSubscription = () => {
       if (profileError) throw profileError;
 
       if (profile) {
-        const aiCallsUsed = profile.ai_calls_used || 0;
-        const aiCallsLimit = profile.ai_calls_limit || 10;
+        const aiCallsUsed = (profile as any)?.ai_calls_used || 0;
+        const aiCallsLimit = (profile as any)?.ai_calls_limit || 10;
         const aiCallsRemaining = Math.max(0, aiCallsLimit - aiCallsUsed);
         const percentageUsed = aiCallsLimit > 0 ? (aiCallsUsed / aiCallsLimit) * 100 : 0;
-        const consumableAICalls = profile.consumable_ai_calls || 0;
+        const consumableAICalls = (profile as any)?.consumable_ai_calls || 0;
 
         setUsage({
-          tier: (profile.subscription_tier as SubscriptionTier) || 'free',
+          tier: ((profile as any)?.subscription_tier as SubscriptionTier) || 'free',
           aiCallsUsed,
           aiCallsLimit,
           aiCallsRemaining,
           percentageUsed,
           consumableAICalls,
-          billingPeriodStart: profile.billing_period_start || undefined,
-          billingPeriodEnd: profile.billing_period_end || undefined,
+          billingPeriodStart: (profile as any)?.billing_period_start || undefined,
+          billingPeriodEnd: (profile as any)?.billing_period_end || undefined,
         });
       }
     } catch (err) {
-      logger.error('Error fetching subscription:', err);
+      logger.error('Error fetching subscription:', err instanceof Error ? err : new Error(String(err)));
       setError(err instanceof Error ? err.message : 'Failed to fetch subscription');
     } finally {
       setLoading(false);
@@ -83,17 +83,17 @@ export const useSubscription = () => {
     try {
       // Use the database function to increment safely
       const { data, error } = await supabase
-        .rpc('increment_ai_calls', { user_uuid: user.id });
+        .rpc<Array<{ success: boolean; calls_used: number; calls_remaining: number; calls_limit: number }>>('increment_ai_calls', { user_uuid: user.id });
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
+      if (data && Array.isArray(data) && data.length > 0) {
         const result = data[0];
 
-        if (!result.success) {
+        if (!(result as any)?.success) {
           return {
             success: false,
-            message: `You've reached your limit of ${result.calls_limit} AI calls this month. Please upgrade to continue.`
+            message: `You've reached your limit of ${(result as any)?.calls_limit} AI calls this month. Please upgrade to continue.`
           };
         }
 
@@ -101,9 +101,9 @@ export const useSubscription = () => {
         if (usage) {
           setUsage({
             ...usage,
-            aiCallsUsed: result.calls_used,
-            aiCallsRemaining: result.calls_remaining,
-            percentageUsed: (result.calls_used / result.calls_limit) * 100,
+            aiCallsUsed: (result as any)?.calls_used,
+            aiCallsRemaining: (result as any)?.calls_remaining,
+            percentageUsed: ((result as any)?.calls_used / (result as any)?.calls_limit) * 100,
           });
         }
 
@@ -112,7 +112,7 @@ export const useSubscription = () => {
 
       return { success: false, message: 'Failed to update AI call count' };
     } catch (err) {
-      logger.error('Error incrementing AI call count:', err);
+      logger.error('Error incrementing AI call count:', err instanceof Error ? err : new Error(String(err)));
       return {
         success: false,
         message: err instanceof Error ? err.message : 'Failed to track AI usage'
@@ -143,7 +143,7 @@ export const useSubscription = () => {
       await fetchSubscription();
       return true;
     } catch (err) {
-      logger.error('Error updating subscription tier:', err);
+      logger.error('Error updating subscription tier:', err instanceof Error ? err : new Error(String(err)));
       setError(err instanceof Error ? err.message : 'Failed to update subscription');
       return false;
     }

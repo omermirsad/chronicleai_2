@@ -28,7 +28,7 @@ export class PerspectivesService {
           const content = await GeminiClient.callWithText(p.prompt);
           return { title: p.title, content };
         } catch (error) {
-          logger.error(`Error generating perspective "${p.title}":`, error);
+          logger.error(`Error generating perspective "${p.title}":`, error instanceof Error ? error : new Error(String(error)));
           return { title: p.title, content: 'Could not generate this perspective at the moment.' };
         }
       })

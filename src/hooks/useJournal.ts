@@ -34,7 +34,7 @@ export const useJournal = () => {
         const fetchedEntries = await JournalService.fetchEntries(user.id, filters);
         setEntries(fetchedEntries);
       } catch (error) {
-        logger.error('Error fetching entries:', error);
+        logger.error('Error fetching entries:', error instanceof Error ? error : new Error(String(error)));
         toast.error('Failed to load entries');
       } finally {
         setLoading(false);

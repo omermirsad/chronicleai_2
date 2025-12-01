@@ -42,4 +42,4 @@ export { rateLimiter } from './rateLimiter';
 export { useFeatureFlag } from './featureFlags';
 
 // API utilities
-export { RetryConfig } from './api/retryConfig';
+export type { RetryConfig } from './api/retryConfig';

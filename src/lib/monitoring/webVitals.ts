@@ -83,7 +83,7 @@ function sendToAnalytics(metric: WebVitalsMetric): void {
       body: JSON.stringify({ type: 'web-vital', ...metric }),
       keepalive: true,
     }).catch((err) => {
-      logger.error('Failed to send Web Vital metric', err);
+      logger.error('Failed to send Web Vital metric', err instanceof Error ? err : new Error(String(err)));
     });
   }
 }
@@ -128,7 +128,7 @@ export function initWebVitals(): void {
 
     logger.info('Web Vitals monitoring initialized');
   } catch (error) {
-    logger.error('Failed to initialize Web Vitals', error);
+    logger.error('Failed to initialize Web Vitals', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -180,7 +180,7 @@ export function monitorLongTasks(): void {
 
       observer.observe({ entryTypes: ['longtask'] });
     } catch (error) {
-      logger.error('Failed to monitor long tasks', error);
+      logger.error('Failed to monitor long tasks', error instanceof Error ? error : new Error(String(error)));
     }
   }
 }

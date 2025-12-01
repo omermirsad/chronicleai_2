@@ -43,12 +43,12 @@ export const PreferencesSection: React.FC = () => {
 
       if (data?.preferences) {
         setPreferences({
-          emailNotifications: data.preferences?.emailNotifications !== false,
-          insightsFrequency: data.preferences?.insightsFrequency || 'weekly',
-          weeklyDigest: data.preferences?.weeklyDigest !== false,
-          onThisDay: data.preferences?.onThisDay !== false,
-          streakReminders: data.preferences?.streakReminders !== false,
-          achievementNotifications: data.preferences?.achievementNotifications !== false,
+          emailNotifications: (data as any)?.preferences?.emailNotifications !== false,
+          insightsFrequency: (data as any)?.preferences?.insightsFrequency || 'weekly',
+          weeklyDigest: (data as any)?.preferences?.weeklyDigest !== false,
+          onThisDay: (data as any)?.preferences?.onThisDay !== false,
+          streakReminders: (data as any)?.preferences?.streakReminders !== false,
+          achievementNotifications: (data as any)?.preferences?.achievementNotifications !== false,
         });
       }
     } catch (error) {

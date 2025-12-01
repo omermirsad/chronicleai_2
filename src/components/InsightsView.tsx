@@ -56,7 +56,7 @@ const InsightsView: FC<InsightsViewProps> = ({ entries, userId }) => {
 
   const hasEnoughEntries = entries.length >= 3;
 
-  const moodData = React.useMemo(() => {
+  const moodData = useMemo(() => {
     return entries
       .filter(entry => typeof entry.mood === 'number')
       .map(entry => ({
@@ -68,7 +68,7 @@ const InsightsView: FC<InsightsViewProps> = ({ entries, userId }) => {
   }, [entries]);
 
   // Tag cloud data - aggregate tags from both entry.tags and entry.aiAnalysis.tags
-  const tagCloudData = React.useMemo(() => {
+  const tagCloudData = useMemo(() => {
     const tagCounts = new Map<string, number>();
 
     entries.forEach(entry => {
@@ -170,8 +170,8 @@ const InsightsView: FC<InsightsViewProps> = ({ entries, userId }) => {
               <div className="flex flex-wrap justify-center items-center gap-3 py-6 px-4 bg-gradient-to-br from-rose-50 to-stone-50 rounded-lg border border-stone-200">
                 {tagCloudData.map(({ tag, count }) => {
                   // Calculate font size based on frequency (min: 12px, max: 32px)
-                  const maxCount = tagCloudData[0].count;
-                  const minCount = tagCloudData[tagCloudData.length - 1].count;
+                  const maxCount = tagCloudData[0]?.count || 1;
+                  const minCount = tagCloudData[tagCloudData.length - 1]?.count || 1;
                   const fontSize = 12 + ((count - minCount) / (maxCount - minCount || 1)) * 20;
 
                   // Calculate opacity for visual depth

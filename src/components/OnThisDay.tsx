@@ -1,5 +1,5 @@
 
-import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { JournalEntry } from '../types';
 import JournalEntryCard from './JournalEntryCard';
 import { CalendarDaysIcon } from './Icons';

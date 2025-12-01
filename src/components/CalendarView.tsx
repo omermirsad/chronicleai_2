@@ -19,7 +19,7 @@ const CalendarView: FC<CalendarViewProps> = ({ entries, onOpenPerspectiveLens, o
   const entriesByDate = useMemo(() => {
     const map = new Map<string, JournalEntry[]>();
     entries.forEach(entry => {
-      const dateKey = new Date(entry.date).toISOString().split('T')[0];
+      const dateKey = entry.date ? new Date(entry.date).toISOString().split('T')[0] : "";
       if (!map.has(dateKey)) {
         map.set(dateKey, []);
       }

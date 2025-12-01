@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAsyncAction } from '../../hooks/useAsyncAction';
 import { TOAST_MESSAGES, VALIDATION } from '../../constants';
-import toast from 'react-hot-toast';
 
 export const PasswordSection: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');

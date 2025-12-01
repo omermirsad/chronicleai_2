@@ -1,6 +1,6 @@
 
 // Fix: Import React and FC type
-import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
+import { FC } from 'react';
 
 type IconProps = {
   className?: string;

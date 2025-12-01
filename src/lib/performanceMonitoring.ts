@@ -57,7 +57,7 @@ class PerformanceMonitor {
 
       return duration;
     } catch (error) {
-      logger.error('Performance measurement error:', error);
+      logger.error('Performance measurement error:', error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -212,7 +212,7 @@ class PerformanceMonitor {
       observer.observe({ type, buffered: true });
     } catch (error) {
       // PerformanceObserver not supported
-      logger.debug('PerformanceObserver not supported for type:', type);
+      logger.debug('PerformanceObserver not supported for type: ' + type);
     }
   }
 

@@ -21,11 +21,11 @@ export const initErrorMonitoring = () => {
     dsn: sentryDsn,
     environment,
     integrations: [
-      new Sentry.BrowserTracing({
+      Sentry.browserTracingIntegration({
         // Set sampling rate for performance monitoring
         tracePropagationTargets: ['localhost', /^\//],
       }),
-      new Sentry.Replay({
+      Sentry.replayIntegration({
         // Mask all text and block all media by default
         maskAllText: true,
         blockAllMedia: true,
@@ -43,7 +43,7 @@ export const initErrorMonitoring = () => {
     enabled: environment === 'production',
 
     // Filter out known non-critical errors
-    beforeSend(event, hint) {
+    beforeSend(event, _hint) {
       // Filter out extension errors
       if (event.exception?.values?.[0]?.value?.includes('extension')) {
         return null;

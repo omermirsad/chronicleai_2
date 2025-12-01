@@ -1,5 +1,5 @@
 // src/pages/TermsOfService.tsx
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { BookOpenIcon } from '../components/Icons';
 
 const TermsOfService: FC = () => {

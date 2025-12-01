@@ -1,6 +1,6 @@
 
 // Fix: Import React types FC, useState, useRef, useEffect
-import { FC, useState, useEffect, useCallback, useRef, useMemo, cloneElement, ChangeEvent, FormEvent, ReactNode } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import { View, User } from '../types';
 import { BookOpenIcon, PencilSquareIcon, SparklesIcon, CalendarDaysIcon, UserCircleIcon, HeartIcon } from './Icons';
 import { StreakDisplay } from './StreakDisplay';

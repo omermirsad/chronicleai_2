@@ -12,7 +12,7 @@ interface VoiceRecordingTimerProps {
 export const VoiceRecordingTimer: React.FC<VoiceRecordingTimerProps> = ({
   currentDuration,
   maxDuration,
-  tier,
+  _tier,
   voiceStatus,
 }) => {
   const percentage = (currentDuration / maxDuration) * 100;

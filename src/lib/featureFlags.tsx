@@ -106,7 +106,7 @@ class FeatureFlagManager {
         });
       }
     } catch (error) {
-      logger.error('Failed to load remote feature flags', error);
+      logger.error('Failed to load remote feature flags', error instanceof Error ? error : new Error(String(error)));
       // Fail gracefully - use defaults
     }
   }
@@ -254,7 +254,7 @@ class FeatureFlagManager {
   getAllFlags(): Record<string, boolean> {
     const result: Record<string, boolean> = {};
 
-    this.flags.forEach((flag, name) => {
+    this.flags.forEach((_flag, name) => {
       result[name] = this.isEnabled(name);
     });
 
@@ -276,7 +276,7 @@ class FeatureFlagManager {
       const overrides = Object.fromEntries(this.overrides);
       localStorage.setItem('feature_flag_overrides', JSON.stringify(overrides));
     } catch (error) {
-      logger.error('Failed to save feature flag overrides', error);
+      logger.error('Failed to save feature flag overrides', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -294,7 +294,7 @@ class FeatureFlagManager {
         });
       }
     } catch (error) {
-      logger.error('Failed to load feature flag overrides', error);
+      logger.error('Failed to load feature flag overrides', error instanceof Error ? error : new Error(String(error)));
     }
   }
 

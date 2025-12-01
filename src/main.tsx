@@ -13,7 +13,7 @@ import './i18n';
 try {
   validateEnv();
 } catch (error) {
-  logger.error('Environment validation failed:', error);
+  logger.error('Environment validation failed:', error instanceof Error ? error : new Error(String(error)));
   if (import.meta.env.PROD) throw error;
 }
 
@@ -21,8 +21,8 @@ try {
 if ('serviceWorker' in navigator && import.meta.env.VITE_ENABLE_PWA === 'true') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(
-      (registration) => logger.info('Service Worker registered:', registration.scope),
-      (error) => logger.error('Service Worker registration failed:', error)
+      (registration) => logger.info('Service Worker registered: ' + registration.scope),
+      (error) => logger.error('Service Worker registration failed:', error instanceof Error ? error : new Error(String(error)))
     );
   });
 }

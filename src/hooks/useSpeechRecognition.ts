@@ -1,0 +1,329 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import toast from 'react-hot-toast';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { VOICE_TO_TEXT_LIMITS, formatDuration } from '@/config/voiceLimits';
+import { SubscriptionTier } from '@/types';
+import { logger } from '@/lib/logger';
+
+// Custom type definitions for the Web Speech API for cross-browser compatibility
+// and to resolve TypeScript errors, as these types are not always standard.
+interface SpeechRecognitionAlternative {
+  readonly transcript: string;
+}
+
+interface SpeechRecognitionResult {
+  readonly isFinal: boolean;
+  readonly [key: number]: SpeechRecognitionAlternative;
+  readonly length: number;
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  readonly resultIndex: number;
+  readonly results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  readonly error: string;
+}
+
+interface ISpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+  start(): void;
+  stop(): void;
+}
+
+type SpeechRecognitionConstructor = new () => ISpeechRecognition;
+
+declare global {
+  interface Window {
+    SpeechRecognition: SpeechRecognitionConstructor;
+    webkitSpeechRecognition: SpeechRecognitionConstructor;
+  }
+}
+
+// Polyfill for cross-browser support (e.g., Chrome uses `webkitSpeechRecognition`)
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+export interface VoiceRecordingStatus {
+  recordingsUsed: number;
+  recordingsLimit: number;
+  recordingsRemaining: number;
+}
+
+export const useSpeechRecognition = (
+  onTranscriptChange: (transcript: string) => void,
+  userTier: SubscriptionTier = 'free'
+) => {
+  const { user } = useAuth();
+  const [isListening, setIsListening] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [hasShownWarning, setHasShownWarning] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState<VoiceRecordingStatus | null>(null);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
+
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
+
+  // Get limits for current tier
+  const limits = VOICE_TO_TEXT_LIMITS[userTier];
+
+  // Fetch voice recording status on mount
+  useEffect(() => {
+    const fetchVoiceStatus = async () => {
+      if (!user || userTier === 'free') {
+        setIsLoadingStatus(false);
+        return;
+      }
+
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase as any).rpc('get_voice_recording_status', {
+          p_user_id: user.id,
+        });
+
+        if (error) throw error;
+
+        if (data) {
+          setVoiceStatus({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            recordingsUsed: (data as any)?.recordings_used || 0,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            recordingsLimit: (data as any)?.recordings_limit || 0,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            recordingsRemaining: (data as any)?.recordings_remaining || 0,
+          });
+        }
+      } catch (error) {
+        logger.error('Error fetching voice recording status', error as Error);
+      } finally {
+        setIsLoadingStatus(false);
+      }
+    };
+
+    fetchVoiceStatus();
+  }, [user, userTier]);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    if (!SpeechRecognitionAPI) {
+      logger.warn('Speech Recognition API not supported in this browser');
+      return;
+    }
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map(result => result[0])
+        .map(result => result?.transcript || "")
+        .join('');
+      onTranscriptChange(transcript);
+    };
+
+    recognition.onerror = (event) => {
+      logger.error('Speech recognition error', undefined, { errorType: event.error });
+      if (isListening) {
+        setIsListening(false);
+        toast.error('Speech recognition error. Please try again.');
+      }
+    };
+
+    recognitionRef.current = recognition;
+  }, [onTranscriptChange, isListening]);
+
+  // Timer effect - runs every second while listening
+  useEffect(() => {
+    if (isListening) {
+      timerRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        setRecordingDuration(elapsed);
+
+        // Show warning when approaching duration limit
+        // explicit cast to handle union type property access
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const warningAtSeconds = (limits as any).warningAtSeconds;
+        if (
+          warningAtSeconds &&
+          elapsed >= warningAtSeconds &&
+          !hasShownWarning
+        ) {
+          const remaining = limits.maxDurationSeconds - elapsed;
+          toast(
+            `${remaining} seconds remaining!`,
+            { duration: 3000, icon: '⏱️' }
+          );
+          setHasShownWarning(true);
+        }
+
+        // Auto-stop at duration limit
+        if (elapsed >= limits.maxDurationSeconds) {
+          stopListening(true); // true = hit duration limit
+        }
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isListening, hasShownWarning, limits]);
+
+  // Check limits and increment recording count
+  const checkAndIncrementRecording = useCallback(async () => {
+    if (!user) {
+      return null;
+    }
+
+    // Check monthly recording limit
+    if (voiceStatus && voiceStatus.recordingsRemaining <= 0) {
+      const limitText = userTier === 'pro' ? '40 recordings' : '99 recordings';
+      toast.error(
+        `Monthly limit reached (${limitText}). ${userTier === 'pro' ? 'Upgrade to Premium for 99 recordings!' : 'Limit will reset next month.'
+        }`,
+        { duration: 5000, icon: '🔒' }
+      );
+      return null;
+    }
+
+    // Increment recording count in backend
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc('increment_voice_recording_count', {
+        p_user_id: user.id,
+      });
+
+      if (error) throw error;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(data as any)?.success) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        toast.error((data as any)?.error || 'Failed to start recording');
+        return null;
+      }
+
+      // Update local status
+      setVoiceStatus({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recordingsUsed: (data as any)?.recordings_used,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recordingsLimit: (data as any)?.recordings_limit,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recordingsRemaining: (data as any)?.recordings_remaining,
+      });
+
+      // Show remaining count if getting low
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((data as any)?.recordings_remaining <= 5 && (data as any)?.recordings_remaining > 0) {
+        toast(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          `${(data as any)?.recordings_remaining} recordings remaining this month`,
+          { duration: 3000, icon: 'ℹ️' }
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error('Error starting voice recording', error as Error);
+      toast.error('Failed to start recording. Please try again.');
+      return null;
+    }
+  }, [user, voiceStatus, userTier]);
+
+  // Web speech recognition
+  const startWebListening = useCallback(async () => {
+    if (!recognitionRef.current || isListening) {
+      return;
+    }
+
+    // Check limits and increment count
+    const recordingData = await checkAndIncrementRecording();
+    if (!recordingData) return;
+
+    // Start recording
+    setIsListening(true);
+    setRecordingDuration(0);
+    setHasShownWarning(false);
+    startTimeRef.current = Date.now();
+    recognitionRef.current.start();
+  }, [isListening, checkAndIncrementRecording]);
+
+  const stopWebListening = useCallback(() => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  }, [isListening]);
+
+  // Unified start/stop functions
+  const startListening = useCallback(async () => {
+    if (isListening || !limits.enabled || !user) {
+      return;
+    }
+
+    await startWebListening();
+  }, [isListening, limits, user, startWebListening]);
+
+  const stopListening = useCallback(
+    (hitDurationLimit: boolean = false) => {
+      if (!isListening) return;
+
+      stopWebListening();
+
+      // Show upgrade prompt if duration limit was hit
+      if (hitDurationLimit) {
+        const currentLimit = formatDuration(limits.maxDurationSeconds);
+        const upgradeMessage =
+          userTier === 'pro'
+            ? `${currentLimit} limit reached! Upgrade to Premium for 2-minute recordings.`
+            : `${currentLimit} recording complete.`;
+
+        if (userTier === 'pro') {
+          toast.error(upgradeMessage, {
+            duration: 5000,
+            icon: '🔒',
+          });
+        } else {
+          toast.success(upgradeMessage, {
+            duration: 3000,
+            icon: '✅',
+          });
+        }
+      }
+    },
+    [isListening, userTier, limits, stopWebListening]
+  );
+
+  return {
+    isListening,
+    startListening,
+    stopListening,
+    hasSupport: !!SpeechRecognitionAPI,
+    recordingDuration,
+    maxDuration: limits.maxDurationSeconds,
+    remainingDuration: Math.max(0, limits.maxDurationSeconds - recordingDuration),
+    voiceStatus,
+    isLoadingStatus,
+  };
+};

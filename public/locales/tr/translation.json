@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "Kaydet",
+    "saving": "Kaydediliyor...",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "success": "Başarılı"
+  },
+  "settings": {
+    "preferencesTitle": "Tercihler",
+    "generalTitle": "Genel Ayarlar",
+    "language": "Dil",
+    "languageDesc": "Tercih ettiğiniz uygulama dilini seçin.",
+    "emailTitle": "E-posta Tercihleri",
+    "emailNotifications": "E-posta Bildirimleri",
+    "emailNotificationsDesc": "Chronicle AI'dan e-posta bildirimleri alın",
+    "insightsFrequency": "İçgörü Sıklığı",
+    "insightsFrequencyDesc": "Yapay zeka destekli içgörüleri ne sıklıkla almak istersiniz?",
+    "weeklyDigest": "Haftalık Özet",
+    "weeklyDigestDesc": "Günlük girişlerinizin haftalık özetini alın",
+    "onThisDay": "Bugün Tarihteydi",
+    "onThisDayDesc": "Geçmiş yıllardaki girişlerin hatırlatıcılarını alın",
+    "streakReminders": "Seri Hatırlatıcıları",
+    "streakRemindersDesc": "Yazma serinizi sürdürmek için bildirimler alın",
+    "achievementNotifications": "Başarı Bildirimleri",
+    "achievementNotificationsDesc": "Yeni başarıların kilidini açtığınızda bildirim alın",
+    "frequencyDaily": "Günlük",
+    "frequencyWeekly": "Haftalık",
+    "frequencyMonthly": "Aylık",
+    "frequencyNever": "Asla"
+  },
+  "toast": {
+    "preferencesSaved": "Tercihler başarıyla kaydedildi",
+    "preferencesSaveError": "Tercihler kaydedilemedi",
+    "languageChanged": "Dil başarıyla değiştirildi",
+    "languageChangeError": "Dil değiştirilemedi"
+  }
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <title>Chronicle AI - Your Intelligent Journaling Companion</title>
+    <meta name="title" content="Chronicle AI - Your Intelligent Journaling Companion" />
+    <meta name="description" content="Chronicle AI is an intelligent journaling app that helps you reflect, grow, and gain insights through AI-powered analysis. Track your mood, discover patterns, and unlock personal growth." />
+    <meta name="keywords" content="journaling, AI journal, mood tracking, personal growth, mental health, reflection, diary app, chronicle, wellness" />
+    <meta name="author" content="Chronicle AI" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chronicle-ai.app/" />
+    <meta property="og:title" content="Chronicle AI - Your Intelligent Journaling Companion" />
+    <meta property="og:description" content="Chronicle AI is an intelligent journaling app that helps you reflect, grow, and gain insights through AI-powered analysis." />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:site_name" content="Chronicle AI" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://chronicle-ai.app/" />
+    <meta name="twitter:title" content="Chronicle AI - Your Intelligent Journaling Companion" />
+    <meta name="twitter:description" content="Chronicle AI is an intelligent journaling app that helps you reflect, grow, and gain insights through AI-powered analysis." />
+    <meta name="twitter:image" content="/og-image.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#44403c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chronicle AI" />
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://chronicle-ai.app/" />
+
+    <!-- Sitemap -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <!-- Content Security Policy - Development allows unsafe-inline/unsafe-eval for Vite HMR -->
+    <!-- Production builds should use stricter CSP via server headers (see vercel.json/netlify.toml) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ws://localhost:* http://localhost:* https://*.supabase.co wss://*.supabase.co https://generativelanguage.googleapis.com https://accounts.google.com https://api.stripe.com https://*.sentry.io https://sentry.io; frame-src https://accounts.google.com https://js.stripe.com; worker-src 'self' blob:; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none';" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Chronicle AI",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": {
+        "@type": "AggregateOffer",
+        "lowPrice": "0",
+        "highPrice": "19.99",
+        "priceCurrency": "USD",
+        "offerCount": "3"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250"
+      },
+      "description": "Chronicle AI is an intelligent journaling app that helps you reflect, grow, and gain insights through AI-powered analysis."
+    }
+    </script>
+  </head>
+  <body class="bg-stone-50 font-sans text-stone-800">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

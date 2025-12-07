@@ -1,0 +1,192 @@
+# Dependencies
+node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+*.lcov
+.nyc_output
+
+# Production builds
+/dist
+/dist-ssr
+/build
+/.next
+/out
+
+# Local environment files - NEVER commit these!
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+.env*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Debug and build output files
+*_output*.txt
+*_log*.txt
+*_errors*.txt
+*_results*.txt
+build_*.txt
+lint_*.txt
+type_*.txt
+eslint_*.txt
+final_*.txt
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+.project
+.settings
+.classpath
+
+# Supabase
+.supabase
+supabase/.temp
+supabase/.branches
+.supabase/*
+!supabase/migrations
+!supabase/functions
+
+# Deployment
+.vercel
+.netlify
+.firebase
+.serverless
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.cache
+.parcel-cache
+.temp
+.tmp
+.sass-cache
+.grunt
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+._*
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDEs
+*.sublime-project
+*.sublime-workspace
+.history
+.vscode/
+.idea/
+*.iml
+
+# Testing
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Storybook
+storybook-static
+
+# Sentry
+.sentryclirc
+sentry.properties
+
+# Analytics
+.analytics
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificates
+*.pem
+*.key
+*.crt
+
+# Security - NEVER commit these!
+secrets.json
+credentials.json
+service-account.json
+*.env.backup
+
+# Backup files
+*.bak
+*.backup
+*-backup
+
+# Generated files
+.docusaurus
+.cache-loader
+.yarn-metadata.json
+.pnp.*
+
+# Lock files (uncomment if you want to commit them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# API keys and secrets - NEVER commit!
+*-key.json
+*-secret.json
+*.secrets
+
+# Local history
+.history/
+
+# Scripts output
+scripts/output/
+scripts/*.log
+
+# Capacitor
+android/app/src/main/assets/public
+android/app/src/main/res/values/strings.xml
+android/.idea
+android/.gradle
+android/build
+android/gradle
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/app/google-services.json
+android/app/build
+android/app/release
+
+ios/App/Pods
+ios/App/build
+ios/App/App.xcworkspace
+ios/App/Podfile.lock
+ios/App/App.xcodeproj/xcuserdata
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata
+
+# Generated native assets
+.capacitor

@@ -176,7 +176,7 @@ jobs:
           find dist/assets/js -name "*.js" -exec du -h {} \; | sort -rh | head -10
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dist-production
           path: dist/
